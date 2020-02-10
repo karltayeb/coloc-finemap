@@ -1,5 +1,6 @@
 library(coloc)
 library(reticulate)
+library(data.table)
 
 data = py_load_object(snakemake@input[[1]])
 num_tissues = dim(data$zscores)[1]
