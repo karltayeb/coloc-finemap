@@ -1,18 +1,38 @@
 library(coloc)
 library(reticulate)
 
-paths = read.csv('/work-zfs/abattle4/karl/gp_fine_mapping/simulation/single_snp_sim/sim_paths.txt')
+num_tissues = dim(data$zscores)[1]
+num_pairs = num_tissues * (num_tissues -1) / 2 + num_tissues
+table<-data.frame(
+	"t1"=1:num_pairs,
+	"t2"=1:num_pairs,
+	"PPH0"=1:num_pairs,
+	"PPH1"=1:num_pairs,
+	"PPH2"=1:num_pairs,
+	"PPH3"=1:num_pairs,
+	"PPH4"=1:num_pairs
+)
 
-run_coloc <- function(path){
-    p = as.character(path)
-    d1 = py_load_object(paste(p, list.files(p, pattern = '*_data1'), sep = ''))
-    d2 = py_load_object(paste(p, list.files(p, pattern = '*_data2'), sep = ''))
-    results = coloc.abf(d1, d2)
-    write.csv(x = results[2], file = paste(p, 'coloc_abf', sep = ''))
-    write.csv(x = results[1], file = paste(p, 'coloc_abf_summary', sep = ''))
+i <- 0
+for (t1 in c(1:num_tissues)){
+	for (t2 in c(t1:num_tissues)){c()
+		i <- i + 1
+		beta1 = data$zscores[t1,]
+		beta2 = data$zscores[t2,]
+		v1 = replicate(length(beta1), data$standard_errors[t1]^2)
+		v2 = replicate(length(beta2), data$standard_errors[t2]^2)
+		res = coloc.abf(
+			dataset1=list(beta=beta1, varbeta=v1, N=length(beta1), sdY=sd(data$Y[t1,]), type='quant'),
+			dataset2=list(beta=beta2, varbeta=v2, N=length(beta2), sdY=sd(data$Y[t2,]), type='quant')
+			)
+		table$t1[i] <- t1
+		table$t2[i] <- t2
+		table$PPH0[i] <- res$summary[2]
+		table$PPH1[i] <- res$summary[3]
+		table$PPH2[i] <- res$summary[4]
+		table$PPH3[i] <- res$summary[5]
+		table$PPH4[i] <- res$summary[6]
+	}
 }
 
-for (path in paths$X0){
-    print(as.character(path))
-    run_coloc(path)
-}
+fwrite(table, snakemake@output[[1]], quote=F, row.names=F, sep="\t")
