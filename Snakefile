@@ -10,23 +10,23 @@ rule simulate_single_causal_variant:
     input:
         "output/genotypes/{gene}_cis_variants"
     output:
-        "output/simulation/single_causal_variant/{gene}/ld_{linkage}_pve_{pve}_data"
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{ld}/gene_{gene}/data"
     script:
         "workflow/scripts/single_causal_variant.py"
 
 rule fit_cosie_summary:
     input:
-        "output/simulation/single_causal_variant/{gene}/ld_{linkage}_pve_{pve}_data"
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{ld}/gene_{gene}/data"
     output:
-        "output/simulation/single_causal_variant/{gene}/ld_{linkage}_pve_{pve}_model_summary"
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{ld}/gene_{gene}/model_summary"
     script:
         "workflow/scripts/fit_cosie_summary.py"
 
 rule fit_cosie_genotype:
     input:
-        "output/simulation/single_causal_variant/{gene}/ld_{linkage}_pve_{pve}_data"
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{ld}/gene_{gene}/data"
     output:
-        "output/simulation/single_causal_variant/{gene}/ld_{linkage}_pve_{pve}_model_genotype"
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{ld}/gene_{gene}/model_genotype"
     script:
         "workflow/scripts/fit_cosie_genotype.py"
         
