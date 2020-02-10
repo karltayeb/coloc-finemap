@@ -8,6 +8,7 @@ def get_cis_variants(genotype, tss, window=500000, size=1000):
         np.arange(genotype.shape[0])[np.argsort(np.abs(pos - tss))[:size]]
     ]
     return cis_variants
+
 gencode = pd.read_csv(
     '/work-zfs/abattle4/lab_data/genomic_annotation_data/gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
 gene = gencode.loc[gencode.iloc[:, 3] == wildcards.gene]
