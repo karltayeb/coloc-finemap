@@ -1,6 +1,6 @@
+import pickle
 import numpy as np
 import pandas as pd
-import pickle
 
 def compute_sigma2(X, true_effect, pve):
     var = np.var(true_effect @ X)
