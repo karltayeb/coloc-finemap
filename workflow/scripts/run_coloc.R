@@ -1,6 +1,7 @@
 library(coloc)
 library(reticulate)
 
+data = py_load_object(snakemake@input[[1]])
 num_tissues = dim(data$zscores)[1]
 num_pairs = num_tissues * (num_tissues -1) / 2 + num_tissues
 table<-data.frame(
