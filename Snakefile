@@ -1,5 +1,12 @@
 configfile: "config/config.yaml"
 
+rule all:
+    output:
+        expand(
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_summary",
+            pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
+        )
+
 rule get_cis_variants:
     output:
         "output/genotypes/{gene}_cis_variants"
