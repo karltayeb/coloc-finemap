@@ -28,7 +28,7 @@ rule simulate_single_causal_variant:
     output:
         "output/simulation/single_causal_variant/{gene}/ld_{linkage}_pve_{pve}_data"
     script:
-        "scripts/single_causal_variant.py"
+        "workflow/scripts/single_causal_variant.py"
 
 rule fit_cosie_summary:
     input:
@@ -44,5 +44,5 @@ rule fit_cosie_genotype:
     output:
         "output/models/cosie_genotype/gene_{gene}_ld_{linkage}_pve_{pve}_model"
     script:
-        "scripts/fit_cosie_genotype.py"
+        "workflow/scripts/fit_cosie_genotype.py"
         
