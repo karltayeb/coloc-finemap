@@ -69,6 +69,8 @@ def generate_data(X, linkage=0.0, pve=0.1):
         'tissue_variance': tissue_variance,
         'ld': LD[snp1, snp2]
     }
+
+    import pdb; pdb.set_trace()
     return data
 
 
