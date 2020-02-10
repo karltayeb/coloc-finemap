@@ -32,8 +32,6 @@ def generate_data(X, linkage=0.0, pve=0.1):
 
     there are two causal variants approximately (ld)
     """
-    import pdb; pdb.set_trace()
-
     N, M = X.shape
     T = 7
     # normalize and compute LD
