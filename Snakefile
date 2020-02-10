@@ -38,7 +38,7 @@ rule run_coloc:
     script:
         "workflow/scripts/run_coloc.R"
 
-rule generate_cosie_results:
+rule make_tissue_pair_components_table:
     input:
         data_path = \
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data",
@@ -50,8 +50,9 @@ rule generate_cosie_results:
         genotype_output = \
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_genotype",
         summary_output = \
-            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_summary",
-
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_summary"
+    script:
+        "workflow/scripts/make_tissue_pair_components_table.py"
 
 
 
