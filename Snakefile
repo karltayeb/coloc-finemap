@@ -36,7 +36,7 @@ rule fit_cosie_summary:
     output:
         "output/models/cosie_summary/gene_{gene}_ld_{linkage}_pve_{pve}_model"
     script:
-        "scripts/fit_cosie_summary.py"
+        "workflow/scripts/fit_cosie_summary.py"
 
 rule fit_cosie_genotype:
     input:
