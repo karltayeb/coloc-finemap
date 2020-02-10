@@ -34,6 +34,6 @@ rule run_coloc:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data_pairs"
     output:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/coloc_summary_data_pair"
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/coloc"
 
 
