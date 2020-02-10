@@ -71,13 +71,18 @@ def generate_data(X, linkage=0.0, pve=0.1):
     }
     return data
 
+
+gene = 'ENSG00000167280.12'
+linkage = 0.0
+pve = 0.1
+
 gencode = pd.read_csv('/work-zfs/abattle4/lab_data/genomic_annotation_data/gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
-gene = gencode.loc[gencode.iloc[:, 3] == snakemake.wildcards.gene]
+gene = gencode.loc[gencode.iloc[:, 3] == gene]
 chr_num = gene.iloc[0, 0]
 tss = gene.iloc[0, 1]
 gene_name = gene.iloc[0, 3]
 
 cis_variants = pd.read_csv('output/genotypes/ENSG00000198464.9_cis_variants', index_col=0)
-data = generate_data(cis_variants, float(snakemake.wildcards.linkage), float(snakemake.wildcards.pve))
+data = generate_data(cis_variants, float(linkage), float(pve))
 pickle.dump(data, open(snakemake.output[0], 'wb'))
 
