@@ -1,8 +1,5 @@
 import pickle
-import pandas as pd
-import numpy as np
 from coloc.independent_model import IndependentFactorSER
-import snakemake
 
 data = pickle.load(open(snakemake.input[0], 'rb'))
 g = IndependentFactorSER(X=data['X'], Y=data['Y'], K=10)

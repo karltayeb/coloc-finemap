@@ -2,7 +2,6 @@ from coloc.ard_ser import MVNFactorSER
 import pandas as pd
 import numpy as np
 import pickle
-import pdb; pdb.set_trace()
 
 data = pickle.load(open(snakemake.input[0], 'rb'))
 n = MVNFactorSER(X=data['LD'], Y=data['zscores'], K=10)
