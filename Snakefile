@@ -1,4 +1,4 @@
-configfile: "config.yaml"
+configfile: "config/config.yaml"
 rule get_cis_variants:
     output:
         "output/genotypes/{gene}_cis_variants"
