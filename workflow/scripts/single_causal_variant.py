@@ -72,19 +72,19 @@ def generate_data(X, linkage=0.0, pve=0.1):
     return data
 
 
-gene = 'ENSG00000167280.12'
-linkage = 0.0
-pve = 0.1
-output = "output/simulation/single_causal_variant/{}/ld_{:.2f}_pve_{:.2f}_data".format(gene, linkage, pve)
+#gene = 'ENSG00000167280.12'
+#linkage = 0.0
+#pve = 0.1
+#output = "output/simulation/single_causal_variant/{}/ld_{:.2f}_pve_{:.2f}_data".format(gene, linkage, pve)
 
 
 gencode = pd.read_csv('/work-zfs/abattle4/lab_data/genomic_annotation_data/gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
-gene = gencode.loc[gencode.iloc[:, 3] == gene]
+gene = gencode.loc[gencode.iloc[:, 3] == snakemake.wildcards.gene]
 chr_num = gene.iloc[0, 0]
 tss = gene.iloc[0, 1]
 gene_name = gene.iloc[0, 3]
 
-cis_variants = pd.read_csv('output/genotypes/{}_cis_variants'.format(gene_name), index_col=0)
-data = generate_data(cis_variants, float(linkage), float(pve))
-pickle.dump(data, open(output, 'wb'))
+cis_variants = pd.read_csv(snakemake.input[0], index_col=0)
+data = generate_data(cis_variants, float(snakemake.wildcards.linkage), float(snakemake.wildcards.pve))
+pickle.dump(data, open(snakemake.output[0], 'wb'))
 
