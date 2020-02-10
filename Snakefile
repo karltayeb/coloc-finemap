@@ -36,6 +36,6 @@ rule run_coloc:
     output:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/coloc"
     script:
-        "workflow/script/run_coloc.R"
+        "workflow/scripts/run_coloc.R"
 
 
