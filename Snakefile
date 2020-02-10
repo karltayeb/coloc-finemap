@@ -3,7 +3,7 @@ rule get_cis_variants:
     output:
         "output/genotypes/{gene}_cis_variants"
     script:
-        "workflow/scripts/get_cit_variants.py"
+        "workflow/scripts/get_cis_variants.py"
 
 rule random_gene_list:
     output:
