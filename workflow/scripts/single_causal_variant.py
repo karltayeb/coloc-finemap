@@ -75,7 +75,7 @@ def generate_data(X, linkage=0.0, pve=0.1):
 gene = 'ENSG00000167280.12'
 linkage = 0.0
 pve = 0.1
-output = "output/simulation/single_causal_variant/{}/ld_{:.2f}_pve_{:.2f}_data".forat(gene, linkage, pve)
+output = "output/simulation/single_causal_variant/{}/ld_{:.2f}_pve_{:.2f}_data".format(gene, linkage, pve)
 
 
 gencode = pd.read_csv('/work-zfs/abattle4/lab_data/genomic_annotation_data/gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
