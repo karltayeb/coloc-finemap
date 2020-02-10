@@ -35,5 +35,7 @@ rule run_coloc:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
     output:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/coloc"
+    script:
+        "workflow/script/run_coloc.R"
 
 
