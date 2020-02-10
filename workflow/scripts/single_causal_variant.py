@@ -75,6 +75,8 @@ def generate_data(X, linkage=0.0, pve=0.1):
 gene = 'ENSG00000167280.12'
 linkage = 0.0
 pve = 0.1
+output = "output/simulation/single_causal_variant/{}/ld_{:.2f}_pve_{:.2f}_data".forat(gene, linkage, pve)
+
 
 gencode = pd.read_csv('/work-zfs/abattle4/lab_data/genomic_annotation_data/gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
 gene = gencode.loc[gencode.iloc[:, 3] == gene]
@@ -84,5 +86,5 @@ gene_name = gene.iloc[0, 3]
 
 cis_variants = pd.read_csv('output/genotypes/ENSG00000198464.9_cis_variants', index_col=0)
 data = generate_data(cis_variants, float(linkage), float(pve))
-pickle.dump(data, open(snakemake.output[0], 'wb'))
+pickle.dump(data, open(output, 'wb'))
 
