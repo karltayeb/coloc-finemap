@@ -84,7 +84,7 @@ chr_num = gene.iloc[0, 0]
 tss = gene.iloc[0, 1]
 gene_name = gene.iloc[0, 3]
 
-cis_variants = pd.read_csv('output/genotypes/ENSG00000198464.9_cis_variants', index_col=0)
+cis_variants = pd.read_csv('output/genotypes/{}_cis_variants'.format(gene), index_col=0)
 data = generate_data(cis_variants, float(linkage), float(pve))
 pickle.dump(data, open(output, 'wb'))
 
