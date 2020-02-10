@@ -32,6 +32,8 @@ def generate_data(X, linkage=0.0, pve=0.1):
 
     there are two causal variants approximately (ld)
     """
+    import pdb; pdb.set_trace()
+
     N, M = X.shape
     T = 7
     # normalize and compute LD
@@ -55,7 +57,7 @@ def generate_data(X, linkage=0.0, pve=0.1):
     expression = expression - expression.mean(1)[:, None]
 
     # generate summary statistics
-    beta = expression @X.T / M
+    beta = expression @ X.T / M
     se = np.sqrt(tissue_variance[:, None] / M)
     data = {
         'LD': LD,
@@ -69,8 +71,6 @@ def generate_data(X, linkage=0.0, pve=0.1):
         'tissue_variance': tissue_variance,
         'ld': LD[snp1, snp2]
     }
-
-    import pdb; pdb.set_trace()
     return data
 
 gencode = pd.read_csv('/work-zfs/abattle4/lab_data/genomic_annotation_data/gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
