@@ -79,10 +79,6 @@ chr_num = gene.iloc[0, 0]
 tss = gene.iloc[0, 1]
 gene_name = gene.iloc[0, 3]
 
-#genotype_path = ("/work-zfs/abattle4/lab_data/GTEx_v8_trans_eqtl_data_processed_by_brian/processed_genotypes/GTEx_Analysis_2017-06-05_v8_WholeGenomeSeq_838Indiv_{}_dosage_MAF_05.txt".format(chr_num))
-#genotype = pd.read_csv(genotype_path, sep='\t', index_col=0, na_values='-', low_memory=True)
-#genotype = genotype.iloc[~np.any(np.isnan(genotype.values), 1)]
-
 cis_variants = pd.read_csv('output/genotypes/ENSG00000198464.9_cis_variants', index_col=0)
 data = generate_data(cis_variants, float(snakemake.wildcards.linkage), float(snakemake.wildcards.pve))
 pickle.dump(data, open(snakemake.output[0], 'wb'))
