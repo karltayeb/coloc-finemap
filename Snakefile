@@ -38,4 +38,20 @@ rule run_coloc:
     script:
         "workflow/scripts/run_coloc.R"
 
+rule generate_cosie_results:
+    input:
+        data_path = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data",
+        genotype_model_path = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/model_genotype",
+        summary_model_path = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/model_summary"
+    output:
+        genotype_output = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_genotype",
+        summary_output = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_genotype",
+
+
+
 
