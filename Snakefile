@@ -29,4 +29,11 @@ rule fit_cosie_genotype:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/model_genotype"
     script:
         "workflow/scripts/fit_cosie_genotype.py"
-        
+
+rule run_coloc:
+    input:
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data_pairs"
+    output:
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/coloc_summary_data_pair"
+
+
