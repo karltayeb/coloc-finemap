@@ -6,8 +6,8 @@ from coloc.ard_ser import MVNFactorSER
 from coloc.independent_model import IndependentFactorSER
 
 data_path = snakemake.input.data_path
-genotype_model_path = snakemake.data.genotype_model_path
-summary_model_path = snakemake.data.summary_model_path
+genotype_model_path = snakemake.input.genotype_model_path
+summary_model_path = snakemake.input.summary_model_path
 
 def assign(obj, dictionary):
     for key in dictionary.keys():
