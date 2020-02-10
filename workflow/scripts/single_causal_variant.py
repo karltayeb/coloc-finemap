@@ -70,6 +70,7 @@ def generate_data(X, linkage=0.0, pve=0.1):
         'ld': LD[snp1, snp2]
     }
 
+    import pdb; pdb.set_trace()
     return data
 
 gencode = pd.read_csv('/work-zfs/abattle4/lab_data/genomic_annotation_data/gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
