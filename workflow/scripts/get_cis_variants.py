@@ -11,7 +11,7 @@ def get_cis_variants(genotype, tss, window=500000, size=1000):
 
 gencode = pd.read_csv(
     '/work-zfs/abattle4/lab_data/genomic_annotation_data/gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
-gene = gencode.loc[gencode.iloc[:, 3] == wildcards.gene]
+gene = gencode.loc[gencode.iloc[:, 3] == snakemake.wildcards.gene]
 chr_num = gene.iloc[0, 0]
 tss = gene.iloc[0, 1]
 gene_name = gene.iloc[0, 3]
