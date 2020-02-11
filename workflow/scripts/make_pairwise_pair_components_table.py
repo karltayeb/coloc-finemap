@@ -48,21 +48,21 @@ model_paths = snakemake.input.summary_model_paths
 
 summary_pairs = []
 data = load_data(data_path)
-key = '/'.join(data_path.split('/')[5:-1])
 
 
 #sub_summary_paths = [x for x in model_paths if key in x]
 for summary_model_path in model_paths:
+    key = '_'.join(summary_model_path.split('/')[3, 4, 5, 7])
+
     model, sub_data = load_model(data, summary_model_path=summary_model_path)
     df = make_table(model, sub_data)
     pairs = pair_coloc(df)
-    if pairs.size > 0:
-        summary_pairs.append(pairs)
 
     t1 = int(summary_model_path.split('/')[-1].split('_')[1])
     t2 = int(summary_model_path.split('/')[-1].split('_')[3])
     if (t1, t2) in [(1, 2), (1, 3), (2, 3), (4, 5), (4, 6), (5, 6)]:
-        summary_pairs[-1].loc[:, 'label'] = True
+        pairs.loc[:, 'label'] = True
+    pairs.loc[:, 'key'] = key
 
 summary_pairs = pd.concat(summary_pairs)
 import pdb; pdb.set_trace()
