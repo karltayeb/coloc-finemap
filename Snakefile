@@ -45,7 +45,7 @@ rule all_pairwise_summary:
         expand(
             ("output/simulation/single_causal_variant/pve_{pve}/"
             "ld_{linkage}/gene_{gene}/model_summary_pairwise/"
-            "t1_{tissue1}_t2_{tissue2}_model_summary")
+            "t1_{tissue1}_t2_{tissue2}_model_summary"),
             pve=config['pves'], linkage=config['linkages'],
             gene=config['genes'],
             tissue1=[0,1,4], tissue2=[2,5]
