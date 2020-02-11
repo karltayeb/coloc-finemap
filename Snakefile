@@ -30,13 +30,23 @@ rule fit_cosie_summary:
     script:
         "workflow/scripts/fit_cosie_summary.py"
 
-rule fit_pairwise_cosie_summary:
+rule fit_pairwise_summary_model:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
     output:
         ("output/simulation/single_causal_variant/pve_{pve}/"
-        "ld_{linkage}/gene_{gene}/model_summary_pairwise/"
+        "ld_{linkage}/gene_{gene}/pairwise_summary/"
         "t1_{tissue1}_t2_{tissue2}_model_summary")
+    script:
+        "workflow/scripts/fit_cosie_summary.py"
+
+rule fit_pairwise_genotype_model:
+    input:
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
+    output:
+        ("output/simulation/single_causal_variant/pve_{pve}/"
+        "ld_{linkage}/gene_{gene}/pairwise_genotype/"
+        "t1_{tissue1}_t2_{tissue2}_model_genotype")
     script:
         "workflow/scripts/fit_cosie_summary.py"
 
@@ -44,8 +54,16 @@ rule all_pairwise_summary:
     input:
         expand(
             ("output/simulation/single_causal_variant/pve_{pve}/"
-            "ld_{linkage}/gene_{gene}/model_summary_pairwise/"
+            "ld_{linkage}/gene_{gene}/pairwise_summary/"
             "t1_{tissue1}_t2_{tissue2}_model_summary"),
+            pve=config['pves'], linkage=config['linkages'],
+            gene=config['genes'],
+            tissue1=[0,1,4], tissue2=[2,5]
+        )
+        expand(
+            ("output/simulation/single_causal_variant/pve_{pve}/"
+            "ld_{linkage}/gene_{gene}/pairwise_genotype/"
+            "t1_{tissue1}_t2_{tissue2}_model_genotype"),
             pve=config['pves'], linkage=config['linkages'],
             gene=config['genes'],
             tissue1=[0,1,4], tissue2=[2,5]
