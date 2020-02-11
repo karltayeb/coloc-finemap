@@ -1,12 +1,13 @@
 import itertools
 configfile: "config/config.yaml"
 
-rule all:
+rule all_tissue_pairs:
     input:
         expand(
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_summary",
             pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
-        ),
+        )
+rule all_coloc:
         expand(
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/coloc",
             pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
