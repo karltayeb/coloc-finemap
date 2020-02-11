@@ -7,8 +7,8 @@ data = pickle.load(open(snakemake.input[0], 'rb'))
 
 Y = data['zscores']
 if 't1' in snakemake.output[0]:
-    t1 = int(snakemake.wildcards.t1)
-    t2 = int(snakemake.wildcards.t2)
+    t1 = int(snakemake.wildcards.tissue1)
+    t2 = int(snakemake.wildcards.tissue2)
     Y = Y[[t1, t2]]
 
 n = MVNFactorSER(X=data['LD'], Y=Y, K=10)
