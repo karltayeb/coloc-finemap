@@ -49,6 +49,9 @@ summary_pairs = []
 data = load_data(data_path)
 key = '/'.join(data_path.split('/')[5:-1])
 
+with open(snakemake.output[0], 'w') as f:
+    f.write('test')
+"""
 #sub_summary_paths = [x for x in model_paths if key in x]
 for summary_model_path in model_paths:
     model, sub_data = load_model(data, summary_model_path=summary_model_path)
@@ -58,3 +61,4 @@ for summary_model_path in model_paths:
         summary_pairs.append(pairs)
 summary_pairs = pd.concat(summary_pairs)
 summary_pairs.to_csv(snakemake.output[0], index=False, sep='\t')
+"""
