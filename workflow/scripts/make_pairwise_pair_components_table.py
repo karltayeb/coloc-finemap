@@ -57,5 +57,6 @@ for summary_model_path in model_paths:
     pairs = pair_coloc(df.loc[df.active == 1])
     if pairs.size > 0:
         summary_pairs.append(pairs)
+import pdb; pdb.set_trace()
 summary_pairs = pd.concat(summary_pairs)
 summary_pairs.to_csv(snakemake.output[0], index=False, sep='\t')
