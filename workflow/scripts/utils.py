@@ -1,4 +1,5 @@
 import pickle
+import itertools
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
@@ -61,33 +62,32 @@ def make_table(model, data):
 def pair_coloc(df):
     pair_results = []
     num_tissues = np.unique(df.tissue).size
-    for t1 in range(0, num_tissues):
-        for t2 in range(t1, num_tissues):
-            for k in np.unique(df.loc[df.active==1].component):
-                d = {
-                    't1': t1,
-                    't2': t2,
-                    't1_p_sign_error': df.loc[(df.tissue == t1) & (df.component == k)].p_sign_error.iloc[0],
-                    't2_p_sign_error': df.loc[(df.tissue == t2) & (df.component == k)].p_sign_error.iloc[0],
-                    't1_ard_variance': df.loc[(df.tissue == t1) & (df.component == k)].ard_variance.iloc[0],
-                    't2_ard_variance': df.loc[(df.tissue == t2) & (df.component == k)].ard_variance.iloc[0],
-                    'k': k,
-                    'matched': np.any(df.loc[df.component == k].matched == 1),
-                    'label': df.loc[(df.tissue == t1) & (df.component == k)].label.iloc[0] * \
-                        df.loc[(df.tissue == t2) & (df.component == k)].label.iloc[0]
-                }
-                pair_results.append(d)
-            if np.unique(df.loc[df.active==1].component).size == 0:
-                d = {
-                    't1': 0,
-                    't2': 1,
-                    't1_p_sign_error': 0.5,
-                    't2_p_sign_error': 0.5,
-                    't1_ard_variance': 0.0,
-                    't2_ard_variance': 0.0,
-                    'k': -1,
-                    'matched': False,
-                    'label': False
-                }
-                pair_results.append(d)
+    for t1, t2 in itertools.combinations(num_tissues, 2):
+        for k in np.unique(df.loc[df.active==1].component):
+            d = {
+                't1': t1,
+                't2': t2,
+                't1_p_sign_error': df.loc[(df.tissue == t1) & (df.component == k)].p_sign_error.iloc[0],
+                't2_p_sign_error': df.loc[(df.tissue == t2) & (df.component == k)].p_sign_error.iloc[0],
+                't1_ard_variance': df.loc[(df.tissue == t1) & (df.component == k)].ard_variance.iloc[0],
+                't2_ard_variance': df.loc[(df.tissue == t2) & (df.component == k)].ard_variance.iloc[0],
+                'k': k,
+                'matched': np.any(df.loc[df.component == k].matched == 1),
+                'label': df.loc[(df.tissue == t1) & (df.component == k)].label.iloc[0] * \
+                    df.loc[(df.tissue == t2) & (df.component == k)].label.iloc[0]
+            }
+            pair_results.append(d)
+        if np.unique(df.loc[df.active==1].component).size == 0:
+            d = {
+                't1': 0,
+                't2': 1,
+                't1_p_sign_error': 0.5,
+                't2_p_sign_error': 0.5,
+                't1_ard_variance': 0.0,
+                't2_ard_variance': 0.0,
+                'k': -1,
+                'matched': False,
+                'label': False
+            }
+            pair_results.append(d)
     return pd.DataFrame(pair_results)
