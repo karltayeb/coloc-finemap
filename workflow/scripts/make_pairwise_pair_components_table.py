@@ -22,13 +22,13 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         model = IndependentFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
         assign(model, pickle.load(open(genotype_model_path, 'rb')))
         model.X = data['X']
-        model.Y = data['Y'][[t1, t2]]
+        model.Y = data['Y']# [[t1, t2]]
     else:
         model = MVNFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
         assign(model, pickle.load(open(summary_model_path, 'rb')))
         model.X = data['X']
-        model.Y = data['zscores'][[t1, t2]]
-    return model
+        model.Y = data['zscores']# [[t1, t2]]
+    return model, t1, t2
 
 if __name__ == '__main__':
     summary_output = 'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/pairs_summary'
@@ -47,9 +47,9 @@ if __name__ == '__main__':
 
         sub_summary_paths = [x for x in summary_model_paths if key in x]
         for summary_model_path in sub_summary_paths:
-            model = load_model(data, summary_model_path=summary_model_path)
-            import pdb; pdb.set_trace()
+            model, t1, t2 = load_model(data, summary_model_path=summary_model_path)
             df = make_table(model, data)
+            df = df.loc[df.tissue in [t1, t2]]
             pairs = pair_coloc(df.loc[df.active == 1])
             if pairs.size > 0:
                 summary_pairs.append(pairs)
