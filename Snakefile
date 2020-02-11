@@ -1,3 +1,4 @@
+import itertools
 configfile: "config/config.yaml"
 
 rule all:
@@ -41,7 +42,6 @@ rule fit_pairwise_cosie_summary:
 
 rule all_pairwise_summary:
     input:
-        import itertools
         [("output/simulation/single_causal_variant/pve_{pve}/"
             "ld_{linkage}/gene_{gene}/model_summary_pairwise/"
             "t1_{tissue1}_t2_{tissue2}_model_summary")
