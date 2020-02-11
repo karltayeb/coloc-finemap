@@ -44,7 +44,6 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
 
 data_path = snakemake.input.data_path
 model_paths = snakemake.input.summary_model_paths
-output = snakemake.output.summary_output
 
 summary_pairs = []
 data = load_data(data_path)
