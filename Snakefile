@@ -118,7 +118,7 @@ rule make_pairwise_pair_components_table:
         ),
         summary_model_paths = expand(
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_model_summary",
-            tissue1=[0, 1, 4], tissue2=[2, 5]
+            tissue1=[0, 1, 4], tissue2=[2, 5], pve='{pve}', linkage='{linkage}', gene='{gene}'
         )
     output:
         genotype_output = "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_genotype/pairs_genotype",
