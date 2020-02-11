@@ -4,7 +4,7 @@ import pandas as pd
 from scipy.stats import norm
 from coloc.ard_ser import MVNFactorSER
 from coloc.independent_model import IndependentFactorSER
-from .make_tissue_pair_components_table import assign, load_models_and_data, matched_labels, make_table, pair_coloc
+from make_tissue_pair_components_table import assign, load_models_and_data, matched_labels, make_table, pair_coloc
 
 def load_data(data_path):
     """
