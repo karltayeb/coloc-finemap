@@ -49,12 +49,12 @@ summary_pairs = []
 data = load_data(data_path)
 key = '/'.join(data_path.split('/')[5:-1])
 
-sub_summary_paths = [x for x in model_paths if key in x]
-for summary_model_path in sub_summary_paths:
+#sub_summary_paths = [x for x in model_paths if key in x]
+for summary_model_path in model_paths:
     model, sub_data = load_model(data, summary_model_path=summary_model_path)
     df = make_table(model, sub_data)
     pairs = pair_coloc(df.loc[df.active == 1])
     if pairs.size > 0:
         summary_pairs.append(pairs)
 summary_pairs = pd.concat(summary_pairs)
-summary_pairs.to_csv(output, index=False, sep='\t')
+summary_pairs.to_csv(snakemake.output[0], index=False, sep='\t')
