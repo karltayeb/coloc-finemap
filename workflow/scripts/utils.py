@@ -59,7 +59,10 @@ def make_table(model, data):
     df.loc[:, 'ard_variance'] = 1 / model.prior_precision.flatten()
     return df
 
-def pair_coloc(df):
+def pair_coloc(df, data):
+    import pdb; pdb.set_trace()
+
+    tissue_colocalize = data['true_effects'] @ data['true_effects'].T
     pair_results = []
     num_tissues = np.unique(df.tissue).size
     for t1, t2 in itertools.combinations(np.arange(num_tissues), 2):
@@ -79,15 +82,15 @@ def pair_coloc(df):
             pair_results.append(d)
         if np.unique(df.loc[df.active==1].component).size == 0:
             d = {
-                't1': 0,
-                't2': 1,
+                't1': t1,
+                't2': t2,
                 't1_p_sign_error': 0.5,
                 't2_p_sign_error': 0.5,
                 't1_ard_variance': 0.0,
                 't2_ard_variance': 0.0,
                 'k': -1,
                 'matched': False,
-                'label': False
+                'label': bool(tissue_colocalize[t1, t2])
             }
             pair_results.append(d)
     return pd.DataFrame(pair_results)
