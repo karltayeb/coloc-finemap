@@ -66,7 +66,7 @@ rule all_pairwise_pairs:
     input:
         expand(
             ("output/simulation/single_causal_variant/pve_{pve}/"
-            "ld_{linkage}/gene_{gene}/pairwise_summary/pairs_summary"),
+            "ld_{linkage}/gene_{gene}/pairwise_summary/pairs_table"),
             pve=config['pves'], linkage=config['linkages'],
             gene=config['genes']
         )
