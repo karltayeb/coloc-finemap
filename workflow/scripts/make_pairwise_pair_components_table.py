@@ -59,6 +59,11 @@ for summary_model_path in model_paths:
     if pairs.size > 0:
         summary_pairs.append(pairs)
 
-import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
+    t1 = int(summary_model_path.split('/')[-1].split('_')[1])
+    t2 = int(summary_model_path.split('/')[-1].split('_')[3])
+    if (t1, t2) in [(1, 2), (1, 3), (2, 3), (4, 5), (4, 6), (5, 6)]:
+        summary_pairs[-1].loc[:, 'label'] = True
+
 summary_pairs = pd.concat(summary_pairs)
 summary_pairs.to_csv(snakemake.output[0], index=False, sep='\t')
