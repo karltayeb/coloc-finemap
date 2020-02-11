@@ -45,7 +45,7 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
 
 if __name__ == '__main__':
     summary_pairs = []
-    for data_path in snakemake.input.data_paths:
+    for data_path in snakemake.input.data_path:
         data = load_data(data_path)
         key = '/'.join(data_path.split('/')[5:-1])
 
