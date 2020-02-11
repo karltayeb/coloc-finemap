@@ -101,3 +101,23 @@ rule make_tissue_pair_components_table:
     script:
         "workflow/scripts/make_tissue_pair_components_table.py"
 
+
+rule make_pairwise_components_table:
+    """
+    same rule as above except for the pairwise outputs
+    """
+
+    input:
+        data_path = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data",
+        genotype_model_path = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_model_summary",
+        summary_model_path = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_genotype/t1_{tissue1}_t2_{tissue2}_model_genotype"
+    output:
+        genotype_output = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_pairs_summary",
+        summary_output = \
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_pairs_genotype"
+    script:
+        "workflow/scripts/make_tissue_pair_components_table.py"
