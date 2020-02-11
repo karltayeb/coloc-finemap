@@ -62,7 +62,7 @@ def make_table(model, data):
 def pair_coloc(df):
     pair_results = []
     num_tissues = np.unique(df.tissue).size
-    for t1, t2 in itertools.combinations(num_tissues, 2):
+    for t1, t2 in itertools.combinations(np.arange(num_tissues), 2):
         for k in np.unique(df.loc[df.active==1].component):
             d = {
                 't1': t1,
