@@ -25,13 +25,12 @@ def load_models_and_data(data_path, genotype_model_path, summary_model_path):
     return genotype_model, summary_model, data
 
 
-if __name__ == '__main__':
-    g, s, data = load_models_and_data(
-        snakemake.input.data_path, snakemake.input.genotype_model_path, snakemake.input.summary_model_path)
-    df = make_table(g, data)
-    pairs = pair_coloc(df.loc[df.active==1])
-    pairs.to_csv(snakemake.output.genotype_output, index=False, sep='\t')
+g, s, data = load_models_and_data(
+    snakemake.input.data_path, snakemake.input.genotype_model_path, snakemake.input.summary_model_path)
+df = make_table(g, data)
+pairs = pair_coloc(df, data)
+pairs.to_csv(snakemake.output.genotype_output, index=False, sep='\t')
 
-    df = make_table(s, data)
-    pairs = pair_coloc(df.loc[df.active==1])
-    pairs.to_csv(snakemake.output.summary_output, index=False, sep='\t')
+df = make_table(s, data)
+pairs = pair_coloc(df, data)
+pairs.to_csv(snakemake.output.summary_output, index=False, sep='\t')
