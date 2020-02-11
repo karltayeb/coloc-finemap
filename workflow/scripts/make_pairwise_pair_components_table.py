@@ -48,6 +48,7 @@ if __name__ == '__main__':
         sub_summary_paths = [x for x in summary_model_paths if key in x]
         for summary_model_path in sub_summary_paths:
             model = load_model(data, summary_model_path=summary_model_path)
+            import pdb; pdb.set_trace()
             df = make_table(model, data)
             pairs = pair_coloc(df.loc[df.active == 1])
             if pairs.size > 0:
