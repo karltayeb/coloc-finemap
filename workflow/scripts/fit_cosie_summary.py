@@ -4,7 +4,14 @@ import numpy as np
 import pickle
 
 data = pickle.load(open(snakemake.input[0], 'rb'))
-n = MVNFactorSER(X=data['LD'], Y=data['zscores'], K=10)
+
+Y = data['zscores']
+if 't1' in snakemake.output[0]:
+    t1 = int(snakemake.wildcards.t1)
+    t2 = int(snakemake.wildcards.t2)
+    Y = Y[[t1, t2]]
+
+n = MVNFactorSER(X=data['LD'], Y=Y, K=10)
 n.fit(max_iter=200, update_active=False, update_weights=True, update_pi=True, ARD_weights=True, verbose=True)
 path = '/'.join(snakemake.output[0].split('/')[:-1])
 name = snakemake.output[0].split('/')[-1]
