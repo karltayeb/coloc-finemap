@@ -5,14 +5,11 @@ from scipy.stats import norm
 from coloc.ard_ser import MVNFactorSER
 from coloc.independent_model import IndependentFactorSER
 
-data_path = snakemake.input.data_path
-genotype_model_path = snakemake.input.genotype_model_path
-summary_model_path = snakemake.input.summary_model_path
-
 
 def assign(obj, dictionary):
     for key in dictionary.keys():
         obj.__dict__[key] = dictionary[key]
+
 
 def load_models_and_data(data_path, genotype_model_path, summary_model_path):
     """
@@ -103,7 +100,7 @@ def pair_coloc(df):
     return pd.DataFrame(pair_results)
 
 g, s, data = load_models_and_data(
-    data_path, genotype_model_path, summary_model_path)
+    snakemake.input.data_path, snakemake.input.genotype_model_path, snakemake.input.summary_model_path)
 df = make_table(g, data)
 pairs = pair_coloc(df.loc[df.active==1])
 pairs.to_csv(snakemake.output.genotype_output, index=False, sep='\t')
