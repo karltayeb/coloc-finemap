@@ -42,13 +42,14 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         model.Y = sub_data['zscores']
     return model, sub_data
 
+"""
 data_path = snakemake.input.data_path
 model_paths = snakemake.input.summary_model_paths
 
 summary_pairs = []
 data = load_data(data_path)
 key = '/'.join(data_path.split('/')[5:-1])
-
+"""
 with open(snakemake.output[0], 'w') as f:
     f.write('test')
 """
