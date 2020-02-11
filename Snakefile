@@ -6,6 +6,10 @@ rule all:
         expand(
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_summary",
             pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
+        ),
+        expand(
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/coloc",
+            pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
         )
 
 rule get_cis_variants:
@@ -22,13 +26,21 @@ rule simulate_single_causal_variant:
     script:
         "workflow/scripts/single_causal_variant.py"
 
-rule fit_cosie_summary:
+rule fit_summary_model:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
     output:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/model_summary"
     script:
         "workflow/scripts/fit_cosie_summary.py"
+
+rule fit_genotype_model:
+    input:
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
+    output:
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/model_genotype"
+    script:
+        "workflow/scripts/fit_cosie_genotype.py"
 
 rule fit_pairwise_summary_model:
     input:
@@ -69,14 +81,6 @@ rule all_pairwise_summary:
             tissue1=[0,1,4], tissue2=[2,5]
         )
 
-rule fit_cosie_genotype:
-    input:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
-    output:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/model_genotype"
-    script:
-        "workflow/scripts/fit_cosie_genotype.py"
-
 rule run_coloc:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
@@ -100,7 +104,6 @@ rule make_tissue_pair_components_table:
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_summary"
     script:
         "workflow/scripts/make_tissue_pair_components_table.py"
-
 
 rule make_pairwise_components_table:
     """
