@@ -50,6 +50,7 @@ summary_pairs = []
 data = load_data(data_path)
 key = '/'.join(data_path.split('/')[5:-1])
 
+import pdb; pdb.set_trace()
 
 #sub_summary_paths = [x for x in model_paths if key in x]
 for summary_model_path in model_paths:
