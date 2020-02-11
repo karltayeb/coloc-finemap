@@ -33,11 +33,19 @@ rule fit_pairwise_cosie_summary:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
     output:
-        "output/simulation/single_causal_variant/pve_{pve}/"
+        ("output/simulation/single_causal_variant/pve_{pve}/"
         "ld_{linkage}/gene_{gene}/model_summary_pairwise/"
-        "t1_{tissue1}_t2_{tissue2}_model_summary"
+        "t1_{tissue1}_t2_{tissue2}_model_summary")
     script:
         "workflow/scripts/fit_cosie_summary.py"
+
+rule all_pairwise_summary:
+    input:
+        import itertools
+        [("output/simulation/single_causal_variant/pve_{pve}/"
+            "ld_{linkage}/gene_{gene}/model_summary_pairwise/"
+            "t1_{tissue1}_t2_{tissue2}_model_summary")
+        for tissue1, tissue2 in itertools.combinations([0, 1, 2, 3, 4, 5, 6], 2)]
 
 rule fit_cosie_genotype:
     input:
