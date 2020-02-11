@@ -30,12 +30,16 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         model.Y = data['zscores'][[t1, t2]]
     return model
 
+summary_output = 'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/pairs_summary'
+data_paths = ['output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/data']
+summary_model_paths = ['output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_2_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_5_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_1_t2_2_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_1_t2_5_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_2_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_5_model_summary']
+
 summary_keys = []
-for data_path in snakemake.input.data_paths:
+for data_path in data_paths:
     data = load_data(data_path)
     key = '/'.join(data_path.split('/')[5:-1])
 
-    sub_summary_paths = [x for x in snakemake.input.summary_model_paths if key in x]
+    sub_summary_paths = [x for x in summary_model_paths if key in x]
     for summary_model_path in sub_summary_paths:
         model = load_model(data, summary_model_path=summary_model_path)
         df = make_table(model, data)
@@ -43,4 +47,4 @@ for data_path in snakemake.input.data_paths:
         if pairs.size > 0:
             summary_pairs.append(pairs)
     summary_pairs = pd.concat(summary_pairs)
-    summary_pairs.to_csv(snakemake.output.summary_output, index=False, sep='/t')
+    summary_pairs.to_csv(summary_output, index=False, sep='/t')
