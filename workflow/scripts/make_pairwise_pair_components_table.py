@@ -53,7 +53,7 @@ if __name__ == '__main__':
         'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_2_model_summary',
         'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_5_model_summary']
 
-    summary_keys = []
+    summary_pairs = []
     for data_path in data_paths:
         data = load_data(data_path)
         key = '/'.join(data_path.split('/')[5:-1])
