@@ -29,6 +29,16 @@ rule fit_cosie_summary:
     script:
         "workflow/scripts/fit_cosie_summary.py"
 
+rule fit_pairwise_cosie_summary:
+    input:
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
+    output:
+        "output/simulation/single_causal_variant/pve_{pve}/"
+        "ld_{linkage}/gene_{gene}/model_summary_pairwise/"
+        "t1_{tissue1}_t2_{tissue2}_model_summary"
+    scripts:
+        "workflow/scripts/fit_cosie_summary.py"
+
 rule fit_cosie_genotype:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
@@ -60,6 +70,4 @@ rule make_tissue_pair_components_table:
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_summary"
     script:
         "workflow/scripts/make_tissue_pair_components_table.py"
-
-
 
