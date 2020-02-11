@@ -109,5 +109,5 @@ rule make_pairwise_pair_components_table:
     output:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/pairs_table"
     script:
-        "workflow/scripts/make_tissue_pair_components_table.py"
+        "workflow/scripts/make_pairwise_pair_components_table.py"
 
