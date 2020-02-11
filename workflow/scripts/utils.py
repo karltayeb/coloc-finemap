@@ -63,7 +63,7 @@ def pair_coloc(df):
     num_tissues = np.unique(df.tissue).size
     for t1 in range(0, num_tissues):
         for t2 in range(t1, num_tissues):
-            for k in np.unique(df.component):
+            for k in np.unique(df.loc[df.active==1].component):
                 d = {
                     't1': t1,
                     't2': t2,
@@ -75,6 +75,19 @@ def pair_coloc(df):
                     'matched': np.any(df.loc[df.component == k].matched == 1),
                     'label': df.loc[(df.tissue == t1) & (df.component == k)].label.iloc[0] * \
                         df.loc[(df.tissue == t2) & (df.component == k)].label.iloc[0]
+                }
+                pair_results.append(d)
+            if np.unique(df.loc[df.active==1].component).size == 0:
+                d = {
+                    't1': 0,
+                    't2': 1,
+                    't1_p_sign_error': 0.5,
+                    't2_p_sign_error': 0.5,
+                    't1_ard_variance': 0.0,
+                    't2_ard_variance': 0.0,
+                    'k': -1,
+                    'matched': False,
+                    'label': False
                 }
                 pair_results.append(d)
     return pd.DataFrame(pair_results)
