@@ -22,12 +22,12 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         model = IndependentFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
         assign(model, pickle.load(open(genotype_model_path, 'rb')))
         model.X = data['X']
-        model.Y = data['Y']# [[t1, t2]]
+        #model.Y = data['Y']# [[t1, t2]]
     else:
         model = MVNFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
         assign(model, pickle.load(open(summary_model_path, 'rb')))
         model.X = data['X']
-        model.Y = data['zscores']# [[t1, t2]]
+        #model.Y = data['zscores']# [[t1, t2]]
     return model, t1, t2
 
 if __name__ == '__main__':
