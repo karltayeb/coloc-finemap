@@ -6,11 +6,6 @@ from coloc.ard_ser import MVNFactorSER
 from coloc.independent_model import IndependentFactorSER
 from make_tissue_pair_component import assign, load_models_and_data, matched_labels, make_table, pair_coloc
 
-data_path = snakemake.input.data_path
-genotype_model_path = snakemake.input.genotype_model_path
-summary_model_path = snakemake.input.summary_model_path
-
-
 def load_data(data_path):
     """
     load models and data
