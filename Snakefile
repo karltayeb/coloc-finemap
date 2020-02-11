@@ -69,13 +69,15 @@ rule all_pairwise_pairs:
             "ld_{linkage}/gene_{gene}/pairwise_summary/pairs_summary"),
             pve=config['pves'], linkage=config['linkages'],
             gene=config['genes']
-        ),
+        )
+        """
         expand(
             ("output/simulation/single_causal_variant/pve_{pve}/"
             "ld_{linkage}/gene_{gene}/pairwise_genotype/pairs_genotype"),
             pve=config['pves'], linkage=config['linkages'],
             gene=config['genes']
         )
+        """
 
 rule run_coloc:
     input:
