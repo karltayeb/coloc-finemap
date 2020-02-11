@@ -33,7 +33,12 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
 if __name__ == '__main__':
     summary_output = 'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/pairs_summary'
     data_paths = ['output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/data']
-    summary_model_paths = ['output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_2_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_5_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_1_t2_2_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_1_t2_5_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_2_model_summary, output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_5_model_summary']
+    summary_model_paths = ['output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_2_model_summary', 
+        'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_5_model_summary', 
+        'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_1_t2_2_model_summary',
+        'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_1_t2_5_model_summary',
+        'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_2_model_summary',
+        'output/simulation/single_causal_variant/pve_0.2/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_5_model_summary']
 
     summary_keys = []
     for data_path in data_paths:
