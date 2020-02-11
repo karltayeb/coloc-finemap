@@ -66,19 +66,15 @@ rule all_pairwise_pairs:
     input:
         expand(
             ("output/simulation/single_causal_variant/pve_{pve}/"
-            "ld_{linkage}/gene_{gene}/pairwise_summary/"
-            "t1_{tissue1}_t2_{tissue2}_pairs_summary"),
+            "ld_{linkage}/gene_{gene}/pairwise_summary/pairs_summary"),
             pve=config['pves'], linkage=config['linkages'],
-            gene=config['genes'],
-            tissue1=[0,1,4], tissue2=[2,5]
+            gene=config['genes']
         ),
         expand(
             ("output/simulation/single_causal_variant/pve_{pve}/"
-            "ld_{linkage}/gene_{gene}/pairwise_genotype/"
-            "t1_{tissue1}_t2_{tissue2}_pairs_genotype"),
+            "ld_{linkage}/gene_{gene}/pairwise_genotype/pairs_genotype"),
             pve=config['pves'], linkage=config['linkages'],
-            gene=config['genes'],
-            tissue1=[0,1,4], tissue2=[2,5]
+            gene=config['genes']
         )
 
 rule run_coloc:
