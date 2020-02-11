@@ -36,7 +36,7 @@ rule fit_pairwise_cosie_summary:
         "output/simulation/single_causal_variant/pve_{pve}/"
         "ld_{linkage}/gene_{gene}/model_summary_pairwise/"
         "t1_{tissue1}_t2_{tissue2}_model_summary"
-    scripts:
+    script:
         "workflow/scripts/fit_cosie_summary.py"
 
 rule fit_cosie_genotype:
