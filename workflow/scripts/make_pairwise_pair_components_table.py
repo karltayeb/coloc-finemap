@@ -42,15 +42,9 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         model.Y = sub_data['zscores']
     return model, sub_data
 
-data_path = 'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/data'
-model_paths = [
-    'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_2_model_summary',
-    'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_5_model_summary',
-    'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_1_t2_2_model_summary',
-    'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_1_t2_5_model_summary',
-    'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_2_model_summary',
-    'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_4_t2_5_model_summary']
-output = 'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/pairs_summary'
+data_path = snakemake.input.data_path
+model_paths = snakemake.input.summary_model_paths
+output = snakemake.output.summary_output
 
 summary_pairs = []
 data = load_data(data_path)
