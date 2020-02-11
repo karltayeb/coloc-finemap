@@ -60,8 +60,6 @@ def make_table(model, data):
     return df
 
 def pair_coloc(df, data):
-    import pdb; pdb.set_trace()
-
     tissue_colocalize = data['true_effects'] @ data['true_effects'].T
     pair_results = []
     num_tissues = np.unique(df.tissue).size
