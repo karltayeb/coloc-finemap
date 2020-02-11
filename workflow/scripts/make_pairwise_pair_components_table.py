@@ -35,28 +35,14 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         model.Y = data['zscores'][[t1, t2]]
     return model
 
-genotype_keys = []
 summary_keys = []
 for data_path in snakemake.input.data_paths:
     data = load_data(data_path)
     key = '/'.join(data_path.split('/')[5:-1])
 
-    sub_genotype_paths = [x for x in snakemake.input.genotype_model_paths if key in x]
     sub_summary_paths = [x for x in snakemake.input.summary_model_paths if key in x]
-
-    genotype_pairs = []
-    summary_pairs = []
-    for genotype_model_path in sub_genotype_paths:
-        model = load_model(data, genotype_model_path=genotype_model_path)
-        df = make_table(model, data)
-        pairs = pair_coloc(df.loc[df.active == 1])
-        if pairs.size > 0:
-            genotype_pairs.append(pairs)
-    genotype_pairs = pd.concat(genotype_pairs)
-    genotype_pairs.to_csv(snakemake.output.genotype_output, index=False, sep='/t')
-
     for summary_model_path in sub_summary_paths:
-        model = load_model(data, summary_model_path=genotype_model_path)
+        model = load_model(data, summary_model_path=summary_model_path)
         df = make_table(model, data)
         pairs = pair_coloc(df.loc[df.active == 1])
         if pairs.size > 0:
