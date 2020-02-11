@@ -43,7 +43,7 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
     return model, sub_data
 
 data_path = 'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/data'
-summary_model_paths = [
+model_paths = [
     'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_2_model_summary',
     'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_0_t2_5_model_summary',
     'output/simulation/single_causal_variant/pve_0.1/ld_0.8/gene_ENSG00000262000.1/pairwise_summary/t1_1_t2_2_model_summary',
