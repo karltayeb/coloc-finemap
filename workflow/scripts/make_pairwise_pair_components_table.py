@@ -49,6 +49,8 @@ if __name__ == '__main__':
         for summary_model_path in sub_summary_paths:
             model, t1, t2 = load_model(data, summary_model_path=summary_model_path)
             df = make_table(model, data)
+
+            import pdb; pdb.set_trace()
             df = df.loc[df.tissue in [t1, t2]]
             pairs = pair_coloc(df.loc[df.active == 1])
             if pairs.size > 0:
