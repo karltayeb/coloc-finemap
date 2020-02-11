@@ -98,16 +98,19 @@ rule make_tissue_pair_components_table:
     script:
         "workflow/scripts/make_tissue_pair_components_table.py"
 
+
+tissue_pairs = [x for x in itertools.combinations(np.arange(7), 2)]
 rule make_pairwise_pair_components_table:
     """
     same rule as above except for the pairwise outputs
     """
-
     input:
         data_path = "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data",
         summary_model_paths = expand(
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_model_summary",
-            tissue1=[0, 1, 4], tissue2=[2, 5], pve='{pve}', linkage='{linkage}', gene='{gene}'
+            tissue1=[x[0] for x in tissue_pairs],
+            tissue2=[x[1] for x in tissue_pairs],
+            pve='{pve}', linkage='{linkage}', gene='{gene}'
         )
     output:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/pairs_table"
