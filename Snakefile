@@ -111,13 +111,13 @@ rule make_pairwise_components_table:
         data_path = \
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data",
         genotype_model_path = \
-            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_model_summary",
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_genotype/t1_{tissue1}_t2_{tissue2}_model_genotype",
         summary_model_path = \
-            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_genotype/t1_{tissue1}_t2_{tissue2}_model_genotype"
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_model_summary"
     output:
         genotype_output = \
-            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_pairs_summary",
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_genotype/t1_{tissue1}_t2_{tissue2}_pairs_genotype",
         summary_output = \
-            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_pairs_genotype"
+            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_pairs_summary"
     script:
         "workflow/scripts/make_tissue_pair_components_table.py"
