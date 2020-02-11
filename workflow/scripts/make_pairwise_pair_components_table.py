@@ -52,7 +52,7 @@ data = load_data(data_path)
 
 #sub_summary_paths = [x for x in model_paths if key in x]
 for summary_model_path in model_paths:
-    key = '_'.join(summary_model_path.split('/')[3, 4, 5, 7])
+    key = '_'.join(np.array(summary_model_path.split('/'))[[3, 4, 5, 7]])
 
     model, sub_data = load_model(data, summary_model_path=summary_model_path)
     df = make_table(model, sub_data)
