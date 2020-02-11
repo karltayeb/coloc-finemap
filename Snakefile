@@ -1,4 +1,6 @@
 import itertools
+import numpy as np
+
 configfile: "config/config.yaml"
 
 rule all_tissue_pairs:
