@@ -33,12 +33,12 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
 
     if genotype_model_path is not None:
         model = IndependentFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
-        assign(model, pickle.load(open(genotype_model_path, 'rb')))
+        assign(model, pickle.load(open(path, 'rb')))
         model.X = sub_data['X']
         model.Y = sub_data['Y']
     else:
         model = MVNFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
-        assign(model, pickle.load(open(summary_model_path, 'rb')))
+        assign(model, pickle.load(open(path, 'rb')))
         model.X = sub_data['X']
         model.Y = sub_data['zscores']
     return model, sub_data
