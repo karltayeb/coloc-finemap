@@ -52,6 +52,7 @@ data = load_data(data_path)
 
 #sub_summary_paths = [x for x in model_paths if key in x]
 for summary_model_path in model_paths:
+    import pdb; pdb.set_trace()
     key = '_'.join(np.array(summary_model_path.split('/'))[[3, 4, 5, 7]])
 
     model, sub_data = load_model(data, summary_model_path=summary_model_path)
@@ -65,5 +66,4 @@ for summary_model_path in model_paths:
     pairs.loc[:, 'key'] = key
 
 summary_pairs = pd.concat(summary_pairs)
-import pdb; pdb.set_trace()
 summary_pairs.to_csv(snakemake.output[0], index=False, sep='\t')
