@@ -92,8 +92,6 @@ rule make_tissue_pair_components_table:
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_genotype",
         summary_output = \
             "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairs_summary"
-    wildcard_constraints:
-        gene = ".+.{\d+}"
     script:
         "workflow/scripts/make_tissue_pair_components_table.py"
 
@@ -109,7 +107,7 @@ rule make_pairwise_pair_components_table:
             tissue1=[0, 1, 4], tissue2=[2, 5], pve='{pve}', linkage='{linkage}', gene='{gene}'
         )
     output:
-        summary_output = "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/pairs_summary"
+        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/pairs_table"
     script:
         "workflow/scripts/make_tissue_pair_components_table.py"
 
