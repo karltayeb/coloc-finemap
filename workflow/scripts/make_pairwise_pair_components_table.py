@@ -1,10 +1,9 @@
 import pickle
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
 from coloc.ard_ser import MVNFactorSER
 from coloc.independent_model import IndependentFactorSER
-from utils import assign, matched_labels, make_table, pair_coloc
+from utils import *
 
 def load_data(data_path):
     """
