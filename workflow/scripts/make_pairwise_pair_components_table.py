@@ -66,5 +66,4 @@ for summary_model_path in model_paths:
     summary_pairs.append(pairs)
 summary_pairs = pd.concat(summary_pairs)
 summary_pairs.to_csv(snakemake.output[0], index=False, sep='\t')
-import pdb; pdb.set_trace()
 
