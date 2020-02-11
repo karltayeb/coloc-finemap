@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
             import pdb; pdb.set_trace()
             df = df.loc[df.tissue in [t1, t2]]
-            pairs = pair_coloc(df.loc[df.active == 1])
+            #pairs = pair_coloc(df.loc[df.active == 1])
             if pairs.size > 0:
                 summary_pairs.append(pairs)
         summary_pairs = pd.concat(summary_pairs)
