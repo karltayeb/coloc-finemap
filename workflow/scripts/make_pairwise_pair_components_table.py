@@ -42,18 +42,17 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         model.Y = sub_data['zscores']
     return model, sub_data
 
-if __name__ == '__main__':
-    summary_pairs = []
-    for data_path in snakemake.input.data_path:
-        data = load_data(data_path)
-        key = '/'.join(data_path.split('/')[5:-1])
+summary_pairs = []
+for data_path in snakemake.input.data_path:
+    data = load_data(data_path)
+    key = '/'.join(data_path.split('/')[5:-1])
 
-        sub_summary_paths = [x for x in snakemake.input.summary_model_paths if key in x]
-        for summary_model_path in sub_summary_paths:
-            model, sub_data = load_model(data, summary_model_path=summary_model_path)
-            df = make_table(model, sub_data)
-            pairs = pair_coloc(df.loc[df.active == 1])
-            if pairs.size > 0:
-                summary_pairs.append(pairs)
-        summary_pairs = pd.concat(summary_pairs)
-        summary_pairs.to_csv(snakemake.output.summary_output, index=False, sep='\t')
+    sub_summary_paths = [x for x in snakemake.input.summary_model_paths if key in x]
+    for summary_model_path in sub_summary_paths:
+        model, sub_data = load_model(data, summary_model_path=summary_model_path)
+        df = make_table(model, sub_data)
+        pairs = pair_coloc(df.loc[df.active == 1])
+        if pairs.size > 0:
+            summary_pairs.append(pairs)
+    summary_pairs = pd.concat(summary_pairs)
+    summary_pairs.to_csv(snakemake.output.summary_output, index=False, sep='\t')
