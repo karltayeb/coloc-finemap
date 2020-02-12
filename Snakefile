@@ -46,7 +46,8 @@ rule simulate_multiple_causal_variant:
     input:
         "output/genotypes/{gene}_cis_variants"
     output:
-        "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_{sparsity}/gene_{gene}/data"
+        "output/simulation/multiple_causal_variant/"
+        "pve_{pve}/sparsity_{sparsity}/gene_{gene}/data"
     script:
         "workflow/scripts/multiple_causal_variant.py"
 

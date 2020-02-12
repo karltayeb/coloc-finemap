@@ -52,13 +52,17 @@ def generate_data(X, sparsity=0.1, pve=0.1):
     }
     return data
 
-gencode = pd.read_csv('/work-zfs/abattle4/lab_data/genomic_annotation_data/gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
+gencode = pd.read_csv(
+    '/work-zfs/abattle4/lab_data/genomic_annotation_data/'
+    'gencode.v19.genes.v6p.patched_contigs_TSS.bed', sep='\t')
 gene = gencode.loc[gencode.iloc[:, 3] == snakemake.wildcards.gene]
 chr_num = gene.iloc[0, 0]
 tss = gene.iloc[0, 1]
 gene_name = gene.iloc[0, 3]
 
 cis_variants = pd.read_csv(snakemake.input[0], index_col=0)
-data = generate_data(cis_variants, float(snakemake.wildcards.linkage), float(snakemake.wildcards.pve))
+data = generate_data(cis_variants,
+    float(snakemake.wildcards.sparsity),
+    float(snakemake.wildcards.pve))
 pickle.dump(data, open(snakemake.output[0], 'wb'))
 
