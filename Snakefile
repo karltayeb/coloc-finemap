@@ -27,6 +27,7 @@ rule all_coloc:
             pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
         )
 
+rull_m
 # intermediate rules
 rule get_cis_variants:
     output:
@@ -76,9 +77,9 @@ rule fit_pairwise_summary_model:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
     output:
-        ("output/simulation/single_causal_variant/pve_{pve}/"
-        "ld_{linkage}/gene_{gene}/pairwise_summary/"
-        "t1_{tissue1}_t2_{tissue2}_model_summary")
+        "output/simulation/{simulation}/"
+        "{settings}/gene_{gene}/pairwise_summary/"
+        "t1_{tissue1}_t2_{tissue2}_model_summary"
     script:
         "workflow/scripts/fit_cosie_summary.py"
 
