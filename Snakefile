@@ -1,5 +1,7 @@
 import itertools
+import pickle
 import numpy as np
+import pandas as pd
 
 configfile: "config/config.yaml"
 
@@ -117,6 +119,42 @@ rule run_coloc:
     script:
         "workflow/scripts/run_coloc.R"
 
+rule format_caviar_data_ld:
+    input:
+        'ouput/{path}/data'
+    output:
+        ld_matrix='output/{path}/data.ld'
+    run:
+        data = pickle.load(open(input[0], 'rb'))
+        np.savetxt(output.ld_matrix, data['LD'], '\t')
+
+rule format_caviar_data_zscore:
+    input:
+        'ouput/{path}/data'
+    output:
+        z_scores='output/{path}/data.z{tissue}'
+    run:
+        data = pickle.load(open(input[0], 'rb'))
+        zscores = pd.DataFrame(data['zscores'][int(wildcards.tissue)])
+        zscores.to_csv(ouput.z_scores, sep='\t')
+
+rule run_caviar:
+    input:
+        # ecaviar inputs
+        ld_matrix='output/{path}/data.ld'
+        z_scores='output/{path}/data.z{tissue}'
+    output:
+        # ecaviar outputs
+
+    run:
+        "eCAVIAR \
+            -o {outfile}\
+            -l {input.ld_file}\
+            -z {input.zfile1}\
+            -z {input.zfile2}\
+            -r {config.rho}\
+            -c {config.ecaviar_num_causal}\
+            -f 1-o"
 # stat gathering rules
 rule make_tissue_pair_components_table:
     input:
