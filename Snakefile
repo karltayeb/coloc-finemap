@@ -157,7 +157,8 @@ rule make_ecaviar_table:
     input:
         data = 'output/{path}/data',
         caviar_posteriors = expand(
-            'output/{path}/caviar/caviar_t{tissue}_post', tissue=np.arange(10)
+            'output/{path}/caviar/caviar_t{tissue}_post',
+            path='{path}', tissue=np.arange(10)
         )
     output:
         'output/{path}/caviar/ecaviar'
