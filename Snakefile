@@ -148,9 +148,9 @@ rule run_caviar:
         'output/{path}/caviar/caviar_t{tissue}_set'
     shell:
         "workflow/bin/caviar/CAVIAR "
-        "-o {wildcards.tissue}"
-        "-l {input.ld_matrix}"
-        "-z {input.z_scores}"
+        "-o output/{path}/caviar/caviar_t{wildcards.tissue} "
+        "-l {input.ld_matrix} "
+        "-z {input.z_scores} "
         "-c 2"
 
 # stat gathering rules
