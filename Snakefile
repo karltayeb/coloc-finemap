@@ -136,7 +136,7 @@ rule format_caviar_data_zscore:
     run:
         data = pickle.load(open(input[0], 'rb'))
         zscores = pd.DataFrame(data['zscores'][int(wildcards.tissue)])
-        zscores.to_csv(ouput.z_scores, sep='\t', index=False)
+        zscores.to_csv(ouput.z_scores, sep='\t', header=None)
 
 # stat gathering rules
 rule make_tissue_pair_components_table:
