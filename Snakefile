@@ -65,9 +65,11 @@ rule fit_summary_model:
 
 rule fit_genotype_model:
     input:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
+        "output/simulation/{simulation}/{settings}/gene_{gene}/data"
     output:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/model_genotype"
+        "output/simulation/{simulation}/{settings}/gene_{gene}/model_genotype"
+    wildcard_constraints:
+        simulation = "(?!\/)[^\/]+(?=\/)"
     script:
         "workflow/scripts/fit_cosie_genotype.py"
 
@@ -78,6 +80,8 @@ rule fit_pairwise_summary_model:
         "output/simulation/{simulation}/"
         "{settings}/gene_{gene}/pairwise_summary/"
         "t1_{tissue1}_t2_{tissue2}_model_summary"
+    wildcard_constraints:
+        simulation = "(?!\/)[^\/]+(?=\/)"
     script:
         "workflow/scripts/fit_cosie_summary.py"
 
@@ -113,6 +117,8 @@ rule make_tissue_pair_components_table:
             "output/simulation/{simulation}/{settings}/gene_{gene}/pairs_genotype",
         summary_output = \
             "output/simulation/{simulation}/{settings}/gene_{gene}/pairs_summary"
+    wildcard_constraints:
+        simulation = "(?!\/)[^\/]+(?=\/)"
     script:
         "workflow/scripts/make_tissue_pair_components_table.py"
 
