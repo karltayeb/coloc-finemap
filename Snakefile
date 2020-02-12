@@ -55,9 +55,9 @@ rule simulate_multiple_causal_variant:
 # model fitting rules
 rule fit_summary_model:
     input:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
+        "output/simulation/{simulation}/pve_{pve}/ld_{linkage}/gene_{gene}/data"
     output:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/model_summary"
+        "output/simulation/{simulation}/pve_{pve}/ld_{linkage}/gene_{gene}/model_summary"
     script:
         "workflow/scripts/fit_cosie_summary.py"
 
