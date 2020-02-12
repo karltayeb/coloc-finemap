@@ -6,6 +6,24 @@ from scipy.stats import norm
 from coloc.ard_ser import MVNFactorSER
 from coloc.independent_model import IndependentFactorSER
 
+def compute_sigma2(X, true_effect, pve):
+    var = np.var(true_effect @ X)
+    sigma2_t = var/pve - var
+    if sigma2_t == 0:
+        # if variance is 0, there were no causal variants-- dont care what the variance is
+        sigma2_t = 1.0
+    return sigma2_t
+
+
+def get_cis_variants(genotype, tss, window=500000, size=1000):
+    pos = np.array([int(x.split('_')[1]) for x in genotype.index.values])
+    #cis_variants = genotype.iloc[np.abs(pos - tss) < window]
+    cis_variants = genotype.iloc[
+        np.arange(genotype.shape[0])[np.argsort(np.abs(pos - tss))[:size]]
+    ]
+    return cis_variants
+
+    
 def assign(obj, dictionary):
     for key in dictionary.keys():
         obj.__dict__[key] = dictionary[key]
