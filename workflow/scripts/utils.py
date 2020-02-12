@@ -92,6 +92,7 @@ def pair_coloc(df, data):
                 't2_ard_variance': df.loc[(df.tissue == t2) & (df.component == k)].ard_variance.iloc[0],
                 'k': k,
                 'matched': np.any(df.loc[df.component == k].matched == 1),
+                'num_tissues': df.loc[df.component == k].num_tissues.iloc[0],
                 'label': df.loc[(df.tissue == t1) & (df.component == k)].label.iloc[0] * \
                     df.loc[(df.tissue == t2) & (df.component == k)].label.iloc[0]
             }
