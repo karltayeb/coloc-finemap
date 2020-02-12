@@ -126,6 +126,7 @@ rule format_caviar_data_ld:
         ld_matrix='output/{path}/data.ld'
     run:
         data = pickle.load(open(input[0], 'rb'))
+        import pdb; pdb.set_trace()
         np.savetxt(output.ld_matrix, data['LD'], '\t')
 
 rule format_caviar_data_zscore:
