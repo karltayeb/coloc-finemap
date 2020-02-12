@@ -27,6 +27,18 @@ rule all_coloc:
             pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
         )
 
+rule run_multiple_causal_variant_simulation:
+    input:
+        expand(
+            "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
+            "gene_{gene}/pairs_summary",
+            pve=config['pves'], gene=config['genes']
+        )
+        expand(
+            "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
+            "gene_{gene}/coloc",
+            pve=config['pves'], gene=config['genes']
+        )
 # intermediate rules
 rule get_cis_variants:
     output:
@@ -97,9 +109,11 @@ rule fit_pairwise_genotype_model:
 
 rule run_coloc:
     input:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
+        "output/simulation/{simulation}/{settings}/gene_{gene}/data"
     output:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/coloc"
+        "output/{simulation}/{settings}/gene_{gene}/coloc"
+    wildcard_constraints:
+        simulation = "(?!\/)[^\/]+(?=\/)"
     script:
         "workflow/scripts/run_coloc.R"
 
