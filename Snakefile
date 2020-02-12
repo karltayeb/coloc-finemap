@@ -153,6 +153,16 @@ rule run_caviar:
         "-z {input.z_scores} "
         "-c 2"
 
+rule make_ecaviar_table:
+    input:
+        data = 'output/{path}/data'
+        caviar_posteriors = expand(
+            'output/{path}/caviar/caviar_t{tissue}_post', tissue=np.arange(10)
+        )
+    output:
+        'output/{path}/caviar/ecaviar'
+    script:
+        'workflow/scripts/make_ecaviar_table.py'
 # stat gathering rules
 rule make_tissue_pair_components_table:
     input:
