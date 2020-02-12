@@ -121,7 +121,7 @@ rule run_coloc:
 
 rule format_caviar_data_ld:
     input:
-        'ouput/{path}/data'
+        'output/{path}/data'
     output:
         ld_matrix='output/{path}/data.ld'
     run:
