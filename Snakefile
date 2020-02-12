@@ -40,6 +40,11 @@ rule run_multiple_causal_variant_simulation:
             "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
             "gene_{gene}/coloc",
             pve=config['pves'], gene=config['genes']
+        ),
+        expand(
+            "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
+            "gene_{gene}/ecaviar",
+            pve=config['pves'], gene=config['genes']
         )
 # intermediate rules
 rule get_cis_variants:
@@ -161,7 +166,7 @@ rule make_ecaviar_table:
             path='{path}', tissue=np.arange(10)
         )
     output:
-        'output/{path}/caviar/ecaviar'
+        'output/{path}/ecaviar'
     script:
         'workflow/scripts/make_ecaviar_table.py'
 # stat gathering rules
