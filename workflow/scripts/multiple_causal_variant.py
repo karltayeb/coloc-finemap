@@ -26,7 +26,8 @@ def generate_data(X, sparsity=0.1, pve=0.1):
     causal_snps = np.random.choice(N, 5)
     true_effects = np.zeros((10, X.shape[0]))
     true_effects[:, causal_snps] = \
-        np.random.binomial(1, sparsity, ((10, 5))) * np.random.normal((10, 5))
+        np.random.binomial(1, sparsity, ((10, 5))) \
+        * np.random.normal(size=(10, 5))
 
     tissue_variance = np.array([
         compute_sigma2(X, te, pve) for te in true_effects])

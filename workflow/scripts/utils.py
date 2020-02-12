@@ -23,7 +23,7 @@ def get_cis_variants(genotype, tss, window=500000, size=1000):
     ]
     return cis_variants
 
-    
+
 def assign(obj, dictionary):
     for key in dictionary.keys():
         obj.__dict__[key] = dictionary[key]
