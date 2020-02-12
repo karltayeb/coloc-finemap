@@ -58,6 +58,8 @@ rule fit_summary_model:
         "output/simulation/{simulation}/{settings}/gene_{gene}/data"
     output:
         "output/simulation/{simulation}/{settings}/gene_{gene}/model_summary"
+    wildcard_constraints:
+        simulation = "(?!\/).+(?=\/)"
     script:
         "workflow/scripts/fit_cosie_summary.py"
 
