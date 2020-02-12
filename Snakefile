@@ -34,6 +34,7 @@ rule get_cis_variants:
     script:
         "workflow/scripts/get_cis_variants.py"
 
+# simulation rules
 rule simulate_single_causal_variant:
     input:
         "output/genotypes/{gene}_cis_variants"
@@ -51,6 +52,7 @@ rule simulate_multiple_causal_variant:
     script:
         "workflow/scripts/multiple_causal_variant.py"
 
+# model fitting rules
 rule fit_summary_model:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
@@ -67,6 +69,7 @@ rule fit_genotype_model:
     script:
         "workflow/scripts/fit_cosie_genotype.py"
 
+# stat gathering rules
 rule fit_pairwise_summary_model:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
@@ -86,7 +89,6 @@ rule fit_pairwise_genotype_model:
         "t1_{tissue1}_t2_{tissue2}_model_genotype")
     script:
         "workflow/scripts/fit_cosie_summary.py"
-
 
 rule run_coloc:
     input:
