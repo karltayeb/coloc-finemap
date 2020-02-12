@@ -123,7 +123,7 @@ rule format_caviar_data_ld:
     input:
         'output/{path}/data'
     output:
-        ld_matrix='output/{path}/data.ld'
+        ld_matrix='output/{path}/caviar/data.ld'
     run:
         data = pickle.load(open(input[0], 'rb'))
         np.savetxt(fname=output.ld_matrix, X=data['LD'], delimiter='\t')
@@ -132,11 +132,26 @@ rule format_caviar_data_zscore:
     input:
         'output/{path}/data'
     output:
-        z_scores='output/{path}/data.z{tissue}'
+        z_scores='output/{path}/caviar/data.z{tissue}'
     run:
         data = pickle.load(open(input[0], 'rb'))
         zscores = pd.DataFrame(data['zscores'][int(wildcards.tissue)])
         zscores.to_csv(output.z_scores, sep='\t', header=None)
+
+rule run_caviar:
+    input:
+        ld_matrix='output/{path}/caviar/data.ld',
+        z_scores='output/{path}/caviar/data.z{tissue}'
+    output:
+        'output/{path}/caviar/{tissue}.log',
+        'output/{path}/{tissue}_post',
+        'output/{path}/{tissue}_set'
+    shell:
+        "workflow/bin/caviar/CAVIAR"
+        "-o {tissue}"
+        "-l {input.ld_matrix}"
+        "-z {input.z_scores}"
+        "-c 2"
 
 # stat gathering rules
 rule make_tissue_pair_components_table:
