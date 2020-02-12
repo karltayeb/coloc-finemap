@@ -143,9 +143,9 @@ rule run_caviar:
         ld_matrix='output/{path}/caviar/data.ld',
         z_scores='output/{path}/caviar/data.z{tissue}'
     output:
-        'output/{path}/caviar/{tissue}.log',
-        'output/{path}/{tissue}_post',
-        'output/{path}/{tissue}_set'
+        'output/{path}/caviar/caviar_t{tissue}.log',
+        'output/{path}/caviar/caviar_t{tissue}_post',
+        'output/{path}/caviar/caviar_t{tissue}_set'
     shell:
         "workflow/bin/caviar/CAVIAR"
         "-o {tissue}"
