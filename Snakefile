@@ -42,6 +42,14 @@ rule simulate_single_causal_variant:
     script:
         "workflow/scripts/single_causal_variant.py"
 
+rule simulate_multiple_causal_variant:
+    input:
+        "output/genotypes/{gene}_cis_variants"
+    output:
+        "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_{sparsity}/gene_{gene}/data"
+    script:
+        "workflow/scripts/multiple_causal_variant.py"
+
 rule fit_summary_model:
     input:
         "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
@@ -78,14 +86,6 @@ rule fit_pairwise_genotype_model:
     script:
         "workflow/scripts/fit_cosie_summary.py"
 
-rule all_pairwise_pairs:
-    input:
-        expand(
-            ("output/simulation/single_causal_variant/pve_{pve}/"
-            "ld_{linkage}/gene_{gene}/pairwise_summary/pairs_table"),
-            pve=config['pves'], linkage=config['linkages'],
-            gene=config['genes']
-        )
 
 rule run_coloc:
     input:
