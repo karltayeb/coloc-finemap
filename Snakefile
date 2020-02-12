@@ -147,7 +147,7 @@ rule run_caviar:
         'output/{path}/caviar/caviar_t{tissue}_post',
         'output/{path}/caviar/caviar_t{tissue}_set'
     shell:
-        "workflow/bin/caviar/CAVIAR"
+        "workflow/bin/caviar/CAVIAR "
         "-o {wildcards.tissue}"
         "-l {input.ld_matrix}"
         "-z {input.z_scores}"
