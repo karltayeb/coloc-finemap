@@ -10,7 +10,7 @@ data = pickle.load(
 )
 
 model_dict = pickle.load(
-    open(snakemake.input.model_path, 'rb')
+    open(snakemake.input.model, 'rb')
 )
 
 ard_var = model_dict['prior_varance']
