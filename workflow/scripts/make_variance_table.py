@@ -14,7 +14,7 @@ model_dict = pickle.load(
     open(snakemake.input.model, 'rb')
 )
 
-ard_var = model_dict['prior_varance']
+ard_var = 1 / model_dict['prior_precision']
 
 table = []
 labels = (data['true_effects'] @ data['true_effects'].T !=0)
