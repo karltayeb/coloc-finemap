@@ -5,7 +5,6 @@ import numpy as np
 import glob
 from utils import load_model
 
-import pdb; pdb.set_trace()
 data = pickle.load(
     open(snakemake.input.data, 'rb')
 )
@@ -16,6 +15,7 @@ model_dict = pickle.load(
 
 ard_var = 1 / model_dict['prior_precision']
 
+#todo: actually load the model, filter components
 table = []
 labels = (data['true_effects'] @ data['true_effects'].T !=0)
 shared = ((data['true_effects']!=0).astype(int) @ (data['true_effects'].T !=0).astype(int))
