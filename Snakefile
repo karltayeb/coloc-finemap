@@ -46,6 +46,11 @@ rule run_multiple_causal_variant_simulation:
             "gene_{gene}/ecaviar",
             pve=config['pves'], gene=config['genes']
         )
+        expand(
+            "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
+            "gene_{gene}/max_min_variance_summary",
+            pve=config['pves'], gene=config['genes']
+        )
 # intermediate rules
 rule get_cis_variants:
     output:
@@ -169,6 +174,13 @@ rule make_ecaviar_table:
         'output/{path}/ecaviar'
     script:
         'workflow/scripts/make_ecaviar_table.py'
+
+rule make_max_min_variance_table:
+    input:
+        data = 'output/{path}/data',
+        model = 'output/{path}/model_summary'
+    output:
+        'outputs/{path}/max_min_variance_summary'
 # stat gathering rules
 rule make_tissue_pair_components_table:
     input:

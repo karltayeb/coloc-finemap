@@ -6,6 +6,28 @@ from scipy.stats import norm
 from coloc.ard_ser import MVNFactorSER
 from coloc.independent_model import IndependentFactorSER
 
+def load_data(data_path):
+    """
+    load models and data
+    """
+    return pickle.load(open(data_path, 'rb'))
+
+
+def load_model(data, genotype_model_path=None, summary_model_path=None):
+    path = genotype_model_path or summary_model_path
+
+    if genotype_model_path is not None:
+        model = IndependentFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
+        assign(model, pickle.load(open(path, 'rb')))
+        model.X = data['X']
+        model.Y = data['Y']
+    else:
+        model = MVNFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
+        assign(model, pickle.load(open(path, 'rb')))
+        model.X = data['LD']
+        model.Y = data['zscores']
+    return model, sub_data
+
 def compute_sigma2(X, true_effect, pve):
     var = np.var(true_effect @ X)
     sigma2_t = var/pve - var
