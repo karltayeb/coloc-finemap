@@ -192,8 +192,9 @@ rule make_ecaviar_table:
         data = 'output/{path}/data',
         caviar_posteriors = expand(
             'output/{path}/caviar/caviar_t{tissue}_post',
-            path='{path}', tissue=np.arange(10)
+            path='{path}', tissue=np.arange(7)
         )
+        # todo get this to adapt to the number of tissues
     output:
         'output/{path}/ecaviar'
     script:
