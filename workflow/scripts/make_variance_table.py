@@ -31,4 +31,4 @@ for t1, t2 in itertools.combinations(np.arange(ard_var.shape[0]), 2):
         'label': labels[t1, t2]
     })
 table = pd.DataFrame(table)
-table.to_csv(snakemake.output[0])
+table.to_csv(snakemake.output[0], sep='\t')
