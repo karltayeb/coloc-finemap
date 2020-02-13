@@ -180,9 +180,10 @@ rule make_max_min_variance_table:
         data = 'output/{path}/data',
         model = 'output/{path}/model_summary'
     output:
-        'outputs/{path}/max_min_variance_summary'
+        'output/{path}/max_min_variance_summary'
     run:
         'workflow/scripts/make_variance_table.py'
+
 # stat gathering rules
 rule make_tissue_pair_components_table:
     input:
