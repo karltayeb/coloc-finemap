@@ -51,6 +51,30 @@ rule run_multiple_causal_variant_simulation:
             "gene_{gene}/max_min_variance_summary",
             pve=config['pves'], gene=config['genes']
         )
+
+rule run_single_causal_variant_simulation:
+    input:
+        expand(
+            "output/simulation/single_causal_variant/"
+            "pve_{pve}/ld_{linkage}/gene_{gene}/pairs_summary",
+            pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
+        ),
+        expand(
+            "output/simulation/single_causal_variant/"
+            "pve_{pve}/ld_{linkage}/gene_{gene}/coloc",
+            pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
+        ),
+        expand(
+            "output/simulation/single_causal_variant/"
+            "pve_{pve}/ld_{linkage}/gene_{gene}/ecaviar",
+            pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
+        ),
+        expand(
+            "output/simulation/single_causal_variant/"
+            "pve_{pve}/ld_{linkage}/gene_{gene}/max_min_variance_summary",
+            pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
+        )
+
 # intermediate rules
 rule get_cis_variants:
     output:
