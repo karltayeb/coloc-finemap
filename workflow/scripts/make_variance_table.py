@@ -5,6 +5,7 @@ import numpy as np
 import glob
 from utils import load_model
 
+import pdb; pdb.set_trace()
 data = pickle.load(
     open(snakemake.input.data, 'rb')
 )
