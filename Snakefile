@@ -45,7 +45,7 @@ rule run_multiple_causal_variant_simulation:
             "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
             "gene_{gene}/ecaviar",
             pve=config['pves'], gene=config['genes']
-        )
+        ),
         expand(
             "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
             "gene_{gene}/max_min_variance_summary",
