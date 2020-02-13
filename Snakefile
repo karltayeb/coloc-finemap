@@ -205,7 +205,7 @@ rule make_max_min_variance_table:
         model = 'output/{path}/model_summary'
     output:
         'output/{path}/max_min_variance_summary'
-    run:
+    script:
         'workflow/scripts/make_variance_table.py'
 
 # stat gathering rules
