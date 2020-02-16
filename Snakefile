@@ -2,15 +2,18 @@ import itertools
 import pickle
 import numpy as np
 import pandas as pd
+import glob
 
 configfile: "config/config.yaml"
 
 # terminal rules
+
+components_report = glob.glob('output/GTEx/*/summary.components.png')
+zscores_report = glob.glob('output/GTEx/*/summary.zscores.png')
 rule generate_figures:
     input:
-        expand(
-            "output/GTEx/gene_{gene}/summary.components.png", gene=config['chr22_genes']
-        )
+        list(components_report),
+        list(zscores_report)
 
 rule all_tissue_pairs:
     input:
