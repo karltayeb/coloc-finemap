@@ -84,7 +84,7 @@ data = {
     'zscores': z_scores.values,
     'covariates': covariates,
     'variant_ids': cis_variants.index.values,
-    'sample_ids': cis_variants.columns.values,
+    'sample_ids': expression.columns.values,
     'tissue_ids': z_scores.index.values
 }
 pickle.dump(data, open(snakemake.output[0], 'wb'))
