@@ -6,6 +6,12 @@ import pandas as pd
 configfile: "config/config.yaml"
 
 # terminal rules
+rule generate_figures:
+    input:
+        expand(
+            "output/GTEx/gene_{gene}/summary.components.png", gene=config['chr22_genes']
+        )
+
 rule all_tissue_pairs:
     input:
         expand(
