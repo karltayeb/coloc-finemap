@@ -26,7 +26,7 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         assign(model, pickle.load(open(path, 'rb')))
         model.X = data['LD']
         model.Y = data['zscores']
-    return model, sub_data
+    return model
 
 def compute_sigma2(X, true_effect, pve):
     var = np.var(true_effect @ X)
