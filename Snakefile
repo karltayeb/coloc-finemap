@@ -82,6 +82,7 @@ rule run_chr22_cafeh_summary:
         )
 
 rule run_chr22_cafeh_genotype:
+    input:
         expand(
             "output/GTEx/gene_{gene}/model_genotype", gene=config['chr22_genes']
         )
