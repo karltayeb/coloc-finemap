@@ -76,7 +76,7 @@ cis_variants = cis_variants.loc[:, samples]
 LD = np.corrcoef(cis_variants.values)
 X = (cis_variants - cis_variants.mean(1)[:, None]).values / \
     np.sqrt(np.var(cis_variants, 1))[:, None]
-
+import pdb; pdb.set_trace()
 data = {
     'X': X,
     'LD': LD,
