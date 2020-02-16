@@ -4,8 +4,7 @@ import pandas as pd
 from utils import compute_sigma2, get_cis_variants
 import os
 
-genes = np.array(['.'.join(x.split('.')[:-2]) for x in os.listdir('/work-zfs/abattle4/karl/gp_fine_mapping/eQTL_sign/associations/chr22/')])
-gene = 3
+gene = snakemake.wildcards.gene
 print('Training model for {}'.format(gene))
 
 #################
