@@ -266,8 +266,8 @@ rule make_cafeh_plots:
         data_path = 'output/{path}/data',
         model_path = 'output/{path}/model_summary'
     output:
-        component_plot_path = 'output/{path}/summary.components.png',
-        zscore_plot_path = 'output/{path}/summary.zscores.png'
+        component_plot_path = report('output/{path}/summary.components.png'),
+        zscore_plot_path = report('output/{path}/summary.zscores.png')
     script:
         'workflow/scripts/cafeh_plots.py'
 
