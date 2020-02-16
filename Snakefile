@@ -261,3 +261,14 @@ rule make_pairwise_pair_components_table:
     script:
         "workflow/scripts/make_pairwise_pair_components_table.py"
 
+rule make_cafeh_plots:
+    input:
+        data_path = 'output/{path}/data'
+        model_path = 'output/{path}/model_summary'
+    output:
+        component_plot_path = 'output/{path}/summary.component.png'
+        zscore_plot_path = 'output/{path}/summary.component.png'
+    script:
+        'workflow/scripts/cafeh_plots.py'
+
+
