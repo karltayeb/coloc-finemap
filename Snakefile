@@ -100,6 +100,13 @@ rule simulate_multiple_causal_variant:
     script:
         "workflow/scripts/multiple_causal_variant.py"
 
+rule get_gtex_data:
+    input:
+        "output/genotypes/{gene}_cis_variants"
+    output:
+        "output/GTEx/gene_{gene}/data"
+    script:
+        "workflow/scripts/get_gtex_data.py"
 # model fitting rules
 rule fit_summary_model:
     input:
