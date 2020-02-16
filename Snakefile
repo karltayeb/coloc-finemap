@@ -110,13 +110,13 @@ rule get_gtex_data:
 # model fitting rules
 rule fit_summary_model:
     input:
-        "output/simulation/{simulation}/{settings}/gene_{gene}/data"
+        "output/{path}/data"
     output:
-        "output/simulation/{simulation}/{settings}/gene_{gene}/model_summary"
+        "output/{path}/model_summary"
     wildcard_constraints:
         simulation = "(?!\/)[^\/]+(?=\/)"
     script:
-        "workflow/scripts/fit_cosie_summary.py"
+        "workflow/scripts/fit_cafeh_summary.py"
 
 rule fit_genotype_model:
     input:
@@ -138,7 +138,7 @@ rule fit_pairwise_summary_model:
     wildcard_constraints:
         simulation = "(?!\/)[^\/]+(?=\/)"
     script:
-        "workflow/scripts/fit_cosie_summary.py"
+        "workflow/scripts/fit_cafeh_summary.py"
 
 rule fit_pairwise_genotype_model:
     input:
@@ -148,7 +148,7 @@ rule fit_pairwise_genotype_model:
         "ld_{linkage}/gene_{gene}/pairwise_genotype/"
         "t1_{tissue1}_t2_{tissue2}_model_genotype")
     script:
-        "workflow/scripts/fit_cosie_summary.py"
+        "workflow/scripts/fit_cafeh_summary.py"
 
 rule run_coloc:
     input:
