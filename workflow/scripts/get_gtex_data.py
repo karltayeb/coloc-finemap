@@ -62,10 +62,11 @@ variant_ids = np.intersect1d(
 )
 associations = associations[associations.variant_id.isin(variant_ids)]
 
+import pdb; pdb.set_trace()
+
 # get zscores and LD matrix
 z_scores = associations.pivot('tissue', 'variant_id', 'z_score')
 nan_filter = np.all(~np.isnan(z_scores), 0)
-import pdb; pdb.set_trace()
 p_filter = (associations.pivot('tissue', 'variant_id', 'pval_nominal').min(0) < 0.01)
 
 z_scores = z_scores.iloc[:, nan_filter.values & p_filter.values]
