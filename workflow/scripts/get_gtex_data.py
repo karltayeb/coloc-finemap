@@ -69,7 +69,7 @@ p_filter = (associations.pivot('tissue', 'variant_id', 'pval_nominal').min(0) < 
 
 z_scores = z_scores.iloc[:, nan_filter.values & p_filter.values]
 cis_variants = chr22_genotype.loc[variant_ids].iloc[nan_filter.values & p_filter.values]
-
+cis_variants = cis_variants.loc[:, samples]
 ##############
 # compute LD #
 ##############
@@ -80,7 +80,7 @@ X = (cis_variants - cis_variants.mean(1)[:, None]).values / \
 data = {
     'X': X,
     'LD': LD,
-    'Y': expression.values,
+    'Y': expression.loc[gene, samples].values,
     'zscores': z_scores.values,
     'covariates': covariates,
     'variant_ids': cis_variants.index.values,
