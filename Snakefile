@@ -80,6 +80,9 @@ rule run_chr22_cafeh:
         expand(
             "output/GTEx/gene_{gene}/model_summary", gene=config['chr22_genes']
         )
+        expand(
+            "output/GTEx/gene_{gene}/model_genotype", gene=config['chr22_genes']
+        )
 # intermediate rules
 rule get_cis_variants:
     output:
