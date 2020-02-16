@@ -77,8 +77,6 @@ LD = np.corrcoef(cis_variants.values)
 X = (cis_variants - cis_variants.mean(1)[:, None]).values / \
     np.sqrt(np.var(cis_variants, 1))[:, None]
 
-import pdb; pdb.set_trace()
-
 data = {
     'X': X,
     'LD': LD,
@@ -89,3 +87,4 @@ data = {
     'sample_ids': cis_variants.columns.values,
     'tissue_ids': z_scores.index.values
 }
+pickle.dump(data, open(snakemake.output[0], 'wb'))
