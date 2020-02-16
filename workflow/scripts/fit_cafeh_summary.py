@@ -11,7 +11,11 @@ if 't1' in snakemake.output[0]:
     t2 = int(snakemake.wildcards.tissue2)
     Y = Y[[t1, t2]]
 
-n = MVNFactorSER(X=data['LD'], Y=Y, K=10)
+kwargs = {
+    'snp_ids': data['variant_ids'],
+    'tissue_ids': data['tissue_ids']
+}
+n = MVNFactorSER(X=data['LD'], Y=Y, K=10, **kwargs)
 n.fit(max_iter=200, update_active=False, update_weights=True, update_pi=True, ARD_weights=True, verbose=True)
 path = '/'.join(snakemake.output[0].split('/')[:-1])
 name = snakemake.output[0].split('/')[-1]
