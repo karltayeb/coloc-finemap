@@ -113,20 +113,16 @@ rule fit_summary_model:
         "output/{path}/data"
     output:
         "output/{path}/model_summary"
-    wildcard_constraints:
-        simulation = "(?!\/)[^\/]+(?=\/)"
     script:
         "workflow/scripts/fit_cafeh_summary.py"
 
 rule fit_genotype_model:
     input:
-        "output/simulation/{simulation}/{settings}/gene_{gene}/data"
+        "output/{path}/data"
     output:
-        "output/simulation/{simulation}/{settings}/gene_{gene}/model_genotype"
-    wildcard_constraints:
-        simulation = "(?!\/)[^\/]+(?=\/)"
+        "output/{path}/model_genotype"
     script:
-        "workflow/scripts/fit_cosie_genotype.py"
+        "workflow/scripts/fit_cafeh_genotype.py"
 
 rule fit_pairwise_summary_model:
     input:
