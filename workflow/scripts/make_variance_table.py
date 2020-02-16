@@ -16,11 +16,10 @@ model_dict = pickle.load(
 model = load_model(data, summary_model_path=snakemake.input.model)
 _, purity = model.get_credible_sets()
 active = np.array([k for k in range(model.dims['K'])if purity[k] > 0.7])
-import pdb; pdb.set_trace()
 if active.size > 0:
     ard_var = (1 / model_dict['prior_precision'])[:, active]
 else:
-    ard_var = np.zeros(model.dims['T'], 1)
+    ard_var = np.zeros((model.dims['T'], 1))
 
 #todo: actually load the model, filter components
 table = []
