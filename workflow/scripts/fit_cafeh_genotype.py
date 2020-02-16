@@ -16,7 +16,7 @@ kwargs = {
     'sample_ids': data['sample_ids'] if 'sample_ids' in data else None
 }
 
-g = IndependentFactorSER(X=data['X'], Y=Y, K=10, **kwargs)
+g = IndependentFactorSER(X=data['X'], Y=Y, K=20, **kwargs)
 g.fit(max_iter=100, update_active=False, update_weights=True, update_pi=True, 
       ARD_weights=True, update_variance=True, verbose=True)
 path = '/'.join(snakemake.output[0].split('/')[:-1])
