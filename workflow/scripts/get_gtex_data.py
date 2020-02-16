@@ -85,7 +85,7 @@ data = {
     'Y': expression.values,
     'zscores': z_scores.values,
     'covariates': covariates,
-    'variant_ids': X.index.values,
-    'sample_ids': X.columns.values,
+    'variant_ids': cis_variants.index.values,
+    'sample_ids': cis_variants.columns.values,
     'tissue_ids': z_scores.index.values
 }
