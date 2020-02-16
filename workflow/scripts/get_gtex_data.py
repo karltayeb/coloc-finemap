@@ -56,13 +56,13 @@ expression.set_index(['gene_id', 'tissue'], inplace=True)
 # filter #
 ##########
 print('filtering...')
+import pdb; pdb.set_trace()
+
 variant_ids = np.intersect1d(
     chr22_genotype.index[~np.any(np.isnan(chr22_genotype.loc[:, samples].values), 1)],
     np.unique(associations.variant_id)
 )
 associations = associations[associations.variant_id.isin(variant_ids)]
-
-import pdb; pdb.set_trace()
 
 # get zscores and LD matrix
 z_scores = associations.pivot('tissue', 'variant_id', 'z_score')
