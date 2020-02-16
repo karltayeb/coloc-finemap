@@ -75,6 +75,11 @@ rule run_single_causal_variant_simulation:
             pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
         )
 
+rule run_chr22_cafeh:
+    input:
+        expand(
+            "output/GTEx/gene_{gene}/cafeh_summary", gene=config['chr22_genes']
+        )
 # intermediate rules
 rule get_cis_variants:
     output:
@@ -107,7 +112,16 @@ rule get_gtex_data:
         "output/GTEx/gene_{gene}/data"
     script:
         "workflow/scripts/get_gtex_data.py"
+
 # model fitting rules
+rule fit_summary_model:
+    input:
+        "output/{path}/data"
+    output:
+        "output/{path}/model_summary"
+    script:
+        "workflow/scripts/fit_cafeh_summary.py"
+
 rule fit_summary_model:
     input:
         "output/{path}/data"
