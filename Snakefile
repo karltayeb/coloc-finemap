@@ -113,15 +113,6 @@ rule get_gtex_data:
     script:
         "workflow/scripts/get_gtex_data.py"
 
-# model fitting rules
-rule fit_summary_model:
-    input:
-        "output/{path}/data"
-    output:
-        "output/{path}/model_summary"
-    script:
-        "workflow/scripts/fit_cafeh_summary.py"
-
 rule fit_summary_model:
     input:
         "output/{path}/data"
