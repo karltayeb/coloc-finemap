@@ -75,14 +75,17 @@ rule run_single_causal_variant_simulation:
             pve=config["pves"], linkage=config["linkages"], gene=config["genes"]
         )
 
-rule run_chr22_cafeh:
+rule run_chr22_cafeh_summary:
     input:
         expand(
             "output/GTEx/gene_{gene}/model_summary", gene=config['chr22_genes']
-        ),
+        )
+
+rule run_chr22_cafeh_genotype:
         expand(
             "output/GTEx/gene_{gene}/model_genotype", gene=config['chr22_genes']
         )
+
 # intermediate rules
 rule get_cis_variants:
     output:
