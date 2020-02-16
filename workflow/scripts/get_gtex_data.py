@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from utils import compute_sigma2, get_cis_variants
+import os
 
 genes = np.array(['.'.join(x.split('.')[:-2]) for x in os.listdir('/work-zfs/abattle4/karl/gp_fine_mapping/eQTL_sign/associations/chr22/')])
 gene = 3
@@ -11,8 +12,10 @@ print('Training model for {}'.format(gene))
 # load genotype #
 #################
 print('loading genotype matrix...')
-genotype_path = "/work-zfs/abattle4/lab_data/GTEx_v8_trans_eqtl_data_processed_by_brian/processed_genotypes/GTEx_Analysis_2017-06-05_v8_WholeGenomeSeq_838Indiv_chr22_dosage_MAF_05.txt"
-chr22_genotype = pd.read_csv(genotype_path, sep='\t', index_col=0, na_values='-')
+#genotype_path = "/work-zfs/abattle4/lab_data/GTEx_v8_trans_eqtl_data_processed_by_brian/processed_genotypes/GTEx_Analysis_2017-06-05_v8_WholeGenomeSeq_838Indiv_chr22_dosage_MAF_05.txt"
+#chr22_genotype = pd.read_csv(genotype_path, sep='\t', index_col=0, na_values='-')
+
+chr22_genotype = pd.read_csv(snakemake.input[0], index_col=0)
 
 #####################
 # load associations #
