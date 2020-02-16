@@ -14,7 +14,7 @@ print('loading genotype matrix...')
 #genotype_path = "/work-zfs/abattle4/lab_data/GTEx_v8_trans_eqtl_data_processed_by_brian/processed_genotypes/GTEx_Analysis_2017-06-05_v8_WholeGenomeSeq_838Indiv_chr22_dosage_MAF_05.txt"
 #chr22_genotype = pd.read_csv(genotype_path, sep='\t', index_col=0, na_values='-')
 
-chr22_genotype = pd.read_csv(snakemake.input[0], index_col=0)
+cis_variants = pd.read_csv(snakemake.input[0], index_col=0)
 
 #####################
 # load associations #
@@ -57,7 +57,7 @@ expression.set_index(['gene_id', 'tissue'], inplace=True)
 ##########
 print('filtering...')
 variant_ids = np.intersect1d(
-    chr22_genotype.index[~np.any(np.isnan(chr22_genotype.loc[:, samples].values), 1)],
+    cis_variants.index[~np.any(np.isnan(cis_variants.loc[:, samples].values), 1)],
     np.unique(associations.variant_id)
 )
 associations = associations[associations.variant_id.isin(variant_ids)]
@@ -65,10 +65,10 @@ associations = associations[associations.variant_id.isin(variant_ids)]
 # get zscores and LD matrix
 z_scores = associations.pivot('tissue', 'variant_id', 'z_score')
 nan_filter = np.all(~np.isnan(z_scores), 0)
-p_filter = (associations.pivot('tissue', 'variant_id', 'pval_nominal').min(0) < 0.01)
+p_filter = (associations.pivot('tissue', 'variant_id', 'pval_nominal').min(0) < 0.5)
 
 z_scores = z_scores.iloc[:, nan_filter.values & p_filter.values]
-cis_variants = chr22_genotype.loc[variant_ids].iloc[nan_filter.values & p_filter.values]
+cis_variants = cis_variants.loc[variant_ids].iloc[nan_filter.values & p_filter.values]
 cis_variants = cis_variants.loc[:, samples]
 ##############
 # compute LD #
@@ -76,7 +76,6 @@ cis_variants = cis_variants.loc[:, samples]
 LD = np.corrcoef(cis_variants.values)
 X = (cis_variants - cis_variants.mean(1)[:, None]).values / \
     np.sqrt(np.var(cis_variants, 1))[:, None]
-import pdb; pdb.set_trace()
 data = {
     'X': X,
     'LD': LD,
@@ -84,7 +83,7 @@ data = {
     'zscores': z_scores.values,
     'covariates': covariates,
     'variant_ids': cis_variants.index.values,
-    'sample_ids': expression.columns.values,
-    'tissue_ids': z_scores.index.values
+    'sample_ids': samples,
+    'tissue_ids': tissues
 }
 pickle.dump(data, open(snakemake.output[0], 'wb'))
