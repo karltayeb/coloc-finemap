@@ -46,7 +46,7 @@ covariates = {tissue: pd.read_csv(
 # load expression #
 ###################
 print('loading expression...')
-expression = pickle.load(open('../notebooks/chr22_expression', 'rb'))
+expression = pickle.load(open('/work-zfs/abattle4/karl/gp_fine_mapping/notebooks/chr22_expression', 'rb'))
 expression = pd.concat(expression, sort=True)
 expression.reset_index(inplace=True)
 expression.rename(columns={'level_0': 'tissue'}, inplace=True)
