@@ -7,13 +7,11 @@ import glob
 configfile: "config/config.yaml"
 
 # terminal rules
-
-components_report = glob.glob('output/GTEx/*/summary.components.png')
-zscores_report = glob.glob('output/GTEx/*/summary.zscores.png')
 rule generate_figures:
     input:
-        list(components_report),
-        list(zscores_report)
+        expand(
+            "output/GTEx/gene_{gene}/summary.zscores.png", gene=config['chr22_genes']
+        )
 
 rule all_tissue_pairs:
     input:
