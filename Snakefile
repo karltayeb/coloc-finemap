@@ -127,7 +127,7 @@ rule get_gtex_data:
     script:
         "workflow/scripts/get_gtex_data.py"
 
-rule get_gtex_data:
+rule get_tissue_specific_cov:
     input:
         "output/GTEx/gene_{gene}/data"
     output:
