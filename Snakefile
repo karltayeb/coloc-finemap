@@ -88,6 +88,18 @@ rule run_chr22_cafeh_summary:
             "output/GTEx/gene_{gene}/model_summary", gene=config['chr22_genes']
         )
 
+rule run_chr22_cafeh_summary_ts_cov:
+    input:
+        expand(
+            "output/GTEx/gene_{gene}/tissue_specific_cov/model_summary", gene=config['chr22_genes']
+        )
+
+rule run_chr22_cafeh_summary_rg_cov:
+    input:
+        expand(
+            "output/GTEx/gene_{gene}/regressed_genotype_cov/model_summary", gene=config['chr22_genes']
+        )
+
 rule run_chr22_cafeh_genotype:
     input:
         expand(
