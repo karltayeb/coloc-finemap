@@ -1,4 +1,4 @@
-from coloc.ard_ser import MVNFactorSER
+from coloc.cafeh import CAFEH
 import pandas as pd
 import numpy as np
 import pickle
