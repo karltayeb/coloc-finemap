@@ -127,6 +127,22 @@ rule get_gtex_data:
     script:
         "workflow/scripts/get_gtex_data.py"
 
+rule get_gtex_data:
+    input:
+        "output/GTEx/gene_{gene}/data"
+    output:
+        "output/GTEx/gene_{gene}/tissue_specific_cov/data"
+    script:
+        "workflow/scripts/get_tissue_specific_cov.py"
+
+rule get_gtex_data:
+    input:
+        "output/GTEx/gene_{gene}/data"
+    output:
+        "output/GTEx/gene_{gene}/regressed_genotype_cov/data"
+    script:
+        "workflow/scripts/get_regressed_genotype_covariance.py"
+
 rule fit_summary_model:
     input:
         "output/{path}/data"
