@@ -124,6 +124,8 @@ rule get_gtex_data:
         "output/genotypes/{gene}_cis_variants"
     output:
         "output/GTEx/gene_{gene}/data"
+    wildcard_constraints:
+        gene = "(?!\/)[^\/]+(?=\/)"
     script:
         "workflow/scripts/get_gtex_data.py"
 
