@@ -17,8 +17,6 @@ kwargs = {
 }
 
 LD = data['LD']
-LD = (0.9 * LD) + (0.1 * np.corrcoef(Y, rowvar=False))
-
 n = MVNFactorSER(X=LD, Y=Y, K=20, **kwargs)
 n.fit(max_iter=200, update_active=False, update_weights=True, update_pi=True, ARD_weights=True, verbose=True)
 path = '/'.join(snakemake.output[0].split('/')[:-1])
