@@ -134,6 +134,8 @@ rule simulate_multiple_causal_variant:
     output:
         "output/simulation/multiple_causal_variant/"
         "pve_{pve}/sparsity_{sparsity}/gene_{gene}/data"
+    wildcard_constraints:
+        gene = "[^\/]+(?=\/)"
     script:
         "workflow/scripts/multiple_causal_variant.py"
 
