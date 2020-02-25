@@ -301,6 +301,7 @@ rule make_tissue_pair_components_table:
             "output/simulation/{path}/model_summary"
     output:
         summary_output = \
+            "output/{path}/pairs_summary"
     wildcard_constraints:
         simulation = "(?!\/)[^\/]+(?=\/)"
     script:
