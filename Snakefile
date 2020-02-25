@@ -155,7 +155,7 @@ rule get_tissue_specific_cov:
     output:
         "output/{path}/tissue_specific_cov/data"
     params:
-        alpha = 0.001
+        alpha = None
     script:
         "workflow/scripts/get_tissue_specific_cov.py"
 
