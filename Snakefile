@@ -210,10 +210,9 @@ rule fit_genotype_model:
 
 rule fit_pairwise_summary_model:
     input:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
+        "output/{path}/data"
     output:
-        "output/simulation/{simulation}/"
-        "{settings}/gene_{gene}/pairwise_summary/"
+        "{path}/pairwise_summary/"
         "t1_{tissue1}_t2_{tissue2}_model_summary"
     wildcard_constraints:
         simulation = "(?!\/)[^\/]+(?=\/)"
@@ -244,16 +243,18 @@ rule format_caviar_data_ld:
     input:
         'output/{path}/data'
     output:
-        ld_matrix='output/{path}/caviar/data.ld'
+        ld_matrix = temp('output/{path}/caviar/data.ld{tissue}')
     run:
-        data = pickle.load(open(input[0], 'rb'))
-        np.savetxt(fname=output.ld_matrix, X=data['LD'], delimiter='\t')
+        LD = pickle.load(open(input[0], 'rb'))['LD']
+        if np.ndim(LD) == 3:
+            LD = LD[int(wildcards.tissue)]
+        np.savetxt(fname=output.ld_matrix, X=LD, delimiter='\t')
 
 rule format_caviar_data_zscore:
     input:
         'output/{path}/data'
     output:
-        z_scores='output/{path}/caviar/data.z{tissue}'
+        z_scores = temp('output/{path}/caviar/data.z{tissue}')
     run:
         data = pickle.load(open(input[0], 'rb'))
         zscores = pd.DataFrame(data['zscores'][int(wildcards.tissue)])
@@ -261,8 +262,8 @@ rule format_caviar_data_zscore:
 
 rule run_caviar:
     input:
-        ld_matrix='output/{path}/caviar/data.ld',
-        z_scores='output/{path}/caviar/data.z{tissue}'
+        ld_matrix = 'output/{path}/caviar/data.ld{tissue}',
+        z_scores = 'output/{path}/caviar/data.z{tissue}'
     output:
         'output/{path}/caviar/caviar_t{tissue}.log',
         'output/{path}/caviar/caviar_t{tissue}_post',
