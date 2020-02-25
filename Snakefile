@@ -165,6 +165,14 @@ rule get_regressed_genotype_cov:
     script:
         "workflow/scripts/get_regressed_genotype_cov.py"
 
+rule get_global_tissue_cov:
+    input:
+        "output/GTEx/gene_{gene}/data"
+    output:
+        "output/GTEx/gene_{gene}/global_regularized_cov/data"
+    script:
+        "workflow/scripts/get_global_regularized_cov.py"
+
 rule fit_summary_model:
     input:
         "output/{path}/data"
