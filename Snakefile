@@ -64,6 +64,22 @@ rule run_multiple_causal_variant_simulation:
             "gene_{gene}/max_min_variance_summary",
             pve=config['pves'], gene=config['genes']
         )
+rule run_multiple_causal_variant_tissue_specific_cov:
+        expand(
+            "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
+            "gene_{gene}/tissue_specific_cov/pairs_summary",
+            pve=config['pves'], gene=config['genes']
+        ),
+        expand(
+            "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
+            "gene_{gene}/tissue_specific_cov/ecaviar",
+            pve=config['pves'], gene=config['genes']
+        ),
+        expand(
+            "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
+            "gene_{gene}/tissue_specific_cov/max_min_variance_summary",
+            pve=config['pves'], gene=config['genes']
+        )
 
 rule run_single_causal_variant_simulation:
     input:
