@@ -11,6 +11,9 @@ if 't1' in snakemake.output[0]:
     t2 = int(snakemake.wildcards.tissue2)
     Y = Y[[t1, t2]]
 
+data['variant_ids'] = data['variant_ids'] if 'variant_ids' in data else np.arange(data['zscores'].shape[1])
+data['tissue_ids'] = data['tissue_ids'] if 'tissue_ids' in data else np.arange(data['zscores'].shape[0])
+
 kwargs = {
     'snp_ids': data['variant_ids'],
     'tissue_ids': data['tissue_ids']
