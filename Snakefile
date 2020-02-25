@@ -243,7 +243,7 @@ rule format_caviar_data_ld:
         LD = pickle.load(open(input[0], 'rb'))['LD']
         if np.ndim(LD) == 3:
             LD = LD[int(wildcards.tissue)]
-        np.savetxt(fname=output.ld_matrix, X=LDc, delimiter='\t')
+        np.savetxt(fname=output.ld_matrix, X=LD, delimiter='\t')
 
 rule format_caviar_data_zscore:
     input:
