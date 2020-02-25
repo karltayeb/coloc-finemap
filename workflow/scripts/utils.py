@@ -22,7 +22,7 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         model.X = data['X']
         model.Y = data['Y']
     else:
-        model = MVNFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
+        model = CAFEH(np.zeros((1, 1)), np.zeros((1, 1)), 1)
         assign(model, pickle.load(open(path, 'rb')))
         model.X = data['LD']
         model.Y = data['zscores']
