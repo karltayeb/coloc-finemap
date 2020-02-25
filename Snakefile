@@ -149,9 +149,9 @@ rule get_gtex_data:
 
 rule get_tissue_specific_cov:
     input:
-        "output/GTEx/gene_{gene}/data"
+        "output/{path}/data"
     output:
-        "output/GTEx/gene_{gene}/tissue_specific_cov/data"
+        "output/{path}/tissue_specific_cov/data"
     params:
         alpha = 0.001
     script:
@@ -159,17 +159,17 @@ rule get_tissue_specific_cov:
 
 rule get_regressed_genotype_cov:
     input:
-        "output/GTEx/gene_{gene}/data"
+        "output/{path}/data"
     output:
-        "output/GTEx/gene_{gene}/regressed_genotype_cov/data"
+        "output/{path}/regressed_genotype_cov/data"
     script:
         "workflow/scripts/get_regressed_genotype_cov.py"
 
 rule get_global_tissue_cov:
     input:
-        "output/GTEx/gene_{gene}/data"
+        "output/{path}/data"
     output:
-        "output/GTEx/gene_{gene}/global_regularized_cov/data"
+        "output/{path}/global_regularized_cov/data"
     script:
         "workflow/scripts/get_global_regularized_cov.py"
 
