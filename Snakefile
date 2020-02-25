@@ -65,6 +65,7 @@ rule run_multiple_causal_variant_simulation:
             pve=config['pves'], gene=config['genes']
         )
 rule run_multiple_causal_variant_tissue_specific_cov:
+    input:
         expand(
             "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
             "gene_{gene}/tissue_specific_cov/pairs_summary",
