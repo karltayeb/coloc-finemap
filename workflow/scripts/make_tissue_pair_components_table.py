@@ -16,7 +16,7 @@ def load_models_and_data(data_path, summary_model_path):
     summary_model.X = data['LD']
     summary_model.Y = data['zscores']
     return summary_model, data
-import pdb; pdb.set_trace()
+
 s, data = load_models_and_data(
     snakemake.input.data_path, snakemake.input.summary_model_path)
 

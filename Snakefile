@@ -296,12 +296,11 @@ rule make_max_min_variance_table:
 rule make_tissue_pair_components_table:
     input:
         data_path = \
-            "output/simulation/{simulation}/{settings}/gene_{gene}/data",
+            "output/{path}/data",
         summary_model_path = \
-            "output/simulation/{simulation}/{settings}/gene_{gene}/model_summary"
+            "output/simulation/{path}/model_summary"
     output:
         summary_output = \
-            "output/simulation/{simulation}/{settings}/gene_{gene}/pairs_summary"
     wildcard_constraints:
         simulation = "(?!\/)[^\/]+(?=\/)"
     script:
