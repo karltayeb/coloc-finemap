@@ -68,11 +68,6 @@ rule run_multiple_causal_variant_tissue_specific_cov:
     input:
         expand(
             "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
-            "gene_{gene}/tissue_specific_cov/pairs_summary",
-            pve=config['pves'], gene=config['genes']
-        ),
-        expand(
-            "output/simulation/multiple_causal_variant/pve_{pve}/sparsity_0.2/"
             "gene_{gene}/tissue_specific_cov/ecaviar",
             pve=config['pves'], gene=config['genes']
         ),
@@ -248,7 +243,7 @@ rule format_caviar_data_ld:
         LD = pickle.load(open(input[0], 'rb'))['LD']
         if np.ndim(LD) == 3:
             LD = LD[int(wildcards.tissue)]
-        np.savetxt(fname=output.ld_matrix, X=LD, delimiter='\t')
+        np.savetxt(fname=output.ld_matrix, X=LDc, delimiter='\t')
 
 rule format_caviar_data_zscore:
     input:
@@ -302,13 +297,9 @@ rule make_tissue_pair_components_table:
     input:
         data_path = \
             "output/simulation/{simulation}/{settings}/gene_{gene}/data",
-        genotype_model_path = \
-            "output/simulation/{simulation}/{settings}/gene_{gene}/model_genotype",
         summary_model_path = \
             "output/simulation/{simulation}/{settings}/gene_{gene}/model_summary"
     output:
-        genotype_output = \
-            "output/simulation/{simulation}/{settings}/gene_{gene}/pairs_genotype",
         summary_output = \
             "output/simulation/{simulation}/{settings}/gene_{gene}/pairs_summary"
     wildcard_constraints:
