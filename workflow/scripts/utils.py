@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-from coloc.ard_ser import MVNFactorSER
+from coloc.cafeh import CAFEH
 from coloc.independent_model import IndependentFactorSER
 
 def load_data(data_path):
