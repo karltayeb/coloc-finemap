@@ -341,5 +341,5 @@ rule make_maf_tss_table:
         'maf/{part}'
     output:
         'output/enrichment/GTEx_maf_tss/GTEx_maf_tss.{part}'
-    scripts:
+    script:
         'workflow/scripts/make_maf_tss_table.py'
