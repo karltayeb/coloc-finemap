@@ -336,3 +336,10 @@ rule make_cafeh_plots:
         'workflow/scripts/cafeh_plots.py'
 
 
+rule make_maf_tss_table:
+    input:
+        'maf/{part}'
+    output:
+        'output/enrichment/GTEx_maf_tss/GTEx_maf_tss.{part}'
+    scripts:
+        'workflow/scripts/make_maf_tss_table.py'
