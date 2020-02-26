@@ -24,18 +24,21 @@ with open(snakemake.output[0], 'w') as g:
     with open(snakemake.input[0], 'r') as f:
         f.readline()
         for line in f:
-            _, variant_id, ref, alt, alt_freq, obs_ct = f.readline().split('\t')
-            chrom, pos = variant_id.split('_')[0], int(variant_id.split('_')[1])
-            alt_freq = float(alt_freq)
-            maf = np.min([1 - alt_freq, alt_freq])
-            low = find(gene_info_dict[chrom].tss.values - pos, -500000, 0,
-                       gene_info_dict[chrom].tss.values.size)
-            high = find(gene_info_dict[chrom].tss.values - pos, 500000, 0,
-                        gene_info_dict[chrom].tss.values.size)
-            gene_info_dict[chrom].iloc[low:high].apply(
-                lambda x: print('{}\t{}\t{}\t{:.5f}\t{}'.format(
-                    chrom, variant_id, x.gene, maf, np.abs(pos - x.tss)), file=g), axis=1
-            )
+            try:
+                _, variant_id, ref, alt, alt_freq, obs_ct = line.split('\t')
+                chrom, pos = variant_id.split('_')[0], int(variant_id.split('_')[1])
+                alt_freq = float(alt_freq)
+                maf = np.min([1 - alt_freq, alt_freq])
+                low = find(gene_info_dict[chrom].tss.values - pos, -500000, 0,
+                           gene_info_dict[chrom].tss.values.size)
+                high = find(gene_info_dict[chrom].tss.values - pos, 500000, 0,
+                            gene_info_dict[chrom].tss.values.size)
+                gene_info_dict[chrom].iloc[low:high].apply(
+                    lambda x: print('{}\t{}\t{}\t{:.5f}\t{}'.format(
+                        chrom, variant_id, x.gene, maf, np.abs(pos - x.tss)), file=g), axis=1
+                )
+            except Exception:
+                break
             i += 1
-            if i % 1000 == 0:
+            if i % 5000 == 0:
                 print(i)
