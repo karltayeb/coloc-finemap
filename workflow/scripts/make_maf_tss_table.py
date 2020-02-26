@@ -35,7 +35,7 @@ with open(snakemake.output[0], 'w') as g:
                             gene_info_dict[chrom].tss.values.size)
                 gene_info_dict[chrom].iloc[low:high].apply(
                     lambda x: print('{}\t{}\t{}\t{:.5f}\t{}'.format(
-                        chrom, variant_id, x.gene, maf, np.abs(pos - x.tss)), file=g), axis=1
+                        chrom, variant_id, x.gene, maf, pos - x.tss), file=g), axis=1
                 )
             except Exception:
                 break
