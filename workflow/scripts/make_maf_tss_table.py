@@ -27,12 +27,10 @@ for line in f:
     chrom, pos = variant_id.split('_')[0], int(variant_id.split('_')[1])
     alt_freq = float(alt_freq)
     maf = np.min([1 - alt_freq, alt_freq])
-    
     low = find(gene_info_dict[chrom].tss.values - pos, -500000, 0,
                gene_info_dict[chrom].tss.values.size)
     high = find(gene_info_dict[chrom].tss.values - pos, 500000, 0,
                 gene_info_dict[chrom].tss.values.size)
-    
     gene_info_dict[chrom].iloc[low:high].apply(
         lambda x: print('{}\t{}\t{}\t{:.5f}\t{}'.format(
             chrom, variant_id, x.gene, maf, np.abs(pos - x.tss)), file=outfile), axis=1
@@ -41,4 +39,4 @@ for line in f:
     if i % 1000 == 0:
         print(i)
 f.close()
-g.close()
+outfile.close()
