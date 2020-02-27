@@ -47,7 +47,7 @@ rule get_gtex_ld:
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01 --r square'
-        ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene} --extract'
+        ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene} --write-snplist'
 
 rule get_gtex_data:
     input:
