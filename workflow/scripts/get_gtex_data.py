@@ -1,12 +1,20 @@
 import pickle
 import pandas as pd
+import numpy as np
 import os
 
 LD = pd.read_csv(snakemake.input.ld, sep='\t', header=None)
 associations = pd.read_csv(snakemake.input.associations, sep='\t', index_col=0)
 
+snplist = pd.read_csv(snakemake.input.snps, header=None)
+snplist = np.squeeze(snplist.values)
+
+associations = associations.loc[:, np.intersect1d(snplist, associations.columns.values)]
+mask = np.isin(snp_list, intersect)
+LD = LD.values[mask][:, mask]
+
 data = {
-    'LD': LD.values,
+    'LD': LD,
     'zscores': associations.values,
     'tissue_ids': associations.index.values,
     'variant_ids': associations.columns.values

@@ -52,7 +52,8 @@ rule get_gtex_ld:
 rule get_gtex_data:
     input:
         associations = 'output/GTEx/gene_{gene}/{gene}.associations',
-        ld = 'output/GTEx/gene_{gene}/{gene}.ld'
+        ld = 'output/GTEx/gene_{gene}/{gene}.ld',
+        snps = 'output/GTEx/gene_{gene}/{gene}.snplist'
     output:
         "output/GTEx/gene_{gene}/data"
     wildcard_constraints:
