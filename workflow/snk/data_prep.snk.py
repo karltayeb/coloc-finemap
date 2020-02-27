@@ -31,11 +31,12 @@ rule build_indices:
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
 
-rule build_gene_seek:
+rule build_gene_seek_index:
     output:
         'output/GTEx/index/{tissue}.association.index'
     run:
         from collections import defaultdict
+        print('building index for {}'.format(wildcards.tissue))
         gene_start = {}
         with open('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/'
                   'GTEx_Analysis_v8_eQTL_all_associations/{}.allpairs.txt'.format(wildcards.tissue), 'r') as f:
@@ -48,7 +49,7 @@ rule build_gene_seek:
                     gene_start[gene] = i
                 i += len(line)
                 last_gene = gene
-        json.dump(gene_start, open(snakemake.output, 'w'))
+        json.dump(gene_start, open(output[0], 'w'))
 
 rule grep_associations_tissue_gene:
     output:
