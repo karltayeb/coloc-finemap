@@ -16,7 +16,14 @@ rule get_gtex_data:
         "workflow/scripts/get_gtex_data.py"
 
 
-rule grep_associations:
+tissues = [x.split('.')[0] for x in os.listdir('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/')]
+rule grep_associations_gene:
+    input:
+        expand(
+            'output/GTEx/gene_{gene}/associations/{tissue}.associations', gene='ENSG00000223972.5', tissue=tissues
+        )
+
+rule grep_associations_tissue_gene:
     output:
         'output/GTEx/gene_{gene}/associations/{tissue}.associations'
     shell:
