@@ -42,7 +42,7 @@ rule get_gtex_ld:
         'output/GTEx/gene_{gene}/{gene}.ld'
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        ' --chr chr1 --from-bp 13550 --to-bp 1631911  --maf 0.01 --r square'
+        ' --chr chr1 --from-bp 13550 --to-bp 1631911  --maf 0.01 --r square --out {wildcards.gene}'
 
 rule build_gene_seek_index:
     output:
