@@ -31,6 +31,24 @@ rule build_indices:
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
 
+rule get_gtex_associations:
+    input:
+        expand(
+            '/output/GTEx/index/{tissue}.association.index', tissue=tissues
+        )
+    output:
+        'output/GTEx/gene_{gene}/{gene}.associations'
+    run:
+        'workflow/scripts/get_gtex_associations.py'
+
+rule get_gtex_ld:
+    input:
+        'output/GTEx/gene_{gene}/{gene}.associations'
+    output:
+        'output/GTEx/gene_{gene}/{gene}.ld'
+    script:
+        'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
+        ' --chr chr1 --from-bp 13550 --to-bp 1631911  --maf 0.01 --r square'
 rule build_gene_seek_index:
     output:
         'output/GTEx/index/{tissue}.association.index'
