@@ -46,7 +46,7 @@ rule get_gtex_ld:
         temp('output/GTEx/gene_{gene}/{gene}.ld')
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        ' --chr {input.chrom} --from-bp {input.from_bp} --to-bp {input.to_bp}  --maf 0.01 --r square'
+        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01 --r square'
         ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene}'
 
 rule get_gtex_data:
