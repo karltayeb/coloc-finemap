@@ -2,7 +2,7 @@ import pickle
 import pandas as pd
 import os
 
-LD = pd.read_csv(snakemake.input.ld, sep='\t', header=None).values
+LD = pd.read_csv(snakemake.input.ld, sep='\t', header=None)
 associations = pd.read_csv(snakemake.input.associations, sep='\t', index_col=0)
 data = {
     'LD': LD.values,
