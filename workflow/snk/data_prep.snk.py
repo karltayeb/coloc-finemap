@@ -28,12 +28,12 @@ rule grep_associations_gene:
 rule build_indices:
     input:
         expand(
-            '../../output/GTEx/{tissue}.association.index', tissue=tissues
+            'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
 
 rule build_gene_seek:
     output:
-        '../../output/GTEx/{tissue}.association.index'
+        'output/GTEx/index/{tissue}.association.index'
     run:
         from collections import defaultdict
         gene_start = {}
