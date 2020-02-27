@@ -11,7 +11,7 @@ def find(arr, target, low, high):
         return find(arr, target, mid, high)
 
 gencode = pd.read_csv(('/work-zfs/abattle4/lab_data/GTEx_v8/references/'
-                      'gencode.v26.GRCh38.genes.gtf'), sep='\t', skiprows=6, header=None)
+                       'gencode.v26.GRCh38.genes.gtf'), sep='\t', skiprows=6, header=None)
 
 g = gencode[gencode.iloc[:, 2] =='gene']
 tss = g.apply(lambda x: x.values[3] if x.values[6] is '+' else x.values[4], axis=1)
@@ -72,3 +72,4 @@ for f in os.listdir('output/enrichment/GTEx_maf_tss/'):
     with open('output/enrichment/bins', 'wb') as f:
         pickle.dump(bins, f)
 """
+
