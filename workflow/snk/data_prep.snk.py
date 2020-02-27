@@ -40,8 +40,8 @@ rule get_gtex_ld:
         associations = 'output/GTEx/gene_{gene}/{gene}.associations'
     params:
         chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
-        from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 1000000,
-        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
+        from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 250000,
+        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 250000
     output:
         temp('output/GTEx/gene_{gene}/{gene}.ld')
     shell:

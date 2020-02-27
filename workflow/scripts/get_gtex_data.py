@@ -9,7 +9,7 @@ associations = pd.read_csv(snakemake.input.associations, sep='\t', index_col=0)
 snplist = pd.read_csv(snakemake.input.snps, header=None)
 snplist = np.squeeze(snplist.values)
 
-intersect = np.intersect1d(snp_list, zscore_snps)
+intersect = np.intersect1d(snplist, associations.columns.values)
 associations = associations.loc[:, intersect]
 
 mask = np.isin(snplist, intersect)
