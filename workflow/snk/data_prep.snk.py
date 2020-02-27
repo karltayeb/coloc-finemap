@@ -13,7 +13,7 @@ rule get_gtex_data:
     wildcard_constraints:
         gene = "(?!\/)[^\/]+(?=\/)"
     script:
-        "workflow/scripts/get_gtex_data.py"
+        "../../workflow/scripts/get_gtex_data.py"
 
 
 import glob
@@ -33,7 +33,7 @@ rule get_gtex_associations:
     output:
         'output/GTEx/gene_{gene}/{gene}.associations'
     script:
-        'workflow/scripts/get_gtex_associations.py'
+        '../../workflow/scripts/get_gtex_associations.py'
 
 rule get_gtex_ld:
     input:

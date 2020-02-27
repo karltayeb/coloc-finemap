@@ -55,4 +55,4 @@ results.index.levels[0].name = 'tissue'
 results.reset_index()
 results.loc[:, 'zscore'] = results.slope.astype(float) / results.slope_se.astype(float)
 results = pd.pivot_table(results, index='tissue', columns='variant_id', values='zscore')
-pd.to_csv(results, snakemake.output, sep='\t')
+results.to_csv(snakemake.output, sep='\t')
