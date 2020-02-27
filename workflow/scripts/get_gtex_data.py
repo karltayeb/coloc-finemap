@@ -1,9 +1,18 @@
 import pickle
-import numpy as np
 import pandas as pd
-from utils import compute_sigma2, get_cis_variants
 import os
 
+LD = pd.read_csv(snakemake.input.ld, sep='\t', header=None).values
+associations = pd.read_csv(snakemake.input.associations, sep='\t', index_col=0)
+data = {
+    'LD': LD.values,
+    'zscores': associations.values,
+    'tissue_ids': associations.index.values,
+    'variant_ids': associations.columns.values
+}
+pickle.dump(data, open(snakemake.output[0], 'wb'))
+
+"""
 gene = snakemake.wildcards.gene
 print('Training model for {}'.format(gene))
 
@@ -87,3 +96,4 @@ data = {
     'tissue_ids': tissues
 }
 pickle.dump(data, open(snakemake.output[0], 'wb'))
+"""

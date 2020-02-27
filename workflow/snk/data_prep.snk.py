@@ -31,7 +31,7 @@ rule get_gtex_associations:
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
     output:
-        'output/GTEx/gene_{gene}/{gene}.associations'
+        temp('output/GTEx/gene_{gene}/{gene}.associations')
     script:
         '../../workflow/scripts/get_gtex_associations.py'
 
@@ -39,11 +39,23 @@ rule get_gtex_ld:
     input:
         'output/GTEx/gene_{gene}/{gene}.associations'
     output:
-        'output/GTEx/gene_{gene}/{gene}.ld'
+        temp('output/GTEx/gene_{gene}/{gene}.ld')
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
         ' --chr chr1 --from-bp 13550 --to-bp 1631911  --maf 0.01 --r square'
         ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene}'
+
+rule get_gtex_data:
+    input:
+        associations = 'output/GTEx/gene_{gene}/{gene}.associations',
+        ld = 'output/GTEx/gene_{gene}/{gene}.ld'
+    output:
+        "output/GTEx/gene_{gene}/data"
+    wildcard_constraints:
+        gene = "(?!\/)[^\/]+(?=\/)"
+    script:
+        "../../workflow/scripts/get_gtex_data.py"
+
 
 rule build_gene_seek_index:
     output:
