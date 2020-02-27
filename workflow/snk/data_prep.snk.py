@@ -21,7 +21,7 @@ rule grep_associations:
         'output/GTEx/gene_{gene}/associations/{tissue}.associations'
     run:
         'grep {gene} \
-        /work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations{tissue}.allpairs.txt \
+        /work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/{tissue}.allpairs.txt \
         > {output}'
 
 rule get_tissue_specific_cov:
