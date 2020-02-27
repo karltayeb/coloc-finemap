@@ -5,17 +5,6 @@ rule get_cis_variants:
     script:
         "workflow/scripts/get_cis_variants.py"
 
-rule get_gtex_data:
-    input:
-        "output/genotypes/{gene}_cis_variants"
-    output:
-        "output/GTEx/gene_{gene}/data"
-    wildcard_constraints:
-        gene = "(?!\/)[^\/]+(?=\/)"
-    script:
-        "../../workflow/scripts/get_gtex_data.py"
-
-
 import glob
 tissues = [x.split('.')[0].split('/')[-1] for x in glob.glob(
     '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/*allpairs.txt')]
