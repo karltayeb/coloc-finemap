@@ -11,7 +11,7 @@ snplist = pd.read_csv(snakemake.input.snps, header=None)
 snplist = np.squeeze(snplist.values)
 
 ld_nan_filter = ~np.any(np.isnan(LD), 1)
-LD = [ld_nan_filter][:, ld_nan_filter]
+LD = LD[ld_nan_filter][:, ld_nan_filter]
 snplist = snplist[ld_nan_filter]
 
 intersect = np.intersect1d(snplist, associations.columns.values)

@@ -6,5 +6,5 @@ rule run_coloc:
     wildcard_constraints:
         simulation = "(?!\/)[^\/]+(?=\/)"
     script:
-        "workflow/scripts/run_coloc.R"
+        "../../workflow/scripts/run_coloc.R"
 
