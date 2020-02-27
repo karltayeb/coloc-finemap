@@ -41,8 +41,8 @@ rule get_gtex_ld:
     output:
         temp('output/GTEx/gene_{gene}/{gene}.ld')
     params:
-        chrom = gencode.loc[wildcards.gene].chromosome
-        from_bp = gencode.loc[wildcards.gene].tss - 500000
+        chrom = gencode.loc[wildcards.gene].chromosome,
+        from_bp = gencode.loc[wildcards.gene].tss - 500000,
         to_bp = gencode.loc[wildcards.gene].tss + 500000
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
