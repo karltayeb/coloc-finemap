@@ -41,7 +41,7 @@ rule get_gtex_ld:
     params:
         chrom = lambda w: gencode.loc[w].chromosome,
         from_bp = lambda w: gencode.loc[w].tss - 500000,
-        to_bp = lambda w: gencode.loc[gene].tss + 500000
+        to_bp = lambda w: gencode.loc[w].tss + 500000
     output:
         temp('output/GTEx/gene_{gene}/{gene}.ld')
     shell:
