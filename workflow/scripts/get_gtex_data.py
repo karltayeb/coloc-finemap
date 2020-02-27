@@ -4,6 +4,8 @@ import os
 
 LD = pd.read_csv(snakemake.input.ld, sep='\t', header=None)
 associations = pd.read_csv(snakemake.input.associations, sep='\t', index_col=0)
+
+import pdb; pdb.set_trace()
 data = {
     'LD': LD.values,
     'zscores': associations.values,
