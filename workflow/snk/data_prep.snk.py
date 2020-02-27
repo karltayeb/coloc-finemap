@@ -45,7 +45,6 @@ rule get_gtex_data:
     script:
         "../../workflow/scripts/get_gtex_data.py"
 
-
 rule build_gene_seek_index:
     output:
         'output/GTEx/index/{tissue}.association.index'
@@ -74,7 +73,7 @@ rule get_tissue_specific_cov:
     params:
         alpha = None
     script:
-        "workflow/scripts/get_tissue_specific_cov.py"
+        "../../workflow/scripts/get_tissue_specific_cov.py"
 
 rule get_regressed_genotype_cov:
     input:
