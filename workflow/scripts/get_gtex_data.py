@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 
-LD = pd.read_csv(snakemake.input.ld, sep='\t', header=None)
+LD = pd.read_csv(snakemake.input.ld, sep='\t', header=None).values
 associations = pd.read_csv(snakemake.input.associations, sep='\t', index_col=0)
 associations = associations.loc[:, ~np.any(np.isnan(associations), 0)]
 
@@ -18,7 +18,7 @@ intersect = np.intersect1d(snplist, associations.columns.values)
 associations = associations.loc[:, intersect]
 
 mask = np.isin(snplist, intersect)
-LD = LD.values[mask][:, mask]
+LD = LD[mask][:, mask]
 
 data = {
     'LD': LD,
