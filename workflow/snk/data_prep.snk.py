@@ -16,7 +16,9 @@ rule get_gtex_data:
         "workflow/scripts/get_gtex_data.py"
 
 
-tissues = [x.split('.')[0] for x in os.listdir('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/')]
+import glob
+tissues = [x.split('.')[0].split('/')[-1] for x in glob.glob(
+    '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/*allpairs.txt')]
 rule grep_associations_gene:
     input:
         expand(
