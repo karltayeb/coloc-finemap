@@ -4,7 +4,7 @@ import numpy as np
 data = pickle.load(open(snakemake.input[0], 'rb'))
 alpha = snakemake.params.alpha
 if alpha is None:
-    alpha = 0.001
+    alpha = 0.01
 
 print('Making tissue specific covariance with alpha={}'.format(alpha))
 LD = np.array([
