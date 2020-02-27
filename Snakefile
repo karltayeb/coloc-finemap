@@ -28,7 +28,7 @@ rule generate_figures:
 gtex_genes = np.loadtxt('/work-zfs/abattle4/karl/cosie_analysis/config/random_gene_list.txt', dtype=str)
 rule run_gtex:
     input:
-        expand("output/GTEx/gene_{gene}/tissue_specific_cov/sumary_model", gene=gtex_genes)
+        expand("output/GTEx/gene_{gene}/tissue_specific_cov/model_summary", gene=gtex_genes)
 
 rule all_tissue_pairs:
     input:
