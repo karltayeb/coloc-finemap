@@ -5,7 +5,6 @@ rule get_cis_variants:
     script:
         "workflow/scripts/get_cis_variants.py"
 
-
 rule get_gtex_data:
     input:
         "output/genotypes/{gene}_cis_variants"
@@ -16,6 +15,13 @@ rule get_gtex_data:
     script:
         "workflow/scripts/get_gtex_data.py"
 
+
+rule grep_associations:
+    output:
+        'output/GTEx/gene_{gene}/associations/{tissue}.associations'
+    run:
+        'grep ${gene} ${tissue}.allpairs.txt > {output}'
+        
 rule get_tissue_specific_cov:
     input:
         "output/{path}/data"
