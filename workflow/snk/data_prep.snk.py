@@ -8,6 +8,7 @@ gene_id = gencode.apply(lambda x: x.values[8].split(';')[0].split('"')[1], axis=
 
 gencode = pd.concat([gencode.iloc[:, 0], tss, gene_id], keys=['chromosome', 'tss', 'gene'], axis=1)
 gencode = gencode.set_index('gene')
+
 # intermediate rules
 rule get_cis_variants:
     output:
@@ -40,8 +41,8 @@ rule get_gtex_ld:
     output:
         temp('output/GTEx/gene_{gene}/{gene}.ld')
     params:
-        chrom = gencode.loc[snakemake.wildcards.gene].chromosome
-        from_bp = gencode.loc[snakemake.wildcards.gene].tss - 500000
+        chrom = gencode.loc[snakemake.wildcards.gene].chromosome,
+        from_bp = gencode.loc[snakemake.wildcards.gene].tss - 500000,
         to_bp = gencode.loc[snakemake.wildcards.gene].tss + 500000
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
