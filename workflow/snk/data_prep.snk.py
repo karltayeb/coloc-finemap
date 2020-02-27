@@ -37,10 +37,11 @@ rule get_gtex_associations:
 
 rule get_gtex_ld:
     input:
-        associations = 'output/GTEx/gene_{gene}/{gene}.associations',
-        chrom = gencode.loc[wildcards.gene].chromosome,
-        from_bp = gencode.loc[wildcards.gene].tss - 500000,
-        to_bp = gencode.loc[wildcards.gene].tss + 500000
+        associations = 'output/GTEx/gene_{gene}/{gene}.associations'
+    params:
+        chrom = gencode.loc[{gene}].chromosome,
+        from_bp = gencode.loc[{gene}].tss - 500000,
+        to_bp = gencode.loc[{gene}].tss + 500000
     output:
         temp('output/GTEx/gene_{gene}/{gene}.ld')
     shell:
