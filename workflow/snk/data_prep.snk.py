@@ -1,3 +1,13 @@
+import pandas as pd
+
+gencode = pd.read_csv(('/work-zfs/abattle4/lab_data/GTEx_v8/references/'
+                       'gencode.v26.GRCh38.genes.gtf'), sep='\t', skiprows=6, header=None)
+gencode = gencode[gencode.iloc[:, 2] =='gene']
+tss = gencode.apply(lambda x: x.values[3] if x.values[6] is '+' else x.values[4], axis=1)
+gene_id = gencode.apply(lambda x: x.values[8].split(';')[0].split('"')[1], axis=1)
+
+gencode = pd.concat([gencode.iloc[:, 0], tss, gene_id], keys=['chromosome', 'tss', 'gene'], axis=1)
+gencode = gencode.set_index('gene')
 # intermediate rules
 rule get_cis_variants:
     output:
@@ -26,12 +36,16 @@ rule get_gtex_associations:
 
 rule get_gtex_ld:
     input:
-        'output/GTEx/gene_{gene}/{gene}.associations'
+        associations = 'output/GTEx/gene_{gene}/{gene}.associations'
     output:
         temp('output/GTEx/gene_{gene}/{gene}.ld')
+    params:
+        chrom = gencode.loc[snakemake.wildcards.gene].chromosome
+        from_bp = gencode.loc[snakemake.wildcards.gene].tss - 500000
+        to_bp = gencode.loc[snakemake.wildcards.gene].tss + 500000
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        ' --chr chr1 --from-bp 13550 --to-bp 1631911  --maf 0.01 --r square'
+        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01 --r square'
         ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene}'
 
 rule get_gtex_data:
