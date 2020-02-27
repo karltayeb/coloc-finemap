@@ -10,7 +10,7 @@ snplist = pd.read_csv(snakemake.input.snps, header=None)
 snplist = np.squeeze(snplist.values)
 
 associations = associations.loc[:, np.intersect1d(snplist, associations.columns.values)]
-mask = np.isin(snp_list, intersect)
+mask = np.isin(snplist, intersect)
 LD = LD.values[mask][:, mask]
 
 data = {
