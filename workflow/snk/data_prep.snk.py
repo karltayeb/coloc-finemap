@@ -25,6 +25,31 @@ rule grep_associations_gene:
             'output/GTEx/gene_{gene}/associations/{tissue}.associations', gene='ENSG00000223972.5', tissue=tissues
         )
 
+rule build_indices:
+    input:
+        expand(
+            '../../output/GTEx/{tissue}.association.index', tissue=tissues
+        )
+
+rule build_gene_seek:
+    output:
+        '../../output/GTEx/{tissue}.association.index'
+    run:
+        from collections import defaultdict
+        gene_start = {}
+        with open('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/'
+                  'GTEx_Analysis_v8_eQTL_all_associations/{}.allpairs.txt'.format(wildcards.tissue), 'r') as f:
+            i = 0
+            last_gene = ''
+            for line in f:
+                gene = line.split('\t')[0]
+
+                if gene != last_gene:
+                    gene_start[gene] = i
+                i += len(line)
+                last_gene = gene
+        json.dump(gene_start, open(snakemake.output, 'w'))
+
 rule grep_associations_tissue_gene:
     output:
         'output/GTEx/gene_{gene}/associations/{tissue}.associations'
