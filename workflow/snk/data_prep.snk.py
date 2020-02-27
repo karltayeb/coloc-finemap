@@ -19,12 +19,6 @@ rule get_gtex_data:
 import glob
 tissues = [x.split('.')[0].split('/')[-1] for x in glob.glob(
     '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/*allpairs.txt')]
-rule grep_associations_gene:
-    input:
-        expand(
-            'output/GTEx/gene_{gene}/associations/{tissue}.associations', gene='ENSG00000223972.5', tissue=tissues
-        )
-
 rule build_indices:
     input:
         expand(
@@ -38,7 +32,7 @@ rule get_gtex_associations:
         )
     output:
         'output/GTEx/gene_{gene}/{gene}.associations'
-    run:
+    script:
         'workflow/scripts/get_gtex_associations.py'
 
 rule get_gtex_ld:
@@ -46,9 +40,10 @@ rule get_gtex_ld:
         'output/GTEx/gene_{gene}/{gene}.associations'
     output:
         'output/GTEx/gene_{gene}/{gene}.ld'
-    script:
+    shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
         ' --chr chr1 --from-bp 13550 --to-bp 1631911  --maf 0.01 --r square'
+
 rule build_gene_seek_index:
     output:
         'output/GTEx/index/{tissue}.association.index'
@@ -68,12 +63,6 @@ rule build_gene_seek_index:
                 i += len(line)
                 last_gene = gene
         json.dump(gene_start, open(output[0], 'w'))
-
-rule grep_associations_tissue_gene:
-    output:
-        'output/GTEx/gene_{gene}/associations/{tissue}.associations'
-    shell:
-        'grep {wildcards.gene} /work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/{wildcards.tissue}.allpairs.txt > {output}'
 
 rule get_tissue_specific_cov:
     input:
