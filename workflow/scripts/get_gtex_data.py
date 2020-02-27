@@ -5,6 +5,7 @@ import os
 
 LD = pd.read_csv(snakemake.input.ld, sep='\t', header=None)
 associations = pd.read_csv(snakemake.input.associations, sep='\t', index_col=0)
+associations = associations.loc[:, ~np.any(np.isnan(associations), 0)]
 
 snplist = pd.read_csv(snakemake.input.snps, header=None)
 snplist = np.squeeze(snplist.values)
