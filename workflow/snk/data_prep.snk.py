@@ -34,7 +34,7 @@ rule build_indices:
 rule get_gtex_associations:
     input:
         expand(
-            '/output/GTEx/index/{tissue}.association.index', tissue=tissues
+            'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
     output:
         'output/GTEx/gene_{gene}/{gene}.associations'
