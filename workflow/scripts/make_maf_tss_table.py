@@ -42,3 +42,33 @@ with open(snakemake.output[0], 'w') as g:
             i += 1
             if i % 5000 == 0:
                 print(i)
+
+
+"""
+import os
+from collections import defaultdict
+import pickle
+import numpy as np
+import pandas as pd
+import yaml
+
+maf_bins = np.linspace(0, 1, 51)
+tss_bins = np.linspace(-500000, 500000, 41)
+bins = {}
+
+for m in maf_bins:
+    for t in tss_bins:
+        bins[float(m) ,float(t)] = []
+
+for f in os.listdir('output/enrichment/GTEx_maf_tss/'):
+    print(f)
+    df = pd.read_csv('output/enrichment/GTEx_maf_tss/{}'.format(f), sep='\t', header=None)
+    maf_binning = np.digitize(df.iloc[:, 3].astype(float), maf_bins)
+    tss_binning = np.digitize(df.iloc[:, 4].astype(float), tss_bins)
+    variants = df.iloc[:, 1].values
+    for m, t, variant in zip(maf_binning, tss_binning, variants):
+        bins[maf_bins[m], tss_bins[t]].append(variant)
+        
+    with open('output/enrichment/bins', 'wb') as f:
+        pickle.dump(bins, f)
+"""
