@@ -43,7 +43,7 @@ rule get_gtex_ld:
         from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 250000,
         to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 250000
     output:
-        temp('output/GTEx/gene_{gene}/{gene}.ld')
+        temp('output/GTEx/gene_{gene}/{gene}.ld'),
         temp('output/GTEx/gene_{gene}/{gene}.snplist')
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
