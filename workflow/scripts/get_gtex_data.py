@@ -3,25 +3,26 @@ import pandas as pd
 import numpy as np
 import os
 
-LD = pd.read_csv(snakemake.input.ld, sep='\t', header=None).values
+# load data
+ld = pd.read_csv(snakemake.input.ld, sep='\t', header=None).values
 associations = pd.read_csv(snakemake.input.associations, sep='\t', index_col=0)
-associations = associations.loc[:, ~np.any(np.isnan(associations), 0)]
+snplist = np.squeeze(pd.read_csv(snakemake.input.snps, header=None).values)
 
-snplist = pd.read_csv(snakemake.input.snps, header=None)
-snplist = np.squeeze(snplist.values)
+# filter out nans
+associations = associations.loc[:, ~np.any(np.isnan(associations), axis=0)]
+mask = ~np.any(np.isnan(ld), axis=1)
+ld = ld[mask][:, mask]
+snplist = snplist[mask]
 
-ld_nan_filter = ~np.any(np.isnan(LD), 1)
-LD = LD[ld_nan_filter][:, ld_nan_filter]
-snplist = snplist[ld_nan_filter]
-
+# filter to intersection
 intersect = np.intersect1d(snplist, associations.columns.values)
 associations = associations.loc[:, intersect]
-
 mask = np.isin(snplist, intersect)
-LD = LD[mask][:, mask]
+ld = ld[mask][:, mask]
+snplist = snplist[mask]
 
 data = {
-    'LD': LD,
+    'LD': ld,
     'zscores': associations.values,
     'tissue_ids': associations.index.values,
     'variant_ids': associations.columns.values
