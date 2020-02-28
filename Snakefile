@@ -16,12 +16,6 @@ include: 'workflow/snk/simulations.snk.py'
 rule generate_figures:
     input:
         expand(
-            "output/GTEx/gene_{gene}/summary.zscores.png", gene=config['chr22_genes']
-        ),
-        expand(
-            "output/GTEx/gene_{gene}/regressed_genotype_cov/summary.zscores.png", gene=config['chr22_genes']
-        ),
-        expand(
             "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=config['chr22_genes']
         )
 
