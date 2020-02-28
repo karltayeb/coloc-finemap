@@ -21,6 +21,11 @@ mask = np.isin(snplist, intersect)
 ld = ld[mask][:, mask]
 snplist = snplist[mask]
 
+
+#genotype = pd.read_csv('../../output/GTEx/gene_ENSG00000000457.13/ENSG00000000457.13.raw', sep=' ')
+#snplist = np.squeeze(pd.read_csv('../../output/GTEx/gene_ENSG00000000457.13/ENSG00000000457.13.snplist', header=None).values)
+
+
 data = {
     'LD': ld,
     'zscores': associations.values,
