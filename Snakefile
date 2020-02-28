@@ -12,14 +12,14 @@ include: 'workflow/snk/coloc.snk.py'
 include: 'workflow/snk/data_prep.snk.py'
 include: 'workflow/snk/simulations.snk.py'
 
+gtex_genes = np.loadtxt('/work-zfs/abattle4/karl/cosie_analysis/config/random_gene_list.txt', dtype=str)
+
 # terminal rules
 rule generate_figures:
     input:
         expand(
-            "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=config['chr22_genes']
+            "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=gtex_genes
         )
-
-gtex_genes = np.loadtxt('/work-zfs/abattle4/karl/cosie_analysis/config/random_gene_list.txt', dtype=str)
 rule run_gtex:
     input:
         expand("output/GTEx/gene_{gene}/tissue_specific_cov/model_summary", gene=gtex_genes)
