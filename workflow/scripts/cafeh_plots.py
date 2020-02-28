@@ -1,6 +1,6 @@
 import pickle
 import numpy as np
-from coloc.ard_ser import MVNFactorSER
+from coloc.cafeh import CAFEH
 
 def assign(obj, dictionary):
     for key in dictionary.keys():
@@ -11,7 +11,7 @@ data_path = snakemake.input.data_path
 component_plot_path = snakemake.output.component_plot_path
 zscore_plot_path = snakemake.output.zscore_plot_path
 
-cafeh = MVNFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
+cafeh = CAFEH(np.zeros((1, 1)), np.zeros((1, 1)), 1)
 
 
 assign(cafeh, pickle.load(open(model_path, 'rb')))
