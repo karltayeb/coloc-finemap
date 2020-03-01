@@ -1,6 +1,7 @@
 import pickle
 from coloc.independent_model import IndependentFactorSER
 
+"""
 data = pickle.load(open(snakemake.input[0], 'rb'))
 
 Y = data['Y']
@@ -22,3 +23,11 @@ g.fit(max_iter=100, update_active=False, update_weights=True, update_pi=True,
 path = '/'.join(snakemake.output[0].split('/')[:-1])
 name = snakemake.output[0].split('/')[-1]
 g.save(path, name)
+"""
+data = pickle.load(open(snakemake.input[0], 'rb'))
+model = IndependentFactorSER(**data, K=20)
+model.fit(max_iter=300, verbose=True, ARD_weights=True)
+
+path = '/'.join(snakemake.output[0].split('/')[:-1])
+name = snakemake.output[0].split('/')[-1]
+model.save(path, name)
