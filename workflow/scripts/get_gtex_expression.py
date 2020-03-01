@@ -23,5 +23,5 @@ for tissue in gene_tissue_map[test_gene]:
 
 gene_expression = pd.concat(gene_expression_df, sort=False).droplevel(1)
 gene_expression = gene_expression.iloc[:, 4:]
-
+gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
 gene_expression.to_csv(snakemake.output[0], sep='\t')
