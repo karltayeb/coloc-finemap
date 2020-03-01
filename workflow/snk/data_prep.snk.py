@@ -43,7 +43,7 @@ rule get_gtex_expression:
     output:
         temp('output/GTEx/gene_{gene}/{gene}.expression')
     script:
-        '../../workflow/scripts/get_gtex_associations.py'
+        '../../workflow/scripts/get_gtex_expression.py'
 
 rule get_gtex_ld:
     input:

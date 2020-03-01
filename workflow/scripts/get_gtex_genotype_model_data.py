@@ -14,7 +14,6 @@ genotype = genotype.loc[gene_expression.columns]
 # filter out snps
 genotype = genotype.loc[:, ~np.any(np.isnan(genotype), 0)]
 
-
 covariates = {}
 for tissue in gene_expression.index.values:
     covariates[tissue] = pd.read_csv(
