@@ -24,6 +24,10 @@ rule run_gtex:
     input:
         expand("output/GTEx/gene_{gene}/tissue_specific_cov/model_summary", gene=gtex_genes)
 
+rule run_gtex_genotype:
+    input:
+        expand("output/GTEx/gene_{gene}/tissue_specific_cov/model_genotype", gene=gtex_genes)
+
 rule all_tissue_pairs:
     input:
         expand(

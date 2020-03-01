@@ -8,7 +8,7 @@ rule fit_summary_model:
 
 rule fit_genotype_model:
     input:
-        "output/{path}/data"
+        "output/{path}/genotype_data"
     output:
         "output/{path}/model_genotype"
     script:
