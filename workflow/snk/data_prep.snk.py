@@ -2,6 +2,7 @@ import numpy as np
 import json
 import glob
 import pandas as pd
+from collections import defaultdict
 
 gencode = pd.read_csv(('/work-zfs/abattle4/lab_data/GTEx_v8/references/'
                        'gencode.v26.GRCh38.genes.gtf'), sep='\t', skiprows=6, header=None)
@@ -90,7 +91,6 @@ rule build_gene_seek_index:
     output:
         'output/GTEx/index/{tissue}.association.index'
     run:
-        from collections import defaultdict
         print('building index for {}'.format(wildcards.tissue))
         gene_start = {}
         with open('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/'
@@ -108,10 +108,18 @@ rule build_gene_seek_index:
 
 rule make_bins:
     input:
-        'output/enrichment/GTEx_maf_tss.{suffix}'
+        'output/enrichment/GTEx_maf_tss/GTEx_maf_tss.{suffix}'
     output:
         'output/enrichment/GTEx_maf_tss_binned/bins.{suffix}'
     run:
+        maf_bins = np.linspace(0, 1, 51)
+        tss_bins = np.linspace(-500000, 500000, 51)
+
+        for m in range(len(maf_bins)):
+            bins[m] = {}
+            for t in range(len(tss_bins)):
+                bins[m][t] = defaultdict(list)
+
         with open(input[0], 'r') as f:
             for line in f:
                 chromosome, variant, gene, maf, dtss = line.split('\t')
