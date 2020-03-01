@@ -1,6 +1,7 @@
 import json
 import glob
 import pandas as pd
+import numpy as np
 
 test_gene = snakemake.wildcards.gene
 association_indices = {
