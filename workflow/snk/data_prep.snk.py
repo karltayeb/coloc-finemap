@@ -115,6 +115,7 @@ rule make_bins:
         maf_bins = np.linspace(0, 1, 51)
         tss_bins = np.linspace(-500000, 500000, 51)
 
+        bins = {}
         for m in range(len(maf_bins)):
             bins[m] = {}
             for t in range(len(tss_bins)):
