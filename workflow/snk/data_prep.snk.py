@@ -70,7 +70,7 @@ rule get_gtex_data:
     wildcard_constraints:
         gene = "(?!\/)[^\/]+(?=\/)"
     script:
-        "../../workflow/scripts/get_gtex_genotype_model_data.py"
+        "../../workflow/scripts/get_gtex_data.py"
 
 rule get_gtex_genotype_data:
     input:
@@ -81,7 +81,7 @@ rule get_gtex_genotype_data:
     wildcard_constraints:
         gene = "(?!\/)[^\/]+(?=\/)"
     script:
-        "../../workflow/scripts/get_gtex_data.py"
+        "../../workflow/scripts/get_gtex_genotype_model_data.py"
 
 rule build_gene_seek_index:
     output:
