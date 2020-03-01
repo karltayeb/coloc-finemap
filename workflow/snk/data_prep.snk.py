@@ -72,6 +72,17 @@ rule get_gtex_data:
     script:
         "../../workflow/scripts/get_gtex_data.py"
 
+rule get_gtex_genotype_data:
+    input:
+        expression = 'output/GTEx/gene_{gene}/{gene}.expression',
+        genotype = 'output/GTEx/gene_{gene}/{gene}.raw',
+    output:
+        "output/GTEx/gene_{gene}/genotype_data"
+    wildcard_constraints:
+        gene = "(?!\/)[^\/]+(?=\/)"
+    script:
+        "../../workflow/scripts/get_gtex_data.py"
+
 rule build_gene_seek_index:
     output:
         'output/GTEx/index/{tissue}.association.index'
