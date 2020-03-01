@@ -4,7 +4,7 @@ import pickle
 
 gene_expression = pd.read_csv(snakemake.input.expression, sep='\t', index_col=0)
 
-genotype = pd.read_csv(snakeake.input.genotype, sep=' ')
+genotype = pd.read_csv(snakemake.input.genotype, sep=' ')
 genotype = genotype.set_index('IID').iloc[:, 5:]
 
 # drop individuals that do not have recorded expression
