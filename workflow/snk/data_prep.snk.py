@@ -1,3 +1,6 @@
+import numpy as np
+import json
+import glob
 import pandas as pd
 
 gencode = pd.read_csv(('/work-zfs/abattle4/lab_data/GTEx_v8/references/'
@@ -16,7 +19,6 @@ rule get_cis_variants:
     script:
         "workflow/scripts/get_cis_variants.py"
 
-import glob
 tissues = [x.split('.')[0].split('/')[-1] for x in glob.glob(
     '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/*allpairs.txt')]
 rule build_indices:
@@ -103,6 +105,21 @@ rule build_gene_seek_index:
                 i += len(line)
                 last_gene = gene
         json.dump(gene_start, open(output[0], 'w'))
+
+rule make_bins:
+    input:
+        'output/enrichment/GTEx_maf_tss.{suffix}'
+    output:
+        'output/enrichment/GTEx_maf_tss_binned/bins.{suffix}'
+    run:
+        with open(input[0], 'r') as f:
+            for line in f:
+                chromosome, variant, gene, maf, dtss = line.split('\t')
+                if float(maf) > 0.01:
+                    maf_bin = np.digitize(float(maf), maf_bins)
+                    tss_bin = np.digitize(float(dtss), tss_bins)
+                    bins[maf_bin][tss_bin][variant].append(gene)
+        json.dump(output[0], open('bins.xab','w'))
 
 rule get_tissue_specific_cov:
     input:
