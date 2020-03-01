@@ -128,7 +128,7 @@ rule make_bins:
                     maf_bin = np.digitize(float(maf), maf_bins)
                     tss_bin = np.digitize(float(dtss), tss_bins)
                     bins[maf_bin][tss_bin][variant].append(gene)
-        json.dump(output[0], open('bins.xab','w'))
+        json.dump(output[0], open(output[0],'w'))
 
 rule get_tissue_specific_cov:
     input:
