@@ -21,7 +21,8 @@ rule create_matched_variant_set:
         bins = []
         results = pd.read_csv(input[0], sep='\t', header=None)
         for chrom, group in results.groupby(0):
-            print(chrom)
+            print(chrom, group.shape[0])
+            print('...', end='')
             df = pd.read_csv('maf/{}.afreq'.format(chrom))
             df.loc[:, 'pos'] = df.ID.apply(lambda x: int(x.split('_')[1]))
             
@@ -38,7 +39,7 @@ rule create_matched_variant_set:
 
                     bins.append((maf_bin, tss_bin))
                 except:
-                    print('!')
+                    print('!' end='')
 
         # select variants from bins
         matched_snps = []
