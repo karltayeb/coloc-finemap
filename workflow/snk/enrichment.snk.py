@@ -1,15 +1,14 @@
 import pandas as pd
 import numpy as np
 
-wildcard_constraints:
-    suffix='^[x][a-z][a-z]$'
-
 rule create_matched_variant_set:
     input:
         'output/enrichment/{prefix}.bed'
         'output/enrichment/GTEx_maf_tss_binned/bins.{suffix}'
     output:
         'output/enrichment/{prefix}.{suffix}.matched.bed'
+    wildcard_constraints:
+        suffix='^[x][a-z][a-z]$'
     run:
         # put variants into bins
         bins = []
