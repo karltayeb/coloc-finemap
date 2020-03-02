@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 wildcard_constraints:
-    suffix='[x][a-z][a-z]'
+    suffix='^[x][a-z][a-z]$'
 
 rule create_matched_variant_set:
     input:
