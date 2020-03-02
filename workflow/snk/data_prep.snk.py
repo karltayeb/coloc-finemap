@@ -141,9 +141,9 @@ rule make_gene_variant_lookup:
         lookup = {'chr{}'.format(x): defaultdict(dict) for x in range(1, 23)}
         with open(input[0], 'r') as f:
             for line in f:
-                chromosome, variant, gene, maf, dtss = line.split('\t')
+                chromosome, variant, gene, maf, dtss = line.strip().split('\t')
                 if float(maf) > 0.01:
-                    lookup[chromosome][variant][gene] = dtss
+                    lookup[chromosome][variant][gene] = int(dtss)
 
         for out_path in output:
             chromosome = out_path.split('/')[-1].split('.')[0]
