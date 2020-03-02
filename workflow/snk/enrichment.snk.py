@@ -24,14 +24,13 @@ rule create_matched_variant_set:
         bins = []
         results = pd.read_csv(input[0], sep='\t', header=None)
         for chrom, group in results.groupby(0):
-            print(chrom, group.shape[0])
-            print('...', end='')
+            print('\n', chrom, group.shape[0])
+            print('\t' end='')
             df = pd.read_csv('maf/{}.afreq'.format(chrom))
             df.loc[:, 'pos'] = df.ID.apply(lambda x: int(x.split('_')[1]))
             
             for i, record in group.iterrows():
                 try:
-                    import pdb; pdb.set_trace()
                     dtss = record[1] - gencode.loc[record[3]].tss
 
                     pos = record[1]
