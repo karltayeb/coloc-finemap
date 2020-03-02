@@ -71,5 +71,6 @@ rule merge_variant_sets:
         sorted_bed='output/enrichment/{prefix}.sorted.bed',
         merged_bed='output/enrichment/{prefix}.matched.bed'
     shell:
-        'cat {input} | sort -k1,1, -k2,2n > {output.sorted_bed}'
-        'merge -i {output.sorted_bed} > {output.merged_bed}'
+        'cat output/enrichment/genotype.*.matched.bed > output/enrichment/genotype.matched.bed'
+        'sort -k1,1 -k2,2n output/enrichment/genotype.matched.bed > output/enrichment/genotype.matched.sorted.bed'
+        'bedtools merge -i output/enrichment/genotype.matched.sorted.bed > output/enrichment/genotype.matched.merged.bed'
