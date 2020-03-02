@@ -11,6 +11,7 @@ include: 'workflow/snk/caviar.snk.py'
 include: 'workflow/snk/coloc.snk.py'
 include: 'workflow/snk/data_prep.snk.py'
 include: 'workflow/snk/simulations.snk.py'
+include: 'workflow/snk/enrichment.snk.py'
 
 gtex_genes = np.loadtxt('/work-zfs/abattle4/karl/cosie_analysis/config/random_gene_list.txt', dtype=str)
 
