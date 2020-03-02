@@ -135,7 +135,7 @@ rule make_gene_variant_lookup:
     input:
         'output/enrichment/GTEx_maf_tss/GTEx_maf_tss.{suffix}'
     output:
-        expand('output/enrichment/GTEx_maf_tss_lookup/chr{chr}.lookup.{suffix}',
+        expand('output/enrichment/GTEx_maf_tss_lookup/chr{chr}/chr{chr}.lookup.{suffix}',
             chr=list(range(1, 23)), suffix='{suffix}')
     run:
         lookup = {'chr{}'.format(x): defaultdict(dict) for x in range(1, 23)}
