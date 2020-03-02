@@ -2,7 +2,7 @@
 rule create_matched_variant_set:
     input:
         'output/enrichment/{prefix}.bed'
-        'output/enrichment/GTEx_maf_tss_binned/bins.x{suffix}'
+        'output/enrichment/GTEx_maf_tss_binned/bins.{suffix}'
     output:
         'output/enrichment/{prefix}.{suffx}.matched.bed'
     run:
