@@ -6,6 +6,7 @@ gene_expression = pd.read_csv(snakemake.input.expression, sep='\t', index_col=0)
 
 genotype = pd.read_csv(snakemake.input.genotype, sep=' ')
 genotype = genotype.set_index('IID').iloc[:, 5:]
+genotype = (genotype - genotype.mean(0)) / genotype.std(0)
 
 # drop individuals that do not have recorded expression
 gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
@@ -25,7 +26,7 @@ for tissue in gene_expression.index.values:
     )
 
 X = genotype.values.T
-X = (X - X.mean(1)[:, None]) # / np.clip(X.std(1)[:, None], 1e-10, 1e10)
+# X = (X - X.mean(1)[:, None]) # / np.clip(X.std(1)[:, None], 1e-10, 1e10)
 
 data = {
     'X': X,
