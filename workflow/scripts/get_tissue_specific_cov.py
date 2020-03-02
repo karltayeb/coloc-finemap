@@ -23,7 +23,7 @@ snplist = snplist[mask]
 
 alpha = 0.05
 LD = np.array([
-    (1 - alpha) * data['X'] + alpha * np.outer(y, y) for y in data['Y']
+    (1 - alpha) * ld + alpha * np.outer(y, y) for y in associations.values
 ])
 
 data = {
