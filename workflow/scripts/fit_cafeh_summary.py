@@ -5,6 +5,7 @@ import pickle
 
 data = pickle.load(open(snakemake.input[0], 'rb'))
 
+"""
 Y = data['zscores']
 if 't1' in snakemake.output[0]:
     t1 = int(snakemake.wildcards.tissue1)
@@ -20,6 +21,7 @@ kwargs = {
 }
 
 LD = data['LD']
+"""
 n = CAFEH(**data, K=20)
 n.fit(max_iter=200, update_active=False, update_weights=True, update_pi=True, ARD_weights=True, verbose=True)
 path = '/'.join(snakemake.output[0].split('/')[:-1])
