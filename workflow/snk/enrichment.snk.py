@@ -68,9 +68,10 @@ rule merge_variant_sets:
     wildcard_constraints:
         prefix= '[^.]+'
     output:
-        sorted_bed='output/enrichment/{prefix}.sorted.bed',
-        merged_bed='output/enrichment/{prefix}.matched.bed'
+        matched='output/enrichment/{prefix}.matched.bed',
+        sorted='output/enrichment/{prefix}.matched.sorted.bed',
+        merged='output/enrichment/{prefix}.matched.merged.bed'
     shell:
-        'cat output/enrichment/genotype.*.matched.bed > output/enrichment/genotype.matched.bed'
-        '\nsort -k1,1 -k2,2n output/enrichment/genotype.matched.bed > output/enrichment/genotype.matched.sorted.bed'
-        '\nbedtools merge -i output/enrichment/genotype.matched.sorted.bed > output/enrichment/genotype.matched.merged.bed'
+        'cat {input} > {input.matched}'
+        '\nsort -k1,1 -k2,2n {input.matched} > {input.sorted}'
+        '\nbedtools merge -i {input.sorted} > {input.merged}'
