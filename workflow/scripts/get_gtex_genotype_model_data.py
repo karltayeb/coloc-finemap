@@ -26,7 +26,7 @@ for tissue in gene_expression.index.values:
     )
 
 X = genotype.values.T
-# X = (X - X.mean(1)[:, None]) # / np.clip(X.std(1)[:, None], 1e-10, 1e10)
+#X = (X - X.mean(1)[:, None]) # / np.clip(X.std(1)[:, None], 1e-10, 1e10)
 
 data = {
     'X': X,
