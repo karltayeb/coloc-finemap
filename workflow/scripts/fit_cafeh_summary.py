@@ -20,7 +20,7 @@ kwargs = {
 }
 
 LD = data['LD']
-n = CAFEH(X=LD, Y=Y, K=20, **kwargs)
+n = CAFEH(**data, K=20)
 n.fit(max_iter=200, update_active=False, update_weights=True, update_pi=True, ARD_weights=True, verbose=True)
 path = '/'.join(snakemake.output[0].split('/')[:-1])
 name = snakemake.output[0].split('/')[-1]
