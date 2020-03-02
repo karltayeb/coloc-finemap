@@ -26,6 +26,8 @@ g.save(path, name)
 """
 data = pickle.load(open(snakemake.input[0], 'rb'))
 model = IndependentFactorSER(**data, K=20)
+
+import pdb; pdb.set_trace()
 model.fit(max_iter=300, verbose=True, ARD_weights=True)
 
 path = '/'.join(snakemake.output[0].split('/')[:-1])
