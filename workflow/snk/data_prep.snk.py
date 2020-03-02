@@ -137,7 +137,7 @@ rule make_gene_variant_lookup:
     output:
         expand('output/enrichment/GTEx_maf_tss_lookup/chr{chr}.lookup.{suffix}', chr=list(range(1, 23)))
     run:
-        lookup = {'chr{}'.format x: defaultdict(dict) for x in range(1, 23)}
+        lookup = {'chr{}'.format(x): defaultdict(dict) for x in range(1, 23)}
         with open(input[0], 'r') as f:
             for line in f:
                 chromosome, variant, gene, maf, dtss = line.split('\t')
