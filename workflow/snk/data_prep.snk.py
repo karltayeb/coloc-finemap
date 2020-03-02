@@ -128,7 +128,22 @@ rule make_bins:
                     maf_bin = np.digitize(float(maf), maf_bins)
                     tss_bin = np.digitize(float(dtss), tss_bins)
                     bins[maf_bin][tss_bin][variant].append(gene)
-        json.dump(output[0], open(output[0],'w'))
+        json.dump(bins, open(output[0], 'w'))
+
+
+rule make_gene_variant_lookup:
+    input:
+        'output/enrichment/GTEx_maf_tss/GTEx_maf_tss.{suffix}'
+    output:
+        'output/enrichment/GTEx_maf_tss_lookup/lookup.{suffix}'
+    run:
+        lookup = defaultdict(dict)
+        with open(input[0], 'r') as f:
+            for line in f:
+                chromosome, variant, gene, maf, dtss = line.split('\t')
+                if float(maf) > 0.01:
+                    lookup[variant][gene] = dtss
+        json.dump(bins, open(output[0], 'w'))
 
 rule get_tissue_specific_cov:
     input:
