@@ -17,6 +17,9 @@ rule create_matched_variant_set:
     wildcard_constraints:
         prefix= '[^.]+'
     run:
+        maf_bins = np.linspace(0, 1, 51)
+        tss_bins = np.linspace(-500000, 500000, 51)
+
         # put variants into bins
         bins = []
         results = pd.read_csv(input[0], sep='\t', header=None)
@@ -31,7 +34,7 @@ rule create_matched_variant_set:
                     import pdb; pdb.set_trace()
                     dtss = record[1] - gencode.loc[record[3]].tss
 
-                    pos = int(record[4].split('_')[1])
+                    pos = record[1]
                     maf = df[df.pos == pos].ALT_FREQS.values[0]
                     maf = np.min([maf, 1-maf])
 
