@@ -13,6 +13,8 @@ gene_type = gencode.apply(lambda x: x.values[8].split(';')[2].split('"')[1], axi
 gencode = pd.concat([gencode.iloc[:, 0], tss, gene_id, gene_type], keys=['chromosome', 'tss', 'gene', 'gene_type'], axis=1)
 gencode = gencode.set_index('gene')
 
+wildcard_constraints:
+    suffix='[x][a-z][a-z]'
 # intermediate rules
 rule get_cis_variants:
     output:
@@ -129,7 +131,6 @@ rule make_bins:
                     tss_bin = np.digitize(float(dtss), tss_bins)
                     bins[maf_bin][tss_bin][variant].append(gene)
         json.dump(bins, open(output[0], 'w'))
-
 
 rule make_gene_variant_lookup:
     input:
