@@ -39,7 +39,7 @@ rule create_matched_variant_set:
 
                     bins.append((maf_bin, tss_bin))
                 except:
-                    print('!' end='')
+                    print('!', end='')
 
         # select variants from bins
         matched_snps = []
