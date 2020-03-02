@@ -8,7 +8,7 @@ if alpha is None:
 
 print('Making tissue specific covariance with alpha={}'.format(alpha))
 LD = np.array([
-    (1 - alpha) * data['LD'] + alpha * np.outer(y, y) for y in data['zscores']
+    (1 - alpha) * data['LD'] + alpha * np.outer(y, y) for y in data['Y']
 ])
 
 data['LD'] = LD
