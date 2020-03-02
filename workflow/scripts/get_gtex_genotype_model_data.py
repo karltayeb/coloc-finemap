@@ -9,8 +9,10 @@ genotype = genotype.set_index('IID').iloc[:, 5:]
 
 # drop individuals that do not have recorded expression
 gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
+
 # filter down to relevant individuals
 genotype = genotype.loc[gene_expression.columns]
+
 # filter out snps
 genotype = genotype.loc[:, ~np.any(np.isnan(genotype), 0)]
 
@@ -23,7 +25,8 @@ for tissue in gene_expression.index.values:
     )
 
 X = genotype.values.T
-X = (X - X.mean(1)[:, None]) / X.std(1)[:, None]
+X = (X - X.mean(1)[:, None]) # / np.clip(X.std(1)[:, None], 1e-10, 1e10)
+
 data = {
     'X': X,
     'Y': gene_expression.values,
