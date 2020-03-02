@@ -56,7 +56,7 @@ rule get_gtex_ld:
         from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 500000,
         to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 500000
     output:
-        temp('output/GTEx/gene_{gene}/{gene}.ld'),
+        'output/GTEx/gene_{gene}/{gene}.ld',
         'output/GTEx/gene_{gene}/{gene}.snplist',
         'output/GTEx/gene_{gene}/{gene}.raw'
     shell:
