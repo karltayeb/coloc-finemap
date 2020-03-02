@@ -22,8 +22,10 @@ for tissue in gene_expression.index.values:
         sep='\t', index_col=0
     )
 
+X = genotype.values.T
+X = (X - X.mean(1)[:, None]) / X.std(1)[:, None]
 data = {
-    'X': genotype.values.T,
+    'X': X,
     'Y': gene_expression.values,
     'covariates': covariates,
     'snp_ids': genotype.columns.values,
