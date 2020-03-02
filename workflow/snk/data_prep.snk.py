@@ -135,15 +135,18 @@ rule make_gene_variant_lookup:
     input:
         'output/enrichment/GTEx_maf_tss/GTEx_maf_tss.{suffix}'
     output:
-        'output/enrichment/GTEx_maf_tss_lookup/lookup.{suffix}'
+        expand('output/enrichment/GTEx_maf_tss_lookup/chr{chr}.lookup.{suffix}', chr=list(range(1, 23)))
     run:
-        lookup = defaultdict(dict)
+        lookup = {'chr{}'.format x: defaultdict(dict) for x in range(1, 23)}
         with open(input[0], 'r') as f:
             for line in f:
                 chromosome, variant, gene, maf, dtss = line.split('\t')
                 if float(maf) > 0.01:
-                    lookup[variant][gene] = dtss
-        json.dump(bins, open(output[0], 'w'))
+                    lookup[chromosome][variant][gene] = dtss
+
+        for out_path in output:
+            chromosome = out_path.split('/')[-1].split('.')[0]
+            json.dump(lookup[chromosome], 'w')
 
 rule get_tissue_specific_cov:
     input:
