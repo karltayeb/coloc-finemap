@@ -24,13 +24,14 @@ snplist = snplist[mask]
 
 #genotype = pd.read_csv('../../output/GTEx/gene_ENSG00000000457.13/ENSG00000000457.13.raw', sep=' ')
 #snplist = np.squeeze(pd.read_csv('../../output/GTEx/gene_ENSG00000000457.13/ENSG00000000457.13.snplist', header=None).values)
-
+alpha = 0.005
+LD = (1 - alpha) * ld + alpha * (associations.values.T @ associations.values) / associations.shape[0]
 
 data = {
-    'LD': ld,
-    'zscores': associations.values,
+    'X': ld,
+    'Y': associations.values,
     'tissue_ids': associations.index.values,
-    'variant_ids': associations.columns.values
+    'snp_ids': associations.columns.values
 }
 
 pickle.dump(data, open(snakemake.output[0], 'wb'))
