@@ -54,7 +54,7 @@ suffixes=[
 ]
 rule merge_variant_sets:
     input:
-        expand('output/enrichment/{prefix}.{suffx}.matched.bed',
+        expand('output/enrichment/{prefix}.{suffix}.matched.bed',
             prefix='{prefix}', suffix=suffixes)
     output:
         sorted_bed='output/enrichment/{prefix}.sorted.bed',
