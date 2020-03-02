@@ -60,6 +60,9 @@ rule merge_variant_sets:
     input:
         expand('output/enrichment/{prefix}.{suffix}.matched.bed',
             prefix='{prefix}', suffix=suffixes)
+    wildcard_constraints:
+        suffix='^[x][a-z][a-z]$',
+        prefix= '[^.]+'
     output:
         sorted_bed='output/enrichment/{prefix}.sorted.bed',
         merged_bed='output/enrichment/{prefix}.matched.bed'
