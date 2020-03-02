@@ -26,7 +26,7 @@ rule create_matched_variant_set:
                     tss_bin = np.digitize(dtss, tss_bins)
 
                     bins.append((maf_bin, tss_bin))
-                 except:
+                except:
                     print('!')
 
         # select variants from bins
