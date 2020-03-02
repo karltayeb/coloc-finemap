@@ -28,6 +28,7 @@ rule create_matched_variant_set:
             
             for i, record in group.iterrows():
                 try:
+                    import pdb; pdb.set_trace()
                     dtss = record[1] - gencode.loc[record[3]].tss
 
                     pos = int(record[4].split('_')[1])
