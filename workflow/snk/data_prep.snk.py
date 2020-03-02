@@ -147,7 +147,7 @@ rule make_gene_variant_lookup:
 
         for out_path in output:
             chromosome = out_path.split('/')[-1].split('.')[0]
-            json.dump(lookup[chromosome], 'w')
+            json.dump(lookup[chromosome], open(out_path, 'w'))
 
 rule get_tissue_specific_cov:
     input:
