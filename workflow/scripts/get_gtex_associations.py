@@ -20,6 +20,7 @@ for tissue in association_indices:
         else:
             gene_tissue_map[gene] = [tissue]
 
+import pdb; pdb.set_trace()
 results = {}
 for test_tissue in gene_tissue_map[test_gene]:
     lines = []
