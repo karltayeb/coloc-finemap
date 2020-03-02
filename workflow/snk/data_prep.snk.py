@@ -172,11 +172,11 @@ rule make_gene_variant_lookup:
 
 rule get_tissue_specific_cov:
     input:
-        associations = 'output/{path}/{gene}.associations',
-        ld = 'output/{path}/{gene}.ld',
-        snps = 'output/{path}/{gene}.snplist'
+        associations = 'output/GTEx/gene_{gene}/{gene}.associations',
+        ld = 'output/GTEx/gene_{gene}/{gene}.ld',
+        snps = 'output/GTEx/gene_{gene}/{gene}.snplist'
     output:
-        "output/{path}/tissue_specific_cov/data"
+        "output/GTEx/gene_{gene}/tissue_specific_cov/data"
     params:
         alpha = None
     script:
