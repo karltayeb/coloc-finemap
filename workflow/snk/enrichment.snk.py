@@ -15,7 +15,6 @@ rule create_matched_variant_set:
     output:
         'output/enrichment/{prefix}.{suffix}.matched.bed'
     wildcard_constraints:
-        suffix='^[x][a-z][a-z]$',
         prefix= '[^.]+'
     run:
         # put variants into bins
@@ -63,7 +62,6 @@ rule merge_variant_sets:
         expand('output/enrichment/{prefix}.{suffix}.matched.bed',
             prefix='{prefix}', suffix=suffixes)
     wildcard_constraints:
-        suffix='^[x][a-z][a-z]$',
         prefix= '[^.]+'
     output:
         sorted_bed='output/enrichment/{prefix}.sorted.bed',
