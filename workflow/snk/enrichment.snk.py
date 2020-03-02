@@ -25,7 +25,7 @@ rule create_matched_variant_set:
         results = pd.read_csv(input[0], sep='\t', header=None)
         for chrom, group in results.groupby(0):
             print('\n', chrom, group.shape[0])
-            print('\t' end='')
+            print('\t', end='')
             df = pd.read_csv('maf/{}.afreq'.format(chrom))
             df.loc[:, 'pos'] = df.ID.apply(lambda x: int(x.split('_')[1]))
             
