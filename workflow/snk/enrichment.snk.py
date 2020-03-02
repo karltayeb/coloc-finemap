@@ -72,6 +72,6 @@ rule merge_variant_sets:
         sorted='output/enrichment/{prefix}.matched.sorted.bed',
         merged='output/enrichment/{prefix}.matched.merged.bed'
     shell:
-        'cat {input} > {input.matched}'
-        '\nsort -k1,1 -k2,2n {input.matched} > {input.sorted}'
-        '\nbedtools merge -i {input.sorted} > {input.merged}'
+        'cat {input} > {output.matched}'
+        '\nsort -k1,1 -k2,2n {output.matched} > {output.sorted}'
+        '\nbedtools merge -i {output.sorted} > {output.merged}'
