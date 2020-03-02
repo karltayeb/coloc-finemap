@@ -1,6 +1,13 @@
 import pandas as pd
 import numpy as np
 
+suffixes=[
+    'xab', 'xac', 'xad', 'xae', 'xaf', 'xag', 'xah', 'xai' ,'xaj', 'xak', 'xal', 'xam',
+    'xan', 'xao', 'xap', 'xaq', 'xar', 'xas', 'xat', 'xau', 'xav', 'xaw', 'xax', 'xay', 'xaz',
+    'xba', 'xbb', 'xbc', 'xbd', 'xbe', 'xbf', 'xbg', 'xbh', 'xbi' ,'xbj', 'xbk', 'xbl', 'xbm',
+    'xbn', 'xbo', 'xbp', 'xbq', 'xbr', 'xbs', 'xbt'
+]
+
 rule create_matched_variant_set:
     input:
         'output/enrichment/{prefix}.bed'
@@ -8,7 +15,8 @@ rule create_matched_variant_set:
     output:
         'output/enrichment/{prefix}.{suffix}.matched.bed'
     wildcard_constraints:
-        suffix='^[x][a-z][a-z]$'
+        suffix='^[x][a-z][a-z]$',
+        prefix= '[^.]+'
     run:
         # put variants into bins
         bins = []
@@ -50,12 +58,6 @@ rule create_matched_variant_set:
                 pos = int(pos)
                 print('{}\t{}\t{}\t{}\t{}'.format(chromosome, pos, pos+1, 'matched', snp.strip()), file=f)
 
-suffixes=[
-    'xab', 'xac', 'xad', 'xae', 'xaf', 'xag', 'xah', 'xai' ,'xaj', 'xak', 'xal', 'xam',
-    'xan', 'xao', 'xap', 'xaq', 'xar', 'xas', 'xat', 'xau', 'xav', 'xaw', 'xax', 'xay', 'xaz',
-    'xba', 'xbb', 'xbc', 'xbd', 'xbe', 'xbf', 'xbg', 'xbh', 'xbi' ,'xbj', 'xbk', 'xbl', 'xbm',
-    'xbn', 'xbo', 'xbp', 'xbq', 'xbr', 'xbs', 'xbt'
-]
 rule merge_variant_sets:
     input:
         expand('output/enrichment/{prefix}.{suffix}.matched.bed',
