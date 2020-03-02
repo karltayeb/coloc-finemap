@@ -34,7 +34,7 @@ rule get_gtex_associations:
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
     output:
-        temp('output/GTEx/gene_{gene}/{gene}.associations')
+        'output/GTEx/gene_{gene}/{gene}.associations'
     script:
         '../../workflow/scripts/get_gtex_associations.py'
 
@@ -44,7 +44,7 @@ rule get_gtex_expression:
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
     output:
-        temp('output/GTEx/gene_{gene}/{gene}.expression')
+        'output/GTEx/gene_{gene}/{gene}.expression'
     script:
         '../../workflow/scripts/get_gtex_expression.py'
 
@@ -105,6 +105,28 @@ rule build_gene_seek_index:
                 i += len(line)
                 last_gene = gene
         json.dump(gene_start, open(output[0], 'w'))
+
+rule build_gene_tissue_map:
+    input:
+        expand(
+            'output/GTEx/index/{tissue}.association.index', tissue=tissues
+        )
+    output:
+        'output/GTEx/gene_tissue_map.json'
+    run:
+        association_indices = {
+            x.split('/')[-1].split('.')[0]: json.load(open(x, 'r'))
+            for x in input
+        }
+
+        gene_tissue_map = {}
+        for tissue in association_indices:
+            for gene in association_indices[tissue]:
+                if gene in gene_tissue_map:
+                    gene_tissue_map[gene].append(tissue)
+                else:
+                    gene_tissue_map[gene] = [tissue]
+        json.dump(gene_tissue_map, open(output[0], 'w'))
 
 rule make_bins:
     input:
