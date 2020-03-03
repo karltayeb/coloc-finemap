@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from coloc.cafeh import CAFEH
-from .utils import assign
 
 suffixes=[
     'xab', 'xac', 'xad', 'xae', 'xaf', 'xag', 'xah', 'xai' ,'xaj', 'xak', 'xal', 'xam',
