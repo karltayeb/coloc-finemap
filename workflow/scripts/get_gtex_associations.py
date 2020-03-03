@@ -51,6 +51,7 @@ results = results.rename({
     8: 'slope_se'
 }, axis='columns')
 
+results = results[results.maf > 0.05]
 results.index.levels[0].name = 'tissue'
 results.reset_index()
 results.loc[:, 'zscore'] = results.slope.astype(float) / results.slope_se.astype(float)
