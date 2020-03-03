@@ -15,7 +15,7 @@ rule make_bed_summary_genotype:
         data='output/{path}/data',
         model='output/{path}/model_genotype'
     output:
-        'ouput/{path}/summary.credible_sets.bed'
+        'ouput/{path}/genotype.credible_sets.bed'
     script:
         'workflow/scripts/make_credible_set_bed_genotype.py'
 
