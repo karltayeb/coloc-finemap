@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from coloc.cafeh import CAFEH
+from .utils import assign
 
 suffixes=[
     'xab', 'xac', 'xad', 'xae', 'xaf', 'xag', 'xah', 'xai' ,'xaj', 'xak', 'xal', 'xam',
@@ -8,12 +10,21 @@ suffixes=[
     'xbn', 'xbo', 'xbp', 'xbq', 'xbr', 'xbs', 'xbt'
 ]
 
+rule make_bed_summary_genotype:
+    input:
+        data='output/{path}/data',
+        model='output/{path}/model_genotype'
+    output:
+        'ouput/{path}/summary.credible_sets.bed'
+    script:
+        'workflow/scripts/make_credible_set_bed_genotype.py'
+
 rule create_matched_variant_set:
     input:
-        'output/enrichment/{prefix}.bed',
+        'output/{path}/{prefix}.bed',
         'output/enrichment/GTEx_maf_tss_binned/bins.{suffix}'
     output:
-        'output/enrichment/{prefix}.{suffix}.matched.bed'
+        temp('output/enrichment/{prefix}.{suffix}.matched.bed')
     wildcard_constraints:
         prefix= '[^.]+'
     run:
@@ -63,7 +74,7 @@ rule create_matched_variant_set:
 
 rule merge_variant_sets:
     input:
-        expand('output/enrichment/{prefix}.{suffix}.matched.bed',
+        expand('output/{path}/{prefix}.{suffix}.matched.bed',
             prefix='{prefix}', suffix=suffixes)
     wildcard_constraints:
         prefix= '[^.]+'

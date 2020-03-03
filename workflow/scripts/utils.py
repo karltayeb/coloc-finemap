@@ -12,6 +12,9 @@ def load_data(data_path):
     """
     return pickle.load(open(data_path, 'rb'))
 
+def assign(obj, dictionary):
+    for key in dictionary.keys():
+        obj.__dict__[key] = dictionary[key]
 
 def load_model(data, genotype_model_path=None, summary_model_path=None):
     path = genotype_model_path or summary_model_path
