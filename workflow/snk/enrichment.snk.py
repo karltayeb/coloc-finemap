@@ -74,7 +74,7 @@ rule create_matched_variant_set:
 rule merge_variant_sets:
     input:
         expand('output/{path}/{prefix}.{suffix}.matched.bed',
-            prefix='{prefix}', suffix=suffixes)
+            path='{path}', prefix='{prefix}', suffix=suffixes)
     wildcard_constraints:
         prefix= '[^.]+'
     output:
