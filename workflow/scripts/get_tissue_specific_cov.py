@@ -21,7 +21,7 @@ mask = np.isin(snplist, intersect)
 ld = ld[mask][:, mask]
 snplist = snplist[mask]
 
-alpha = 0.05
+alpha = 0.01
 LD = np.array([
     (1 - alpha) * ld + alpha * np.outer(y, y) for y in associations.values
 ])
