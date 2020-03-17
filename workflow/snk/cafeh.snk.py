@@ -6,6 +6,14 @@ rule fit_summary_model:
     script:
         "../../workflow/scripts/fit_cafeh_summary.py"
 
+rule fit_study_model:
+    input:
+        "output/{path}/data"
+    output:
+        "output/{path}/model_study"
+    script:
+        "../../workflow/scripts/fit_susie_summary.py"
+
 rule fit_genotype_model:
     input:
         "output/{path}/genotype_data"
