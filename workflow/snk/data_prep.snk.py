@@ -188,7 +188,7 @@ rule get_regressed_genotype_cov:
     output:
         "output/{path}/regressed_genotype_cov/data"
     script:
-        "workflow/scripts/get_regressed_genotype_cov.py"
+        "../../workflow/scripts/get_regressed_genotype_cov.py"
 
 rule get_global_tissue_cov:
     input:
@@ -196,7 +196,7 @@ rule get_global_tissue_cov:
     output:
         "output/{path}/global_regularized_cov/data"
     script:
-        "workflow/scripts/get_global_regularized_cov.py"
+        "../../workflow/scripts/get_global_regularized_cov.py"
 
 rule make_maf_tss_table:
     input:
@@ -204,4 +204,4 @@ rule make_maf_tss_table:
     output:
         'output/enrichment/GTEx_maf_tss/GTEx_maf_tss.{part}'
     script:
-        'workflow/scripts/make_maf_tss_table.py'
+        '../../workflow/scripts/make_maf_tss_table.py'
