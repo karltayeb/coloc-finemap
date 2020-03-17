@@ -2,7 +2,8 @@ import pickle
 import numpy as np
 
 data = pickle.load(open(snakemake.input[0], 'rb'))
-alpha = snakemake.params.alpha
+#alpha = snakemake.params.alpha
+alpha = 0.1
 """
 LD = np.array([
     (1 - alpha) * data['LD'] + alpha * np.outer(y, y) for y in data['zscores']
