@@ -6,7 +6,7 @@ rule fit_summary_model:
     script:
         "../../workflow/scripts/fit_cafeh_summary.py"
 
-rule fit_summary_model:
+rule fit_cafeh2:
     input:
         "output/{path}/data"
     output:
