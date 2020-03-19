@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from coloc.cafeh import CAFEH
 
-suffixes = [
+suffixes=[
     'xab', 'xac', 'xad', 'xae', 'xaf', 'xag', 'xah', 'xai' ,'xaj', 'xak', 'xal', 'xam',
     'xan', 'xao', 'xap', 'xaq', 'xar', 'xas', 'xat', 'xau', 'xav', 'xaw', 'xax', 'xay', 'xaz',
     'xba', 'xbb', 'xbc', 'xbd', 'xbe', 'xbf', 'xbg', 'xbh', 'xbi' ,'xbj', 'xbk', 'xbl', 'xbm',
@@ -10,13 +10,15 @@ suffixes = [
 ]
 
 rule create_matched_variant_set:
+    """
+    """
     input:
-        'output/enrichment/{prefix}.bed',
+        'output/{path}/{prefix}.bed',
         'output/enrichment/GTEx_maf_tss_binned/bins.{suffix}'
     output:
         temp('output/enrichment/{prefix}.{suffix}.matched.bed')
     wildcard_constraints:
-        prefix= '([\w.]*)+'
+        prefix= '[^.]+'
     run:
         maf_bins = np.linspace(0, 1, 51)
         tss_bins = np.linspace(-500000, 500000, 51)
@@ -54,7 +56,7 @@ rule create_matched_variant_set:
                 snps = snps[np.random.choice(snps.size, 100)]
                 matched_snps.append(list(snps))
             except Exception:
-                '!'
+                print('!', end='')
 
         with open(output[0], 'w') as f:
             for snp in np.unique(np.concatenate(matched_snps)):
