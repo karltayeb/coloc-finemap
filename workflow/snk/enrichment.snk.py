@@ -9,16 +9,9 @@ suffixes=[
     'xbn', 'xbo', 'xbp', 'xbq', 'xbr', 'xbs', 'xbt'
 ]
 
-rule make_bed_summary_genotype:
-    input:
-        data='output/{path}/data',
-        model='output/{path}/model_genotype'
-    output:
-        'ouput/{path}/genotype.credible.bed'
-    script:
-        'workflow/scripts/make_credible_set_bed_genotype.py'
-
 rule create_matched_variant_set:
+    """
+    """
     input:
         'output/{path}/{prefix}.bed',
         'output/enrichment/GTEx_maf_tss_binned/bins.{suffix}'
@@ -73,7 +66,7 @@ rule create_matched_variant_set:
 
 rule merge_variant_sets:
     input:
-        expand('output/{path}/{prefix}.{suffix}.matched.bed',
+        expand('output/enrichment/{prefix}.{suffix}.matched.bed',
             path='{path}', prefix='{prefix}', suffix=suffixes)
     wildcard_constraints:
         prefix= '[^.]+'
