@@ -18,7 +18,7 @@ rule create_matched_variant_set:
     output:
         temp('output/enrichment/{prefix}.{suffix}.matched.bed')
     wildcard_constraints:
-        prefix= '(?!\/)(\w*.)+(?=\.bed)'
+        prefix= '([\w.]*)+'
     run:
         maf_bins = np.linspace(0, 1, 51)
         tss_bins = np.linspace(-500000, 500000, 51)
