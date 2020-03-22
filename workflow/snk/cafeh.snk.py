@@ -26,9 +26,10 @@ rule fit_genotype_model:
     input:
         "output/{path}/genotype_data"
     output:
-        "output/{path}/model_genotype"
+        "output/{path}/genotype.model"
     script:
         "../../workflow/scripts/fit_cafeh_genotype.py"
+
 
 rule fit_pairwise_summary_model:
     input:

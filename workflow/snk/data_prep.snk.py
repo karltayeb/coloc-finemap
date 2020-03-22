@@ -28,6 +28,10 @@ rule build_indices:
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
 
+
+#####
+# GATHER DATA
+#####
 rule get_gtex_associations:
     input:
         expand(
@@ -86,6 +90,83 @@ rule get_gtex_genotype_data:
         gene = "(?!\/)[^\/]+(?=\/)"
     script:
         "../../workflow/scripts/get_gtex_genotype_model_data.py"
+
+
+# GATHER DATA
+#####
+rule get_gtex_associations:
+    input:
+        expand(
+            'output/GTEx/index/{tissue}.association.index', tissue=tissues
+        )
+    output:
+        'output/GTEx/{chr}/{gene}/{gene}.associations'
+    script:
+        '../../workflow/scripts/get_gtex_associations.py'
+
+rule get_gtex_expression:
+    input:
+        expand(
+            'output/GTEx/index/{tissue}.association.index', tissue=tissues
+        )
+    output:
+        'output/GTEx/{chr}/{gene}/{gene}.expression'
+    script:
+        '../../workflow/scripts/get_gtex_expression.py'
+
+rule get_gtex_genotype:
+    input:
+        associations = 'output/GTEx/gene_{gene}/{gene}.associations'
+    params:
+        chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
+        from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 500000,
+        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 500000
+    output:
+        'output/GTEx/{params.chrom}/{gene}/{gene}.snplist',
+        'output/GTEx/{params.chrom}/{gene}/{gene}.raw'
+    shell:
+        'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
+        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01'
+        ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene} --write-snplist --recodeA'
+
+rule get_gtex_ld:
+    input:
+        associations = 'output/GTEx/gene_{gene}/{gene}.associations'
+    params:
+        chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
+        from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 500000,
+        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 500000
+    output:
+        'output/GTEx/{params.chrom}/{gene}/{gene}.ld',
+        'output/GTEx/{params.chrom}/{gene}/{gene}.snplist'
+    shell:
+        'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
+        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01 --r square'
+        ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene} --write-snplist'
+
+rule get_gtex_data:
+    input:
+        associations = 'output/GTEx/gene_{gene}/{gene}.associations',
+        ld = 'output/GTEx/gene_{gene}/{gene}.ld',
+        snps = 'output/GTEx/gene_{gene}/{gene}.snplist'
+    output:
+        "output/GTEx/gene_{gene}/data"
+    wildcard_constraints:
+        gene = "(?!\/)[^\/]+(?=\/)"
+    script:
+        "../../workflow/scripts/get_gtex_data.py"
+
+rule get_gtex_genotype_data:
+    input:
+        expression = 'output/GTEx/gene_{gene}/{gene}.expression',
+        genotype = 'output/GTEx/gene_{gene}/{gene}.raw',
+    output:
+        "output/GTEx/gene_{gene}/genotype_data"
+    wildcard_constraints:
+        gene = "(?!\/)[^\/]+(?=\/)"
+    script:
+        "../../workflow/scripts/get_gtex_genotype_model_data.py"
+
 
 rule build_gene_seek_index:
     output:
