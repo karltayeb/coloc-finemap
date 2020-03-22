@@ -142,11 +142,11 @@ rule get_gtex_ld2:
 
 rule get_gtex_data2:
     input:
-        associations = 'output/GTEx/gene_{gene}/{gene}.associations',
-        ld = 'output/GTEx/gene_{gene}/{gene}.ld',
-        snps = 'output/GTEx/gene_{gene}/{gene}.snplist'
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        ld = 'output/GTEx/{chr}/{gene}/{gene}.ld',
+        snps = 'output/GTEx/{chr}/{gene}/{gene}.snplist'
     output:
-        "output/GTEx/gene_{gene}/data"
+        "output/GTEx/{chr}/{gene}/data"
     wildcard_constraints:
         gene = "(?!\/)[^\/]+(?=\/)"
     script:
@@ -154,10 +154,10 @@ rule get_gtex_data2:
 
 rule get_gtex_genotype_data2:
     input:
-        expression = 'output/GTEx/gene_{gene}/{gene}.expression',
-        genotype = 'output/GTEx/gene_{gene}/{gene}.raw',
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
     output:
-        "output/GTEx/gene_{gene}/genotype_data"
+        "output/GTEx/{chr}/{gene}/genotype.data"
     wildcard_constraints:
         gene = "(?!\/)[^\/]+(?=\/)"
     script:
