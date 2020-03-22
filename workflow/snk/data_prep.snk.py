@@ -94,7 +94,7 @@ rule get_gtex_genotype_data:
 
 # GATHER DATA
 #####
-rule get_gtex_associations:
+rule get_gtex_associations2:
     input:
         expand(
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
@@ -104,7 +104,7 @@ rule get_gtex_associations:
     script:
         '../../workflow/scripts/get_gtex_associations.py'
 
-rule get_gtex_expression:
+rule get_gtex_expression2:
     input:
         expand(
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
@@ -114,7 +114,7 @@ rule get_gtex_expression:
     script:
         '../../workflow/scripts/get_gtex_expression.py'
 
-rule get_gtex_genotype:
+rule get_gtex_genotype2:
     input:
         associations = 'output/GTEx/gene_{gene}/{gene}.associations'
     params:
@@ -129,7 +129,7 @@ rule get_gtex_genotype:
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01'
         ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene} --write-snplist --recodeA'
 
-rule get_gtex_ld:
+rule get_gtex_ld2:
     input:
         associations = 'output/GTEx/gene_{gene}/{gene}.associations'
     params:
@@ -144,7 +144,7 @@ rule get_gtex_ld:
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01 --r square'
         ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene} --write-snplist'
 
-rule get_gtex_data:
+rule get_gtex_data2:
     input:
         associations = 'output/GTEx/gene_{gene}/{gene}.associations',
         ld = 'output/GTEx/gene_{gene}/{gene}.ld',
@@ -156,7 +156,7 @@ rule get_gtex_data:
     script:
         "../../workflow/scripts/get_gtex_data.py"
 
-rule get_gtex_genotype_data:
+rule get_gtex_genotype_data2:
     input:
         expression = 'output/GTEx/gene_{gene}/{gene}.expression',
         genotype = 'output/GTEx/gene_{gene}/{gene}.raw',
