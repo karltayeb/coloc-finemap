@@ -115,8 +115,6 @@ rule get_gtex_expression2:
         '../../workflow/scripts/get_gtex_expression.py'
 
 rule get_gtex_genotype2:
-    input:
-        associations = 'output/GTEx/gene_{gene}/{gene}.associations'
     params:
         chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
         from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 500000,
