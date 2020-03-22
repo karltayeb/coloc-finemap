@@ -117,8 +117,8 @@ rule get_gtex_expression2:
 rule get_gtex_genotype2:
     params:
         chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
-        from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 500000,
-        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 500000
+        from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 1000000,
+        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
     output:
         'output/GTEx/{chrom}/{gene}/{gene}.snplist',
         'output/GTEx/{chrom}/{gene}/{gene}.raw'
@@ -130,8 +130,8 @@ rule get_gtex_genotype2:
 rule get_gtex_ld2:
     params:
         chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
-        from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 500000,
-        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 500000
+        from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 1000000,
+        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
     output:
         'output/GTEx/{params.chrom}/{gene}/{gene}.ld',
         'output/GTEx/{params.chrom}/{gene}/{gene}.snplist'
