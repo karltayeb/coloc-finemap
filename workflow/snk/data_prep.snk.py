@@ -157,7 +157,7 @@ rule get_gtex_genotype_data2:
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
         genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
     output:
-        "output/GTEx/{chr}/{gene}/genotype.data"
+        temp("output/GTEx/{chr}/{gene}/genotype.data")
     wildcard_constraints:
         gene = "(?!\/)[^\/]+(?=\/)"
     script:
