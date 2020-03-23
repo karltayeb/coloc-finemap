@@ -94,7 +94,10 @@ for path in paths:
     gene = path.split('/')[-1]
     print(gene)
     
-    model = load_compact_model(path, gene)
-    report_credible_set(model, path, gene)
-    report_expected_weights(model, path, gene)
-    report_ard_precision(model, path, gene)
+    try:
+        model = load_compact_model(path, gene)
+        report_credible_set(model, path, gene)
+        report_expected_weights(model, path, gene)
+        report_ard_precision(model, path, gene)
+    except Exception:
+        print('\tsomething went wrong')
