@@ -14,7 +14,7 @@ gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
 # filter down to relevant individuals
 genotype = genotype.loc[gene_expression.columns]
 
-# filter out snps
+# filter out snps with nans
 genotype = genotype.loc[:, ~np.any(np.isnan(genotype), 0)]
 
 covariates = {}
@@ -26,7 +26,7 @@ for tissue in gene_expression.index.values:
     )
 
 X = genotype.values.T
-#X = (X - X.mean(1)[:, None]) # / np.clip(X.std(1)[:, None], 1e-10, 1e10)
+X = (X - X.mean(1)[:, None]) # / np.clip(X.std(1)[:, None], 1e-10, 1e10)
 
 data = {
     'X': X,
