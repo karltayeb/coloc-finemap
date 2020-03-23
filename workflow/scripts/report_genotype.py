@@ -87,7 +87,7 @@ def report_credible_set(model, path, gene):
             line = '{}\t{}\t{}\t{}\t{}'.format(chrom, pos, pos+1, gene, val)
             print(line, file=f)
 
-df = pd.read_csv('../../output/GTEx/100genes.txt', sep='\t')
+df = pd.read_csv('../../output/GTEx/2000genes.txt', sep='\t')
 paths = df.apply(lambda x: '../../output/GTEx/{}/{}'.format(x.chromosome, x.gene), axis=1)
 
 for path in paths:
