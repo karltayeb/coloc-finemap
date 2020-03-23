@@ -13,7 +13,12 @@ def load_compact_model(path, gene):
     model_dict = pickle.load(open(
         '{}/genotype.model'.format(path), 'rb'))
 
-    genotype = pd.read_csv('{}/{}.raw'.format(path, gene), sep=' ', usecols=model_dict['snp_ids'][model_dict['snps_in_cs']])
+    cols = ['IID']
+    cols.extend(list(model_dict['snp_ids']))
+    genotype = pd.read_csv('{}/{}.raw'.format(path, gene), sep=' ', index_col=0, usecols=cols)
+    genotype = genotype.loc[model_dict['sample_ids']]
+    genotype = genotype.iloc[:, model_dict['snps_in_cs']]
+    
     expression = pd.read_csv('{}/{}.expression'.format(path, gene), sep='\t', index_col=0)
     data = {
         'X': genotype.values.T,
@@ -27,9 +32,8 @@ def load_compact_model(path, gene):
     model_dict['snp_ids'] = model_dict['snp_ids'][model_dict['snps_in_cs']]
     model_dict['prior_pi'] = model_dict['prior_pi'][model_dict['snps_in_cs']]
     model.__dict__.update(model_dict)
-    
-
     return model
+
 
 def report_expected_weights(model, path, gene):
     active = np.array([model.purity[k] > 0.1 for k in range(20)])
@@ -38,7 +42,6 @@ def report_expected_weights(model, path, gene):
         index = model.tissue_ids,
         columns = np.arange(20)[active]
     )
-
     weight_json = weights.to_json()
     with open('{}/genotype.expected_weights'.format(path), 'w') as f:
         f.write(weight_json)
@@ -84,10 +87,10 @@ def report_credible_set(model, path, gene):
             line = '{}\t{}\t{}\t{}\t{}'.format(chrom, pos, pos+1, gene, val)
             print(line, file=f)
 
-paths = glob.glob('../../output/GTEx/*/*/genotype.model')
+df = pd.read_csv('../../output/GTEx/100genes.txt', sep='\t')
+paths = df.apply(lambda x: '../../output/GTEx/{}/{}'.format(x.chromosome, x.gene), axis=1)
 
 for path in paths:
-    path =  '/'.join(path.split('/')[:-1])
     gene = path.split('/')[-1]
     print(gene)
     
