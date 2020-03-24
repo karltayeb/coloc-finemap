@@ -94,7 +94,7 @@ for i, path in enumerate(paths):
     gene = path.split('/')[-1]
     print('{}: {} ({:.2f}%)'.format(i, gene, 100 * float(i / paths.shape[0]))) 
 
-    if os.path.isfiles('{}/genotype.cset.bed'.format(path)):
+    if os.path.isfile('{}/genotype.cset.bed'.format(path)):
         try:
             model = load_compact_model(path, gene)
             report_credible_set(model, path, gene)
