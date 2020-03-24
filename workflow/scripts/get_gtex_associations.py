@@ -50,6 +50,9 @@ results = results.rename({
     8: 'slope_se'
 }, axis='columns')
 
+results.slope = results.slope.astype(float)
+results.slope_se = results.slope_se.astype(float)
+
 results = results[results.maf.astype(float) > 0.01]
 results.index.levels[0].name = 'tissue'
 results.reset_index()
