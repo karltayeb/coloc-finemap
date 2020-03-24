@@ -100,7 +100,9 @@ rule get_gtex_associations2:
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
     output:
-        'output/GTEx/{chr}/{gene}/{gene}.associations'
+        'output/GTEx/{chr}/{gene}/{gene}.zscores',
+        'output/GTEx/{chr}/{gene}/{gene}.betas',
+        'output/GTEx/{chr}/{gene}/{gene}.standard_errors'
     script:
         '../../workflow/scripts/get_gtex_associations.py'
 
