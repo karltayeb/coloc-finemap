@@ -26,7 +26,7 @@ name = snakemake.output[0].split('/')[-1]
 g.save(path, name)
 """
 data = pickle.load(open(snakemake.input[0], 'rb'))
-model = IndependentFactorSER(**data, K=20)
+model = IndependentFactorSER(**data, K=40)
 model.fit(max_iter=500, verbose=True, ARD_weights=True)
 
 # get broad cs-- contains most information for model
