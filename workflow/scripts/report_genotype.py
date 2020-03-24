@@ -93,10 +93,12 @@ paths = df.apply(lambda x: '../../output/GTEx/{}/{}'.format(x.chromosome, x.gene
 for i, path in enumerate(paths):
     gene = path.split('/')[-1]
     print('{}: {} ({:.2f}%)'.format(i, gene, 100 * float(i / paths.shape[0]))) 
-    try:
-        model = load_compact_model(path, gene)
-        report_credible_set(model, path, gene)
-        report_expected_weights(model, path, gene)
-        report_ard_precision(model, path, gene)
-    except Exception:
-        print('\tsomething went wrong')
+
+    if os.path.isfiles('{}/genotype.cset.bed'.format(path)):
+        try:
+            model = load_compact_model(path, gene)
+            report_credible_set(model, path, gene)
+            report_expected_weights(model, path, gene)
+            report_ard_precision(model, path, gene)
+        except Exception:
+            print('\tsomething went wrong')
