@@ -35,6 +35,18 @@ rule fit_genotype_model2:
         "output/{path}/genotype.data"
     output:
         "output/{path}/genotype.model"
+    params:
+        k=20
+    script:
+        "../../workflow/scripts/fit_cafeh_genotype.py"
+
+rule fit_genotype_model40:
+    input:
+        "output/{path}/genotype.data"
+    output:
+        "output/{path}/genotype.k40.model"
+    params:
+        k=40
     script:
         "../../workflow/scripts/fit_cafeh_genotype.py"
 
