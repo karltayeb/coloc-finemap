@@ -26,8 +26,8 @@ def load_compact_model(path, gene):
     }
 
     # load model
-    model = IndependentFactorSER(**data, K=20)
-    model_dict.pop('dims')
+    model = IndependentFactorSER(**data, K=1)
+    model_dict['dims']['N'] = model.dims['N']
     model_dict['pi'] = model_dict['pi'][:, model_dict['snps_in_cs']]
     model_dict['snp_ids'] = model_dict['snp_ids'][model_dict['snps_in_cs']]
     model_dict['prior_pi'] = model_dict['prior_pi'][model_dict['snps_in_cs']]
@@ -36,11 +36,11 @@ def load_compact_model(path, gene):
 
 
 def report_expected_weights(model, path, gene):
-    active = np.array([model.purity[k] > 0.1 for k in range(20)])
+    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
     weights = pd.DataFrame(
         model.get_expected_weights()[:, active],
         index = model.tissue_ids,
-        columns = np.arange(20)[active]
+        columns = np.arange(model.dims['K'])[active]
     )
     weight_json = weights.to_json()
     with open('{}/genotype.expected_weights'.format(path), 'w') as f:
@@ -48,11 +48,11 @@ def report_expected_weights(model, path, gene):
         
         
 def report_ard_precision(model, path, gene):
-    active = np.array([model.purity[k] > 0.1 for k in range(20)])
+    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
     weights = pd.DataFrame(
         model.prior_precision[:, active],
         index = model.tissue_ids,
-        columns = np.arange(20)[active]
+        columns = np.arange(model.dims['K'])[active]
     )
 
     weight_json = weights.to_json()
@@ -60,11 +60,11 @@ def report_ard_precision(model, path, gene):
         f.write(weight_json)
         
 def report_ard_precision(model, path, gene):
-    active = np.array([model.purity[k] > 0.1 for k in range(20)])
+    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
     weights = pd.DataFrame(
         model.prior_precision[:, active],
         index = model.tissue_ids,
-        columns = np.arange(20)[active]
+        columns = np.arange(model.dims['K'])[active]
     )
 
     weight_json = weights.to_json()
@@ -72,10 +72,10 @@ def report_ard_precision(model, path, gene):
         f.write(weight_json)
         
 def report_credible_set(model, path, gene):
-    active = np.array([model.purity[k] > 0.1 for k in range(20)])
+    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
     pi = pd.DataFrame(model.pi.T, index=model.snp_ids)
     min_cset_alpha = pd.concat(
-        [pi.iloc[:, k].sort_values(ascending=False).cumsum() for k in np.arange(20)[active]],
+        [pi.iloc[:, k].sort_values(ascending=False).cumsum() for k in np.arange(model.dims['K'])[active]],
         sort=False, axis=1
     ).min(1)
 
