@@ -53,15 +53,13 @@ results = results.rename({
 results = results[results.maf.astype(float) > 0.01]
 results.index.levels[0].name = 'tissue'
 results.reset_index()
-
 results.loc[:, 'zscore'] = results.slope.astype(float) / results.slope_se.astype(float)
-results = pd.pivot_table(results, index='tissue', columns='variant_id', values='zscore')
-results.to_csv(snakemake.output[0], sep='\t')
 
-results.loc[:, 'slope'] = results.slope.astype(float) / results.slope_se.astype(float)
-results = pd.pivot_table(results, index='tissue', columns='variant_id', values='zscore')
-results.to_csv(snakemake.output[1], sep='\t')
+a = pd.pivot_table(results, index='tissue', columns='variant_id', values='zscore')
+a.to_csv(snakemake.output[0], sep='\t')
 
-results.loc[:, 'slope_se'] = results.slope.astype(float) / results.slope_se.astype(float)
-results = pd.pivot_table(results, index='tissue', columns='variant_id', values='zscore')
-results.to_csv(snakemake.output[2], sep='\t')
+a = pd.pivot_table(results, index='tissue', columns='variant_id', values='slope')
+a.to_csv(snakemake.output[1], sep='\t')
+
+a = pd.pivot_table(results, index='tissue', columns='variant_id', values='slope_se')
+a.to_csv(snakemake.output[2], sep='\t')
