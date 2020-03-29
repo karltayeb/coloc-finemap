@@ -14,8 +14,12 @@ gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
 # filter down to relevant individuals
 genotype = genotype.loc[gene_expression.columns]
 
-# filter out snps with nans
-genotype = genotype.loc[:, ~np.any(np.isnan(genotype), 0)]
+
+# filter down to common individuals
+individuals = np.intersect1d(genotype.index.values, gene_expression.columns.values)
+genotype = genotype.loc[individuals]
+gene_expression = gene_expression.loc[:, individuals]
+
 
 covariates = {}
 for tissue in gene_expression.index.values:
@@ -24,7 +28,7 @@ for tissue in gene_expression.index.values:
         'ciseQTL/GTEx_Analysis_v8_eQTL_covariates/{}.v8.covariates.txt'.format(tissue),
         sep='\t', index_col=0
     )
-
+    
 X = genotype.values.T
 
 data = {
