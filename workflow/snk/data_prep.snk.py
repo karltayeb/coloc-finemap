@@ -126,7 +126,7 @@ rule get_gtex_genotype2:
         'output/GTEx/{chrom}/{gene}/{gene}.raw'
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01'
+        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1'
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene} --write-snplist --recodeA'
 
 rule get_gtex_ld2:
@@ -139,7 +139,7 @@ rule get_gtex_ld2:
         'output/GTEx/{params.chrom}/{gene}/{gene}.snplist'
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01 --r square'
+        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1 --r square'
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene} --write-snplist'
 
 rule get_gtex_data2:
