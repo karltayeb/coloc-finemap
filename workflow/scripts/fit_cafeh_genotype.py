@@ -29,8 +29,6 @@ data = pickle.load(open(snakemake.input[0], 'rb'))
 model = IndependentFactorSER(**data, K=snakemake.params.k)
 
 model.tolerance = 1e-6
-model.alpha0 = 1e-6
-model.beta0 = 1e-6
 model.fit(max_iter=500, verbose=True, ARD_weights=True)
 
 # get broad cs-- contains most information for model
