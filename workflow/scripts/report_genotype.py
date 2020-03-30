@@ -8,18 +8,17 @@ import glob
 
 import matplotlib.pyplot as plt
 
-def load_compact_model(path, gene):
+def load_compact_model():
     #get data
     model_dict = pickle.load(open(
         '{}/genotype.model'.format(path), 'rb'))
 
     cols = ['IID']
     cols.extend(list(model_dict['snp_ids']))
-    genotype = pd.read_csv('{}/{}.raw'.format(path, gene), sep=' ', index_col=0, usecols=cols)
+    genotype = pd.read_csv(snakemake.input.genotype, sep=' ', index_col=0, usecols=cols)
     genotype = genotype.loc[model_dict['sample_ids']]
     genotype = genotype.iloc[:, model_dict['snps_in_cs']]
-    
-    expression = pd.read_csv('{}/{}.expression'.format(path, gene), sep='\t', index_col=0)
+    expression = pd.read_csv(snakemake.input.expression, sep='\t', index_col=0)
     data = {
         'X': genotype.values.T,
         'Y': expression.values
@@ -34,6 +33,47 @@ def load_compact_model(path, gene):
     model.__dict__.update(model_dict)
     return model
 
+def report_component_scores(model):
+    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
+    mw = model.weight_means
+    mv = model.weight_vars
+    pi = model.pi
+    scores = ((np.abs(mw) / np.sqrt(mv)) * pi[None]).sum(-1)
+
+    if active.sum() > 0:
+        weights = pd.DataFrame(
+            scores[:, active],
+            index = model.tissue_ids,
+            columns = np.arange(model.dims['K'])[active]
+        )
+    else:
+        weights = pd.DataFrame(
+            np.zeros((model.dims['T'], 1)),
+            index = model.tissue_ids
+        )
+    weight_json = weights.to_json()
+    with open(snakemake.output.scores, 'w') as f:
+        f.write(weight_json)
+
+def report_credible_set(model):
+    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
+
+    if active.sum() > 0:
+        pi = pd.DataFrame(model.pi.T, index=model.snp_ids)
+        min_cset_alpha = pd.concat(
+            [pi.iloc[:, k].sort_values(ascending=False).cumsum() for k in np.arange(model.dims['K'])[active]],
+            sort=False, axis=1
+        ).min(1)
+    else:
+        min_cset_alpha = []
+
+    with open(snakemake.output.csets, 'w') as f:
+        for row in min_cset_alpha.reset_index().values:
+            variant, val = row
+            chrom, pos = variant.split('_')[:2]
+            pos = int(pos)
+            line = '{}\t{}\t{}\t{}\t{}'.format(chrom, pos, pos+1, gene, val)
+            print(line, file=f)
 
 def report_expected_weights(model, path, gene):
     active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
@@ -45,8 +85,7 @@ def report_expected_weights(model, path, gene):
     weight_json = weights.to_json()
     with open('{}/genotype.expected_weights'.format(path), 'w') as f:
         f.write(weight_json)
-        
-        
+
 def report_ard_precision(model, path, gene):
     active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
     weights = pd.DataFrame(
@@ -70,35 +109,8 @@ def report_ard_precision(model, path, gene):
     weight_json = weights.to_json()
     with open('{}/genotype.ard_precision'.format(path), 'w') as f:
         f.write(weight_json)
-        
-def report_credible_set(model, path, gene):
-    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
-    pi = pd.DataFrame(model.pi.T, index=model.snp_ids)
-    min_cset_alpha = pd.concat(
-        [pi.iloc[:, k].sort_values(ascending=False).cumsum() for k in np.arange(model.dims['K'])[active]],
-        sort=False, axis=1
-    ).min(1)
 
-    with open('{}/genotype.cset.bed'.format(path), 'w') as f:
-        for row in min_cset_alpha.reset_index().values:
-            variant, val = row
-            chrom, pos = variant.split('_')[:2]
-            pos = int(pos)
-            line = '{}\t{}\t{}\t{}\t{}'.format(chrom, pos, pos+1, gene, val)
-            print(line, file=f)
 
-df = pd.read_csv('../../output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t')
-paths = df.apply(lambda x: '../../output/GTEx/{}/{}'.format(x.chromosome, x.gene), axis=1)
-
-for i, path in enumerate(paths):
-    gene = path.split('/')[-1]
-    print('{}: {} ({:.2f}%)'.format(i, gene, 100 * float(i / paths.shape[0]))) 
-
-    if ~os.path.isfile('{}/genotype.cset.bed'.format(path)):
-        try:
-            model = load_compact_model(path, gene)
-            report_credible_set(model, path, gene)
-            report_expected_weights(model, path, gene)
-            report_ard_precision(model, path, gene)
-        except Exception:
-            print('\tsomething went wrong')
+model = load_compact_model()
+report_credible_set(model)
+report_component_scores(model)
