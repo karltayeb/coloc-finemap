@@ -20,6 +20,14 @@ rule generate_figures:
         expand(
             "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=gtex_genes
         )
+
+run_genes = [x.split('/')[-2] for x in glob.glob('output/GTEx/*/*/genotype.model')]
+rule generate_genotype_reports:
+    input:
+        expand(
+            "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=run_genes
+        )
+
 rule run_gtex:
     input:
         expand("output/GTEx/gene_{gene}/tissue_specific_cov/model_summary", gene=gtex_genes)
