@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 def load_compact_model():
     #get data
     model_dict = pickle.load(open(
-        '{}/genotype.model'.format(path), 'rb'))
+        snakemake.input.model, 'rb'))
 
     cols = ['IID']
     cols.extend(list(model_dict['snp_ids']))

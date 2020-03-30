@@ -127,7 +127,8 @@ rule make_cafeh_plots:
 rule report_genotype:
     input:
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
-        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw'
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        model = 'output/GTEx/{chr}/{gene}/genotype.model'
     output:
         scores = "output/GTEx/{chr}/{gene}/genotype.scores",
         csets = "output/GTEx/{chr}/{gene}/genotype.csets"
