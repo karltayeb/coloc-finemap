@@ -26,7 +26,7 @@ run_genes = np.loadtxt('output/GTEx/run_genes.txt', dtype=str)
 rule generate_genotype_reports:
     input:
         expand(
-            "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=run_genes
+            "output/GTEx/{chr}/{gene}/genotype.csets", gene=run_genes
         )
 
 rule run_gtex:
