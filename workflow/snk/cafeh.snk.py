@@ -122,3 +122,14 @@ rule make_cafeh_plots:
         zscore_plot_path = report('output/{path}/summary.zscores.png')
     script:
         '../../workflow/scripts/cafeh_plots.py'
+
+
+rule report_genotype:
+    input:
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw'
+    output:
+        scores = "output/GTEx/{chr}/{gene}/genotype.scores",
+        csets = "output/GTEx/{chr}/{gene}/genotype.csets"
+    script:
+        '../../workflow/scripts/report_genotype.py'
