@@ -26,7 +26,7 @@ run_genes = np.loadtxt('output/GTEx/run_genes.txt', dtype=str)
 rule generate_genotype_reports:
     input:
         expand(
-            "{path}genotype.csets", path=run_genes
+            "{path}/genotype.csets", path=run_genes
         )
 
 rule run_gtex:
