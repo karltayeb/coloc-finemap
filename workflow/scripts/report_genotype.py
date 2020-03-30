@@ -67,6 +67,7 @@ def report_credible_set(model):
     else:
         min_cset_alpha = []
 
+    gene = snakemake.output.csets.split('/')[-2]
     with open(snakemake.output.csets, 'w') as f:
         for row in min_cset_alpha.reset_index().values:
             variant, val = row
