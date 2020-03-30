@@ -4,16 +4,10 @@ import glob
 import pandas as pd
 from collections import defaultdict
 
-gencode = pd.read_csv(('/work-zfs/abattle4/lab_data/GTEx_v8/references/'
-                       'gencode.v26.GRCh38.genes.gtf'), sep='\t', skiprows=6, header=None)
-gencode = gencode[gencode.iloc[:, 2] =='gene']
-tss = gencode.apply(lambda x: x.values[3] if x.values[6] is '+' else x.values[4], axis=1)
-gene_id = gencode.apply(lambda x: x.values[8].split(';')[0].split('"')[1], axis=1)
-gene_type = gencode.apply(lambda x: x.values[8].split(';')[2].split('"')[1], axis=1)
-gencode = pd.concat([gencode.iloc[:, 0], tss, gene_id, gene_type], keys=['chromosome', 'tss', 'gene', 'gene_type'], axis=1)
-gencode = gencode.set_index('gene')
 
-# intermediate rules
+gencode = pd.read_csv(
+    'output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t', index_col=0)
+
 rule get_cis_variants:
     output:
         "output/genotypes/{gene}_cis_variants"
