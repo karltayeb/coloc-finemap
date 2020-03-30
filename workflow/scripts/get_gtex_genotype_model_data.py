@@ -28,7 +28,7 @@ for tissue in gene_expression.index.values:
         'ciseQTL/GTEx_Analysis_v8_eQTL_covariates/{}.v8.covariates.txt'.format(tissue),
         sep='\t', index_col=0
     )
-    
+
 X = genotype.values.T
 
 data = {
