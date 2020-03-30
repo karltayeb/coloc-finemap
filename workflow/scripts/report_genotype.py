@@ -55,12 +55,14 @@ def report_component_scores(model):
     with open(snakemake.output.scores, 'w') as f:
         f.write(weight_json)
 
-def report_component_scores(model, path, gene):
+def report_component_scores(model):
     active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
     if active.sum() > 0:
         mw = model.weight_means
         mv = model.weight_vars
         pi = model.pi
+
+        diags = np.stack([model._get_diag(t) for t in range(model.dims['T'])])
         a = np.clip(model.prior_precision[:, :, None], 1e-10, 1e10)
         b = (diags / model.tissue_variance[:, None])[:, None]
         s2 = 1 / (a + b)
