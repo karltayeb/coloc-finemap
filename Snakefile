@@ -21,7 +21,8 @@ rule generate_figures:
             "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=gtex_genes
         )
 
-run_genes = [x.split('/')[-2] for x in glob.glob('output/GTEx/*/*/genotype.model')]
+#run_genes = [x.split('/')[-2] for x in glob.glob('output/GTEx/*/*/genotype.model')]
+run_genes = np.loadtxt('output/GTEx/run_genes.txt', dtype=str)
 rule generate_genotype_reports:
     input:
         expand(
