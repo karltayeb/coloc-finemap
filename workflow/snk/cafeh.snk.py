@@ -50,6 +50,16 @@ rule fit_genotype_model40:
     script:
         "../../workflow/scripts/fit_cafeh_genotype.py"
 
+rule fit_genotype_model20:
+    input:
+        "output/{path}/genotype.data"
+    output:
+        "output/{path}/genotype.k20.model"
+    params:
+        k=20
+    script:
+        "../../workflow/scripts/fit_cafeh_genotype.py"
+
 rule fit_pairwise_summary_model:
     input:
         "output/{path}/data"
