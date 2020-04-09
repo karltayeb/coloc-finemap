@@ -15,7 +15,7 @@ model.fit(
 )
 
 PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
-snps_in_cs = model.snp_ids[PIP > 1e-2]
+snps_in_cs = (PIP > 1e-2)
 
 # only retain relevant snps
 wm = model.weight_means[:, :, snps_in_cs]
