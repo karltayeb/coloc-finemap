@@ -4,7 +4,6 @@ from coloc.independent_model2 import IndependentFactorSER
 
 data = pickle.load(open(snakemake.input[0], 'rb'))
 model = IndependentFactorSER(**data, K=snakemake.params.k)
-
 model.fit(
     max_iter=500,
     update_covariate_weights=True,
@@ -14,7 +13,6 @@ model.fit(
     update_variance=True,
     verbose=True
 )
-
 
 PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
 snps_in_cs = model.snp_ids[PIP > 1e-2]
