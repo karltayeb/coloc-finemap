@@ -18,7 +18,7 @@ model.fit(
 # save model
 # get broad cs-- contains most information for model
 cs, p = model.get_credible_sets(0.999)
-active = np.array([p[k] > 0.01 for k in range(20)])
+active = np.array([p[k] > 0.01 for k in range(model.dims['K'])])
 
 # boolean mask for relevant snps
 snps_in_cs = np.unique(np.concatenate([cs[k] for k in range(model.dims['K']) if active[k]]))
