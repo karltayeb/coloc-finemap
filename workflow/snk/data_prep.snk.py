@@ -4,7 +4,6 @@ import glob
 import pandas as pd
 from collections import defaultdict
 
-
 gencode = pd.read_csv(
     'output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t', index_col=0)
 

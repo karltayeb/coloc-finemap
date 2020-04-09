@@ -2,18 +2,22 @@ import pandas as pd
 import numpy as np
 import pickle
 
+# load expression
 gene_expression = pd.read_csv(snakemake.input.expression, sep='\t', index_col=0)
+
+#load genotype
 genotype = pd.read_csv(snakemake.input.genotype, sep=' ')
 genotype = genotype.set_index('IID').iloc[:, 5:]
+
+# mean imputation
 genotype = (genotype - genotype.mean(0))
-genotype = genotype.fillna(0) # mean imputation
+genotype = genotype.fillna(0)
 
 # drop individuals that do not have recorded expression
 gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
 
 # filter down to relevant individuals
 genotype = genotype.loc[gene_expression.columns]
-
 
 # filter down to common individuals
 individuals = np.intersect1d(genotype.index.values, gene_expression.columns.values)
@@ -23,11 +27,13 @@ gene_expression = gene_expression.loc[:, individuals]
 
 covariates = {}
 for tissue in gene_expression.index.values:
-    covariates[tissue] = pd.read_csv(
+    c = pd.read_csv(
         '/work-zfs/abattle4/lab_data/GTEx_v8/'
         'ciseQTL/GTEx_Analysis_v8_eQTL_covariates/{}.v8.covariates.txt'.format(tissue),
         sep='\t', index_col=0
     )
+    c.loc['intercept'] = np.ones(c.shape[1])
+    covariates[tissue] = c
 
 X = genotype.values.T
 
