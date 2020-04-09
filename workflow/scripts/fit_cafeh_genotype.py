@@ -5,9 +5,6 @@ from coloc.independent_model2 import IndependentFactorSER
 data = pickle.load(open(snakemake.input[0], 'rb'))
 model = IndependentFactorSER(**data, K=snakemake.params.k)
 
-model.a = 1e-1
-model.b = 1e-10
-
 model.fit(
     max_iter=500,
     update_covariate_weights=True,
