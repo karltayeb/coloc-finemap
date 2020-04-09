@@ -15,14 +15,9 @@ model.fit(
     verbose=True
 )
 
-# save model
-# get broad cs-- contains most information for model
-cs, p = model.get_credible_sets(0.999)
-active = np.array([p[k] > 0.01 for k in range(model.dims['K'])])
 
-# boolean mask for relevant snps
-snps_in_cs = np.unique(np.concatenate([cs[k] for k in range(model.dims['K']) if active[k]]))
-snps_in_cs = np.isin(model.snp_ids, snps_in_cs)
+PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
+snps_in_cs = model.snp_ids[PIP > 1e-2]
 
 # only retain relevant snps
 wm = model.weight_means[:, :, snps_in_cs]
