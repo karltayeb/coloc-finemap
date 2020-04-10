@@ -24,10 +24,12 @@ rule generate_figures:
 #run_genes = [x.split('/')[-2] for x in glob.glob('output/GTEx/*/*/genotype.model')]
 run_genes = np.loadtxt('output/GTEx/run_genes.txt', dtype=str)
 
+
+k20_genes = [x.split('/')[-2] for x in glob.glob('output/GTEx/*/*/genotype.k20.model')]
 rule generate_genotype_reportsk20:
     input:
         expand(
-            "{path}/genotype.k20.csets", path=run_genes
+            "{path}/genotype.k20.csets", path=k20_genes
         )
 
 
