@@ -25,7 +25,7 @@ rule generate_figures:
 run_genes = np.loadtxt('output/GTEx/run_genes.txt', dtype=str)
 
 
-k20_genes = [x.split('/')[-2] for x in glob.glob('output/GTEx/*/*/genotype.k20.model')]
+k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/*/*/genotype.k20.model')]
 rule generate_genotype_reportsk20:
     input:
         expand(
