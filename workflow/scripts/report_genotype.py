@@ -8,17 +8,31 @@ import glob
 
 import matplotlib.pyplot as plt
 
-def load_compact_model():
+def load_compact_model(path, gene, name='genotype.model'):
     #get data
     model_dict = pickle.load(open(
         snakemake.input.model, 'rb'))
 
-    cols = ['IID']
-    cols.extend(list(model_dict['snp_ids']))
-    genotype = pd.read_csv(snakemake.input.genotype, sep=' ', index_col=0, usecols=cols)
-    genotype = genotype.loc[model_dict['sample_ids']]
+    #load genotype
+    genotype = pd.read_csv(snakemake.input.genotype, sep=' ')
+    genotype = genotype.set_index('IID').iloc[:, 5:]
+
+    # mean imputation
+    genotype = (genotype - genotype.mean(0))
+    genotype = genotype.fillna(0)
     genotype = genotype.iloc[:, model_dict['snps_in_cs']]
+
+    # load expression
     expression = pd.read_csv(snakemake.input.expression, sep='\t', index_col=0)
+
+    # filter down to relevant individuals
+    genotype = genotype.loc[expression.columns]
+
+    # filter down to common individuals
+    individuals = np.intersect1d(genotype.index.values, gene_expression.columns.values)
+    genotype = genotype.loc[individuals]
+    gene_expression = gene_expression.loc[:, individuals]
+
     data = {
         'X': genotype.values.T,
         'Y': expression.values
@@ -30,17 +44,18 @@ def load_compact_model():
     model_dict['pi'] = model_dict['pi'][:, model_dict['snps_in_cs']]
     model_dict['snp_ids'] = model_dict['snp_ids'][model_dict['snps_in_cs']]
     model_dict['prior_pi'] = model_dict['prior_pi'][model_dict['snps_in_cs']]
+    model_dict.pop('precompute', None)
     model.__dict__.update(model_dict)
     return model
 
 def report_component_scores(model):
     active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
-    mw = model.weight_means
-    mv = model.weight_vars
-    pi = model.pi
-    scores = ((np.abs(mw) / np.sqrt(mv)) * pi[None]).sum(-1)
-
     if active.sum() > 0:
+        print('!')
+        mw = model.weight_means
+        mv = model.weight_vars
+        pi = model.pi
+        scores = np.einsum('ijk,jk->ij', np.abs(mw) / np.sqrt(mv), model.pi)
         weights = pd.DataFrame(
             scores[:, active],
             index = model.tissue_ids,
