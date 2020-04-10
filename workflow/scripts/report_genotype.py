@@ -102,7 +102,8 @@ def report_credible_set(model):
     if active.sum() > 0:
         pi = pd.DataFrame(model.pi.T, index=model.snp_ids)
         min_cset_alpha = pd.concat(
-            [pi.iloc[:, k].sort_values(ascending=False).cumsum() for k in np.arange(model.dims['K'])[active]],
+            [pi.iloc[:, k].sort_values(ascending=False).cumsum() - pi.iloc[:, k]
+             for k in np.arange(model.dims['K']) if model.purity[k] > 0.5],
             sort=False, axis=1
         ).min(1)
     else:
