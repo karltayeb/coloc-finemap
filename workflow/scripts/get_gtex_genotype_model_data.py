@@ -9,9 +9,15 @@ gene_expression = pd.read_csv(snakemake.input.expression, sep='\t', index_col=0)
 genotype = pd.read_csv(snakemake.input.genotype, sep=' ')
 genotype = genotype.set_index('IID').iloc[:, 5:]
 
-# mean imputation
+# center
 genotype = (genotype - genotype.mean(0))
+
+# mean impute
 genotype = genotype.fillna(0)
+
+# standardize
+if snakemake.params.standardize == True:
+    genotype = genotype / genotype.std(0)
 
 # drop individuals that do not have recorded expression
 gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]

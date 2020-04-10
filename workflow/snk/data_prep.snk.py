@@ -153,11 +153,25 @@ rule get_gtex_genotype_data2:
         genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
     output:
         temp("output/GTEx/{chr}/{gene}/genotype.data")
+    params:
+        standardize = False
     wildcard_constraints:
         gene = "(?!\/)[^\/]+(?=\/)"
     script:
         "../../workflow/scripts/get_gtex_genotype_model_data.py"
 
+rule get_gtex_standardizied_genotype_data:
+    input:
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+    output:
+        temp("output/GTEx/{chr}/{gene}/genotype.standardized.data")
+    params:
+        standardize = True
+    wildcard_constraints:
+        gene = "(?!\/)[^\/]+(?=\/)"
+    script:
+        "../../workflow/scripts/get_gtex_genotype_model_data.py"
 
 rule build_gene_seek_index:
     output:
