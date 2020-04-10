@@ -28,6 +28,7 @@ save_dict.pop('X')
 save_dict.pop('Y')
 save_dict.pop('covariates')
 save_dict.pop('sample_covariate_map')
+save_dict.pop('precompute')
 
 save_dict['weight_means'] = wm
 save_dict['weight_vars'] = wv
