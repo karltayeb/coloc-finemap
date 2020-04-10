@@ -144,3 +144,16 @@ rule report_genotype:
         csets = "output/GTEx/{chr}/{gene}/genotype.csets"
     script:
         '../../workflow/scripts/report_genotype.py'
+
+
+rule report_genotypek20:
+    input:
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        model = 'output/GTEx/{chr}/{gene}/genotype.k20.model'
+    output:
+        scores = "output/GTEx/{chr}/{gene}/genotype.k20.scores",
+        csets = "output/GTEx/{chr}/{gene}/genotype.k20.csets"
+    script:
+        '../../workflow/scripts/report_genotype.py'
+
