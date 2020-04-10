@@ -8,7 +8,7 @@ import glob
 
 import matplotlib.pyplot as plt
 
-def load_compact_model(path, gene, name='genotype.model'):
+def load_compact_model():
     #get data
     model_dict = pickle.load(open(
         snakemake.input.model, 'rb'))
@@ -29,9 +29,9 @@ def load_compact_model(path, gene, name='genotype.model'):
     genotype = genotype.loc[expression.columns]
 
     # filter down to common individuals
-    individuals = np.intersect1d(genotype.index.values, gene_expression.columns.values)
+    individuals = np.intersect1d(genotype.index.values, expression.columns.values)
     genotype = genotype.loc[individuals]
-    gene_expression = gene_expression.loc[:, individuals]
+    expression = expression.loc[:, individuals]
 
     data = {
         'X': genotype.values.T,
