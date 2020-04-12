@@ -82,7 +82,7 @@ def report_component_scores(model):
     # we saved snps with pip > 1e-2
     # if a component is mostly explained by high PIP snps, include it
     # this is kind of hacky and should be updated for future analysis
-    active = model.pi(1) > 0.1
+    active = model.pi.sum(1) > 0.1
     if active.sum() > 0:
         mw = model.weight_means
         mv = model.weight_vars
@@ -106,7 +106,7 @@ def report_credible_set(model):
     # we saved snps with pip > 1e-2
     # if a component is mostly explained by high PIP snps, include it
     # this is kind of hacky and should be updated for future analysis
-    active = model.pi(1) > 0.1
+    active = model.pi.sum(1) > 0.1
     if active.sum() > 0:
         pi = pd.DataFrame(model.pi.T, index=model.snp_ids)
         min_cset_alpha = pd.concat(
@@ -127,7 +127,7 @@ def report_credible_set(model):
             print(line, file=f)
 
 def report_expected_weights(model, path, gene):
-    active = model.pi(1) > 0.1
+    active = model.pi.sum(1) > 0.1
     active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
     weights = pd.DataFrame(
         model.get_expected_weights()[:, active],
@@ -139,7 +139,7 @@ def report_expected_weights(model, path, gene):
         f.write(weight_json)
 
 def report_ard_precision(model, path, gene):
-    active = model.pi(1) > 0.1
+    active = model.pi.sum(1) > 0.1
     weights = pd.DataFrame(
         model.prior_precision[:, active],
         index = model.tissue_ids,
@@ -149,9 +149,9 @@ def report_ard_precision(model, path, gene):
     weight_json = weights.to_json()
     with open('{}/genotype.ard_precision'.format(path), 'w') as f:
         f.write(weight_json)
-        
+
 def report_ard_precision(model, path, gene):
-    active = model.pi(1) > 0.1
+    active = model.pi.sum(1) > 0.1
     weights = pd.DataFrame(
         model.prior_precision[:, active],
         index = model.tissue_ids,

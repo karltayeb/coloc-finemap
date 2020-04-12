@@ -32,6 +32,13 @@ rule generate_genotype_reportsk20:
             "{path}/genotype.k20.csets", path=k20_genes
         )
 
+k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/*/*/genotype.standardized.k20.model')]
+rule generate_standardized_genotype_reportsk20:
+    input:
+        expand(
+            "{path}/genotype.standardized.k20.csets", path=k20_genes
+        )
+
 
 rule generate_genotype_reports:
     input:
