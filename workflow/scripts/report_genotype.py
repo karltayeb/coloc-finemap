@@ -49,14 +49,13 @@ def load_compact_model_old():
     return model
 
 
-def load_compact_modle():
+def load_compact_model():
     """
     load the compact model save
     im avoiding having to load the expression and genotype
 
     only parameters for snps with PIP > 1e-2 were saved
     """
-    
     #get data
     model_dict = pickle.load(open(
         snakemake.input.model, 'rb'))
