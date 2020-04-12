@@ -8,7 +8,7 @@ import glob
 
 import matplotlib.pyplot as plt
 
-def load_compact_model():
+def load_compact_model_old():
     #get data
     model_dict = pickle.load(open(
         snakemake.input.model, 'rb'))
@@ -48,8 +48,42 @@ def load_compact_model():
     model.__dict__.update(model_dict)
     return model
 
+
+def load_compact_modle():
+    """
+    load the compact model save
+    im avoiding having to load the expression and genotype
+
+    only parameters for snps with PIP > 1e-2 were saved
+    """
+    
+    #get data
+    model_dict = pickle.load(open(
+        snakemake.input.model, 'rb'))
+    model_dict.pop('precompute', None)
+
+    model_dict['dims']['N'] = model_dict['snps_in_cs'].sum()
+    model_dict['full_snp_ids'] = model_dict['snp_ids']
+    model_dict['snp_ids'] = model_dict['snp_ids'][model_dict['snps_in_cs']]
+    model_dict['full_pi'] = model_dict['pi']
+    model_dict['pi'] = model_dict['pi'][:, model_dict['snps_in_cs']]
+
+    data = {
+        'X': np.zeros((model_dict['dims']['N'], model_dict['dims']['M'])),
+        'Y': np.zeros((model_dict['dims']['T'], model_dict['dims']['M'])),
+        'K': model_dict['dims']['K']
+    }
+
+    model = IndependentFactorSER(**data)
+    model.__dict__.update(model_dict)
+
 def report_component_scores(model):
-    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
+    # active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
+
+    # we saved snps with pip > 1e-2
+    # if a component is mostly explained by high PIP snps, include it
+    # this is kind of hacky and should be updated for future analysis
+    active = model.pi(1) > 0.1
     if active.sum() > 0:
         mw = model.weight_means
         mv = model.weight_vars
@@ -70,8 +104,10 @@ def report_component_scores(model):
         f.write(weight_json)
 
 def report_credible_set(model):
-    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
-
+    # we saved snps with pip > 1e-2
+    # if a component is mostly explained by high PIP snps, include it
+    # this is kind of hacky and should be updated for future analysis
+    active = model.pi(1) > 0.1
     if active.sum() > 0:
         pi = pd.DataFrame(model.pi.T, index=model.snp_ids)
         min_cset_alpha = pd.concat(
@@ -92,6 +128,7 @@ def report_credible_set(model):
             print(line, file=f)
 
 def report_expected_weights(model, path, gene):
+    active = model.pi(1) > 0.1
     active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
     weights = pd.DataFrame(
         model.get_expected_weights()[:, active],
@@ -103,7 +140,7 @@ def report_expected_weights(model, path, gene):
         f.write(weight_json)
 
 def report_ard_precision(model, path, gene):
-    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
+    active = model.pi(1) > 0.1
     weights = pd.DataFrame(
         model.prior_precision[:, active],
         index = model.tissue_ids,
@@ -115,7 +152,7 @@ def report_ard_precision(model, path, gene):
         f.write(weight_json)
         
 def report_ard_precision(model, path, gene):
-    active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
+    active = model.pi(1) > 0.1
     weights = pd.DataFrame(
         model.prior_precision[:, active],
         index = model.tissue_ids,
