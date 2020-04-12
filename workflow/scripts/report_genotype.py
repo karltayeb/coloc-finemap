@@ -75,6 +75,7 @@ def load_compact_model():
 
     model = IndependentFactorSER(**data)
     model.__dict__.update(model_dict)
+    return model
 
 def report_component_scores(model):
     # active = np.array([model.purity[k] > 0.1 for k in range(model.dims['K'])])
