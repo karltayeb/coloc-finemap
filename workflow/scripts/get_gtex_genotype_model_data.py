@@ -30,7 +30,7 @@ def make_gtex_genotype_data_dict(expression_path, genotype_path, save_path, para
     gene_expression = gene_expression.loc[:, individuals]
 
     # load covariates
-    covariates = pd.read_csv('../../output/GTEx/covariates.csv', sep='\t', index_col=[0, 1])
+    covariates = pd.read_csv('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/covariates.csv', sep='\t', index_col=[0, 1])
     covariates = covariates.loc[gene_expression.index]
     covariates = covariates.loc[:, genotype.index.values]
 
