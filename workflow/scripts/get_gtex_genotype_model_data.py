@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pickle
 
-def make_gtex_genotype_data_dict(expression_path, genotype_path, save_path, params):
+def make_gtex_genotype_data_dict(expression_path, genotype_path, params):
     # load expression
     gene_expression = pd.read_csv(expression_path, sep='\t', index_col=0)
 
@@ -51,9 +51,7 @@ def make_gtex_genotype_data_dict(expression_path, genotype_path, save_path, para
 data = make_gtex_genotype_data_dict(
     snakemake.input.expression,
     snakemake.input.genotype,
-    snakemake.output[0],
     snakemake.params
 )
 
-pickle.dump(data, open(save_path, 'wb'))
-
+pickle.dump(data, open(snakemake.output[0], 'wb'))
