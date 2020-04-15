@@ -15,7 +15,8 @@ model.fit(
 )
 
 PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
-snps_in_cs = (PIP > 1e-2)
+q = np.quantile(PIP, 0.9)
+snps_in_cs = (PIP > np.minimum(q, 1e-2))
 
 # only retain relevant snps
 wm = model.weight_means[:, :, snps_in_cs]
@@ -24,11 +25,10 @@ pi = model.pi[:, snps_in_cs]
 
 # make save dict
 save_dict = model.__dict__
-save_dict.pop('X')
-save_dict.pop('Y')
-save_dict.pop('covariates')
-save_dict.pop('sample_covariate_map')
-save_dict.pop('precompute')
+save_dict.pop('X', None)
+save_dict.pop('Y', None)
+save_dict.pop('covariates', None)
+save_dict.pop('precompute', None)
 
 save_dict['weight_means'] = wm
 save_dict['weight_vars'] = wv

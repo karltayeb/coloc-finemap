@@ -9,10 +9,8 @@ gene_expression = pd.read_csv(snakemake.input.expression, sep='\t', index_col=0)
 genotype = pd.read_csv(snakemake.input.genotype, sep=' ')
 genotype = genotype.set_index('IID').iloc[:, 5:]
 
-# center
+# center, mean immpute
 genotype = (genotype - genotype.mean(0))
-
-# mean impute
 genotype = genotype.fillna(0)
 
 # standardize
@@ -30,16 +28,10 @@ individuals = np.intersect1d(genotype.index.values, gene_expression.columns.valu
 genotype = genotype.loc[individuals]
 gene_expression = gene_expression.loc[:, individuals]
 
-
-covariates = {}
-for tissue in gene_expression.index.values:
-    c = pd.read_csv(
-        '/work-zfs/abattle4/lab_data/GTEx_v8/'
-        'ciseQTL/GTEx_Analysis_v8_eQTL_covariates/{}.v8.covariates.txt'.format(tissue),
-        sep='\t', index_col=0
-    )
-    c.loc['intercept'] = np.ones(c.shape[1])
-    covariates[tissue] = c
+# load covariates
+covariates = pd.read_csv('../../output/GTEx/covariates.csv', sep='\t', index_col=[0, 1])
+covariates = covariates.loc[gene_expression.index]
+covariates = covariates.loc[:, genotype.index.values]
 
 X = genotype.values.T
 
