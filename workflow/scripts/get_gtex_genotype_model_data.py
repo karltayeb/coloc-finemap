@@ -45,13 +45,15 @@ def make_gtex_genotype_data_dict(expression_path, genotype_path, save_path, para
         'tissue_ids': gene_expression.index.values
     }
 
-    pickle.dump(data, open(save_path, 'wb'))
+    return data
 
 
-make_gtex_genotype_data_dict(
+data = make_gtex_genotype_data_dict(
     snakemake.input.expression,
     snakemake.input.genotype,
     snakemake.output[0],
     snakemake.params
 )
+
+pickle.dump(data, open(save_path, 'wb'))
 
