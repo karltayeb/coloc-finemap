@@ -14,19 +14,17 @@ def strip_and_dump(model, path):
     wv = model.weight_vars[:, :, mask]
     wm = model.weight_means[:, :, mask]
 
+    model.record_credible_sets = model.get_credible_sets(0.99)
+    model.mini_weight_means = wm
+    model.mini_weight_vars = wv
+    model.snp_subset = mask
+
     model.__dict__.pop('precompute', None)
     model.__dict__.pop('weight_vars', None)
     model.__dict__.pop('weight_means', None)
     model.__dict__.pop('X', None)
     model.__dict__.pop('Y', None)
     model.__dict__.pop('covariates', None)
-
-
-    model.record_credible_sets = model.get_credible_sets(0.99)
-    model.mini_weight_means = wm
-    model.mini_weight_vars = wv
-    model.snp_subset = mask
-
     pickle.dump(model, open(path, 'wb'))
 
 def component_scores(model):
