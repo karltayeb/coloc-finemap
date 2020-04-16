@@ -82,11 +82,11 @@ model = IndependentFactorSER(**data, K=snakemake.params.k)
 
 fit_args = {
     'max_iter': 500,
-    'update_covariate_weights': False,
+    'update_covariate_weights': True,
     'update_weights': True,
     'update_pi': True,
-    'ARD_weights': False,
-    'update_variance': False,
+    'ARD_weights': True,
+    'update_variance': True,
     'verbose': True
 }
 
