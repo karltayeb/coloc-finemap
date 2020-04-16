@@ -53,7 +53,7 @@ def make_variant_report(model):
     active = np.array([purity[k] > 0.5 for k in range(model.dims['K'])])
 
     if active.sum() == 0:
-    	active[0] = True
+        active[0] = True
 
     pi = pd.DataFrame(model.pi.T, index=model.snp_ids)
     cset_alpha = pd.concat(
@@ -90,9 +90,19 @@ fit_args = {
     'verbose': True
 }
 
+print('training model')
+for arg in fit_args:
+    print('\t{}: {}'.format(arg, fit_args[arg]))
 model.fit(**fit_args)
 
 base_path = snakemake.output[0][:-len('.model')]
-component_scores(model).to_json('{}.scores'.format(base_path))
-make_variant_report(model).to_csv('{}.variants.bed'.format(base_path))
+
+print('generating scores and variant file')
+try:
+    component_scores(model).to_json('{}.scores'.format(base_path))
+    make_variant_report(model).to_csv('{}.variants.bed'.format(base_path))
+except Exception:
+    print('There was an error generating secondary files')
+
+print('saving model')
 strip_and_dump(model, snakemake.output[0])
