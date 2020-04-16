@@ -100,7 +100,7 @@ base_path = snakemake.output[0][:-len('.model')]
 print('generating scores and variant file')
 try:
     component_scores(model).to_json('{}.scores'.format(base_path))
-    make_variant_report(model).to_csv('{}.variants.bed'.format(base_path))
+    make_variant_report(model).to_csv('{}.variants.bed'.format(base_path), sep='\t')
 except Exception:
     print('There was an error generating secondary files')
 
