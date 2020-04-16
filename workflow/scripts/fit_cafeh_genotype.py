@@ -1,38 +1,100 @@
+import pandas as pd
 import pickle
 import numpy as np
 from coloc.independent_model2 import IndependentFactorSER
 
+def strip_and_dump(model, path):
+    """
+    save the model with data a weight parameters removed
+    add 'mini_weight_measn' and 'mini_weight_vars' to model
+    the model can be reconstituted in a small number of iterations
+    """
+    PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
+    mask = (PIP > 0.01)
+    wv = model.weight_vars[:, :, mask]
+    wm = model.weight_means[:, :, mask]
+
+    model.__dict__.pop('precompute', None)
+    model.__dict__.pop('weight_vars', None)
+    model.__dict__.pop('weight_means', None)
+    model.__dict__.pop('X', None)
+    model.__dict__.pop('Y', None)
+    model.__dict__.pop('covariates', None)
+
+
+    model.record_credible_sets = model.get_credible_sets(0.99)
+    model.mini_weight_means = wm
+    model.mini_weight_vars = wv
+    model.snp_subset = mask
+
+    pickle.dump(model, open(path, 'wb'))
+
+def component_scores(model):
+    purity = model.get_credible_sets(0.99)[1]
+    active = np.array([purity[k] > 0.5 for k in range(model.dims['K'])])
+    if active.sum() > 0:
+        mw = model.weight_means
+        mv = model.weight_vars
+        pi = model.pi
+        scores = np.einsum('ijk,jk->ij', mw / np.sqrt(mv), model.pi)
+        weights = pd.DataFrame(
+            scores[:, active],
+            index = model.tissue_ids,
+            columns = np.arange(model.dims['K'])[active]
+        )
+    else:
+        weights = pd.DataFrame(
+            np.zeros((model.dims['T'], 1)),
+            index = model.tissue_ids
+        )
+    return weights
+
+def make_variant_report(model):
+    PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
+    purity = model.get_credible_sets(0.99)[1]
+    active = np.array([purity[k] > 0.5 for k in range(model.dims['K'])])
+
+    if active.sum() == 0:
+    	active[0] = True
+
+    pi = pd.DataFrame(model.pi.T, index=model.snp_ids)
+    cset_alpha = pd.concat(
+        [pi.iloc[:, k].sort_values(ascending=False).cumsum() - pi.iloc[:, k]
+         for k in np.arange(model.dims['K']) if purity[k] > 0.5],
+        sort=False, axis=1
+    )
+
+    most_likely_k = np.argmax(pi.values[:, active], axis=1)
+    most_likely_p = np.max(pi.values[:, active], axis=1)
+    most_likely_cset_alpha = cset_alpha.values[np.arange(pi.shape[0]), most_likely_k]
+
+    A = pd.DataFrame(
+        [PIP, most_likely_k, most_likely_p, most_likely_cset_alpha],
+        index=['PIP','k', 'p', 'min_alpha'], columns=model.snp_ids).T
+
+    A.loc[:, 'chr'] = [x.split('_')[0] for x in A.index]
+    A.loc[:, 'start'] = [int(x.split('_')[1]) for x in A.index]
+    A.loc[:, 'end'] = A.loc[:, 'start'] + 1
+
+    A = A.set_index(['chr', 'start', 'end'])
+    return A
+
 data = pickle.load(open(snakemake.input[0], 'rb'))
 model = IndependentFactorSER(**data, K=snakemake.params.k)
-model.fit(
-    max_iter=500,
-    update_covariate_weights=True,
-    update_weights=True,
-    update_pi=True,
-    ARD_weights=True,
-    update_variance=True,
-    verbose=True
-)
 
-PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
-q = np.quantile(PIP, 0.9)
-snps_in_cs = (PIP > np.minimum(q, 1e-2))
+fit_args = {
+    'max_iter': 500,
+    'update_covariate_weights': True,
+    'update_weights': True,
+    'update_pi': True,
+    'ARD_weights': True,
+    'update_variance': True,
+    'verbose': True
+}
 
-# only retain relevant snps
-wm = model.weight_means[:, :, snps_in_cs]
-wv = model.weight_vars[:, :, snps_in_cs]
-pi = model.pi[:, snps_in_cs]
+model.fit(**fit_args)
 
-# make save dict
-save_dict = model.__dict__
-save_dict.pop('X', None)
-save_dict.pop('Y', None)
-save_dict.pop('covariates', None)
-save_dict.pop('precompute', None)
-
-save_dict['weight_means'] = wm
-save_dict['weight_vars'] = wv
-save_dict['snps_in_cs'] = snps_in_cs
-
-# save pickle
-pickle.dump(save_dict, open(snakemake.output[0], 'wb'))
+base_path = snakemake.output[0][:-len('.model')]
+component_scores(model).to_json('{}.scores'.format(base_path))
+make_variant_report(model).to_csv('{}.variants.bed'.format(base_path))
+strip_and_dump(model, snakemake.output[0])

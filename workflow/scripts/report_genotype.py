@@ -48,7 +48,6 @@ def load_compact_model_old():
     model.__dict__.update(model_dict)
     return model
 
-
 def load_compact_model():
     """
     load the compact model save
@@ -107,7 +106,10 @@ def report_credible_set(model):
     # we saved snps with pip > 1e-2
     # if a component is mostly explained by high PIP snps, include it
     # this is kind of hacky and should be updated for future analysis
+
+    PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
     active = model.pi.sum(1) > 0.1
+
     if active.sum() > 0:
         pi = pd.DataFrame(model.pi.T, index=model.snp_ids)
         min_cset_alpha = pd.concat(
