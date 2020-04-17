@@ -79,7 +79,6 @@ def make_variant_report(model, gene):
 
 
     A.loc[:, 'gene_id'] = gene
-    A.rename(columns={'index': 'variant_id'}, inplace=True)
     A = A.set_index(['chr', 'start', 'end'])
     return A.loc[:, ['gene_id', 'variant_id', 'ref', 'PIP', 'k', 'p', 'min_alpha']]
 
