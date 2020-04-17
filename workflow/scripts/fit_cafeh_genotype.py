@@ -106,7 +106,7 @@ print('generating scores and variant file')
 try:
     component_scores(model).to_json('{}.scores'.format(base_path))
     gene = base_path.split('/')[-2]
-    make_variant_report(model).to_csv('{}.variants.bed'.format(base_path, gene), sep='\t')
+    make_variant_report(model, gene).to_csv('{}.variants.bed'.format(base_path), sep='\t')
 except Exception:
     print('There was an error generating secondary files')
 
