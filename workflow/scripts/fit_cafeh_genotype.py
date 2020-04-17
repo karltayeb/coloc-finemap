@@ -47,7 +47,7 @@ def component_scores(model):
         )
     return weights
 
-def make_variant_report(model):
+def make_variant_report(model, gene):
     PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
     purity = model.get_credible_sets(0.99)[1]
     active = np.array([purity[k] > 0.5 for k in range(model.dims['K'])])
@@ -73,9 +73,15 @@ def make_variant_report(model):
     A.loc[:, 'chr'] = [x.split('_')[0] for x in A.index]
     A.loc[:, 'start'] = [int(x.split('_')[1]) for x in A.index]
     A.loc[:, 'end'] = A.loc[:, 'start'] + 1
+    A.reset_index(inplace=True)
+    A.loc[:, 'variant_id'] = A.loc[:, 'index'].apply(lambda x: '_'.join(x.split('_')[:-1]))
+    A.loc[:, 'ref'] = A.loc[:, 'index'].apply(lambda x: x.split('_')[-1])
 
+
+    A.loc[:, 'gene_id'] = gene
+    A.rename(columns={'index': 'variant_id'}, inplace=True)
     A = A.set_index(['chr', 'start', 'end'])
-    return A
+    return A.loc[:, ['gene_id', 'variant_id', 'ref', 'PIP', 'k', 'p', 'min_alpha']]
 
 data = pickle.load(open(snakemake.input[0], 'rb'))
 model = IndependentFactorSER(**data, K=snakemake.params.k)
@@ -100,7 +106,8 @@ base_path = snakemake.output[0][:-len('.model')]
 print('generating scores and variant file')
 try:
     component_scores(model).to_json('{}.scores'.format(base_path))
-    make_variant_report(model).to_csv('{}.variants.bed'.format(base_path), sep='\t')
+    gene = base_path.split('/')[-2]
+    make_variant_report(model).to_csv('{}.variants.bed'.format(base_path, gene), sep='\t')
 except Exception:
     print('There was an error generating secondary files')
 
