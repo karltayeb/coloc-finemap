@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 import pandas as pd
 import glob
-from coloc.misc import *
+from coloc.misc import repair_model
 
 configfile: "config/config.yaml"
 
@@ -34,7 +34,7 @@ rule repair_k20_model:
         '{path}/genotype.standardized.k20.model'
     output:
         '{path}/genotype.standardized.k20.repaired.log'
-    script:
+    run:
         repair_model(input[0])
         print('reapired_model', f=open(output[0], 'w'))
 
