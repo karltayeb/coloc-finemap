@@ -71,6 +71,17 @@ rule fit_standardized_genotype_model20:
     script:
         "../../workflow/scripts/fit_cafeh_genotype.py"
 
+rule fit_standardized_genotype_model40:
+    input:
+        "output/{path}/genotype.standardized.data"
+    output:
+        "output/{path}/genotype.standardized.k40.model"
+    params:
+        k=20
+    script:
+        "../../workflow/scripts/fit_cafeh_genotype.py"
+
+
 rule fit_pairwise_summary_model:
     input:
         "output/{path}/data"
