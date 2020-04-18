@@ -14,10 +14,18 @@ def strip_and_dump(model, path):
     wv = model.weight_vars[:, :, mask]
     wm = model.weight_means[:, :, mask]
 
-    model.record_credible_sets = model.get_credible_sets(0.99)
-    model.mini_weight_means = wm
-    model.mini_weight_vars = wv
-    model.snp_subset = mask
+    credible_sets, purity = model.record_credible_sets(0.99)
+    active = np.array([purity[k] > 0.5 for k in range(model.dims['K'])])
+    records = {
+        'active': active,
+        'purity': purity,
+        'credible_sets': credible_sets,
+        'EXz': model.pi @ model.X,
+        'mini_wm': wm,
+        'mini_wv': wv,
+        'snp_subsets': mask
+    }
+    model.records = records
 
     model.__dict__.pop('precompute', None)
     model.__dict__.pop('weight_vars', None)
@@ -86,7 +94,7 @@ data = pickle.load(open(snakemake.input[0], 'rb'))
 model = IndependentFactorSER(**data, K=snakemake.params.k)
 
 fit_args = {
-    'max_iter': 500,
+    'max_iter': 3,
     'update_covariate_weights': True,
     'update_weights': True,
     'update_pi': True,
