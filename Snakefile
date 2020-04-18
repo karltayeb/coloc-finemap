@@ -36,7 +36,7 @@ rule repair_k20_model:
         '{path}/genotype.standardized.k20.repaired.log'
     run:
         repair_model(input[0])
-        print('reapired_model', f=open(output[0], 'w'))
+        print('model repaired', file=open(output[0], 'w'))
 
 #run_genes = [x.split('/')[-2] for x in glob.glob('output/GTEx/*/*/genotype.model')]
 run_genes = np.loadtxt('output/GTEx/run_genes.txt', dtype=str)
