@@ -94,7 +94,7 @@ data = pickle.load(open(snakemake.input[0], 'rb'))
 model = IndependentFactorSER(**data, K=snakemake.params.k)
 
 fit_args = {
-    'max_iter': 3,
+    'max_iter': 300,
     'update_covariate_weights': True,
     'update_weights': True,
     'update_pi': True,
