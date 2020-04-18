@@ -3,6 +3,7 @@ import pickle
 import numpy as np
 import pandas as pd
 import glob
+from coloc.misc import *
 
 configfile: "config/config.yaml"
 
@@ -20,6 +21,24 @@ rule generate_figures:
         expand(
             "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=gtex_genes
         )
+
+
+k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/chr[2-8]/*/genotype.k20.model')]
+rule_repair_k20_models:
+    input:
+        expand(
+            "{path}/genotype.standardized.k20.repaired.log", path=k20_genes
+        )
+
+rule repair_k20_model:
+    input:
+        '{path}/{gene}/genotype.standardized.k20.model'
+    output:
+        '{path}/{gene}/genotype.standardized.k20.repaired.log'
+    script:
+        gene = wildcards.gene
+        repair_model(input[0])
+        print('reapired_model', f=open(output[0], 'w'))
 
 #run_genes = [x.split('/')[-2] for x in glob.glob('output/GTEx/*/*/genotype.model')]
 run_genes = np.loadtxt('output/GTEx/run_genes.txt', dtype=str)
