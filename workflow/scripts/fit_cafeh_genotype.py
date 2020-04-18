@@ -14,7 +14,7 @@ def strip_and_dump(model, path):
     wv = model.weight_vars[:, :, mask]
     wm = model.weight_means[:, :, mask]
 
-    credible_sets, purity = model.record_credible_sets(0.99)
+    credible_sets, purity = model.get_credible_sets(0.99)
     active = np.array([purity[k] > 0.5 for k in range(model.dims['K'])])
     records = {
         'active': active,
