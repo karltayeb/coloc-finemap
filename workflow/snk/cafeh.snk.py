@@ -77,7 +77,7 @@ rule fit_standardized_genotype_model40:
     output:
         "output/{path}/genotype.standardized.k40.model"
     params:
-        k=20
+        k=40
     script:
         "../../workflow/scripts/fit_cafeh_genotype.py"
 
