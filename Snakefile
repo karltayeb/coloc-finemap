@@ -23,7 +23,7 @@ rule generate_figures:
         )
 
 k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/chr[2-8]/*/genotype.k20.model')]
-rule_repair_k20_models:
+rule repair_k20_models:
     input:
         expand(
             "{path}/genotype.standardized.k20.repaired.log", path=k20_genes
