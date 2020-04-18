@@ -22,7 +22,7 @@ rule generate_figures:
             "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=gtex_genes
         )
 
-k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/chr[2-8]/*/genotype.k20.model')]
+k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/chr[2-8]/*/genotype.standardized.k20.model')]
 rule repair_k20_models:
     input:
         expand(
