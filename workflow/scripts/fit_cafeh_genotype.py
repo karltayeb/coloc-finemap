@@ -23,7 +23,7 @@ def strip_and_dump(model, path):
         'EXz': model.pi @ model.X,
         'mini_wm': wm,
         'mini_wv': wv,
-        'snp_subsets': mask
+        'snp_subset': mask
     }
     model.records = records
 
