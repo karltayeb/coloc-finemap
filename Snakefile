@@ -22,7 +22,6 @@ rule generate_figures:
             "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=gtex_genes
         )
 
-
 k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/chr[2-8]/*/genotype.k20.model')]
 rule_repair_k20_models:
     input:
@@ -32,11 +31,10 @@ rule_repair_k20_models:
 
 rule repair_k20_model:
     input:
-        '{path}/{gene}/genotype.standardized.k20.model'
+        '{path}/genotype.standardized.k20.model'
     output:
-        '{path}/{gene}/genotype.standardized.k20.repaired.log'
+        '{path}/genotype.standardized.k20.repaired.log'
     script:
-        gene = wildcards.gene
         repair_model(input[0])
         print('reapired_model', f=open(output[0], 'w'))
 
