@@ -29,6 +29,13 @@ rule repair_k20_models:
             "{path}/genotype.standardized.k20.repaired.log", path=k20_genes
         )
 
+rule run_component_cluster_enrichment:
+    input:
+        test='output/enrichment/component_clusters/{component}.sorted.merged.bed',
+        background='output/enrichment/component_clusters/{component}.background.merged.bed'
+    output:
+        "output/enrichment/component_clusters/{component}.enrichment"
+
 rule repair_k20_model:
     input:
         '{path}/genotype.standardized.k20.model'
