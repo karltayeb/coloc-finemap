@@ -35,6 +35,8 @@ rule run_component_cluster_enrichment:
         background='output/enrichment/component_clusters/{component}.background.merged.bed'
     output:
         "output/enrichment/component_clusters/{component}.enrichment"
+    script:
+        "workflow/scripts/run_enrichment.py"
 
 rule repair_k20_model:
     input:
