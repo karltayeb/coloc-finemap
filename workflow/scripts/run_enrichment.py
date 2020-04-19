@@ -63,7 +63,7 @@ for annot_path in promoter_paths:
     odds, p = fisher_exact(ct)
     enrichment = {
         'test_set': k,
-        'background_set': background,
+        'background_set': 'dtss_maf_matched_background',
         'annotation': annot_label,
         'test_in_annot': ct[0, 0],
         'test_not_annot': ct[0, 1],
