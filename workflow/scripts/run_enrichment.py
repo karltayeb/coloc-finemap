@@ -29,9 +29,12 @@ test = pybedtools.BedTool(snakemake.input.test)
 background = pybedtools.BedTool(snakemake.input.background)
 background = background - test
 
+results = []
 promoter_paths = glob.glob('output/enrichment/annotations/ct_annot/*.enhancer.bed')
 for annot_path in promoter_paths:
     annot_label = annot_path.split('/')[-1][:-4]
+    print(annot_label)
+
     annot = pybedtools.BedTool(annot_path)
     ct = contingency_table(test, background, annot)
     odds, p = fisher_exact(ct)
@@ -46,11 +49,13 @@ for annot_path in promoter_paths:
         'odds_ratio': odds,
         'p': p
     }
-    print(enrichment)
+    results.append(enrichment)
 
 promoter_paths = glob.glob('output/enrichment/annotations/ct_annot/*.promoter.bed')
 for annot_path in promoter_paths:
     annot_label = annot_path.split('/')[-1][:-4]
+    print(annot_label)
+
     annot = pybedtools.BedTool(annot_path)
     ct = contingency_table(test, background, annot)
     odds, p = fisher_exact(ct)
@@ -65,6 +70,6 @@ for annot_path in promoter_paths:
         'odds_ratio': odds,
         'p': p
     }
-    print(enrichment)
+    results.append(enrichment)
 
 pd.DataFrame(results).to_csv(snakemake.output[0], sep='\t')
