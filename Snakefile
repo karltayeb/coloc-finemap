@@ -31,10 +31,10 @@ rule repair_k20_models:
 
 rule run_component_cluster_enrichment:
     input:
-        test='output/enrichment/component_clusters/{component}.sorted.merged.bed',
-        background='output/enrichment/component_clusters/{component}.background.merged.bed'
+        test='output/enrichment/component_clusters/{cluster}.sorted.merged.bed',
+        background='output/enrichment/component_clusters/{cluster}.background.merged.bed'
     output:
-        "output/enrichment/component_clusters/{component}.enrichment"
+        "output/enrichment/component_clusters/{cluster}.enrichment"
     script:
         "workflow/scripts/run_enrichment.py"
 
