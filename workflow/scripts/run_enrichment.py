@@ -37,8 +37,7 @@ all_tested = all_tested - test
 
 background_sets = {
     'dtss_maf_matched_background': background,
-    'all_cset_snps': all_cset,
-    'all_tested_snps': all_tested
+    'all_cset_snps': all_cset
 }
 
 annotations = {}
