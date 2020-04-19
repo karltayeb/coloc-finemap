@@ -14,12 +14,14 @@ def contingency_table(test, background, annotation):
     return [[test/annotation, tesn n annotation],
             [background/annotation, [test n annotation]]
     """
-    test_in_annot = test.intersect(annotation).count()
-    background_in_annot = background.intersect(annotation).count()
+    test_in_annot = (test + annotation).count()
+    background_in_annot = (background + annotation).count()
     test_size = test.count()
     background_size = background.count()
-    return np.array([[test_in_annot, test_size - test_in_annot],
-            [background_in_annot, background_size - background_in_annot]])
+    return np.array(
+        [[test_in_annot, test_size - test_in_annot],
+        [background_in_annot, background_size - background_in_annot]]
+    )
 
 # open beds
 k = snakemake.wildcards.cluster
