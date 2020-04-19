@@ -29,16 +29,18 @@ test = pybedtools.BedTool(snakemake.input.test)
 background = pybedtools.BedTool(snakemake.input.background)
 background = background - test
 
+"""
 all_cset = pybedtools.BedTool('output/enrichment/component_clusters/all.sorted.merged.bed')
 all_cset = all_cset - test
 
 all_tested = pybedtools.BedTool('output/enrichment/component_clusters/all_tested_variants.merged.bed')
 all_tested = all_tested - test
+"""
 
 background_sets = {
     'dtss_maf_matched_background': background,
-    'all_cset_snps': all_cset
 }
+
 
 annotations = {}
 for f in glob.glob('/work-zfs/abattle4/marios/annotations/ct_annot/*.bed'):
