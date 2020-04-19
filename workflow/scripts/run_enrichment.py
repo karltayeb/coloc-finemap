@@ -29,52 +29,42 @@ test = pybedtools.BedTool(snakemake.input.test)
 background = pybedtools.BedTool(snakemake.input.background)
 background = background - test
 
-"""
-all_cset = pybedtools.BedTool('output/enrichment/component_clusters/all.sorted.merged.bed')
-all_cset = all_cset - test
+promoter_paths = glob.glob('output/enrichment/annotations/ct_annot/*.enhancer.bed')
+for annot_path in promoter_paths:
+    annot_label = annot_path.split('/')[-1][:-4]
+    annot = pybedtools.BedTool(annot_path)
+    ct = contingency_table(test, background, annot)
+    odds, p = fisher_exact(ct)
+    enrichment = {
+        'test_set': k,
+        'background_set': background,
+        'annotation': annot_label,
+        'test_in_annot': ct[0, 0],
+        'test_not_annot': ct[0, 1],
+        'background_in_annot': ct[1, 0],
+        'background_not_annot': ct[1, 1],
+        'odds_ratio': odds,
+        'p': p
+    }
+    print(enrichment)
 
-all_tested = pybedtools.BedTool('output/enrichment/component_clusters/all_tested_variants.merged.bed')
-all_tested = all_tested - test
-"""
+promoter_paths = glob.glob('output/enrichment/annotations/ct_annot/*.promoter.bed')
+for annot_path in promoter_paths:
+    annot_label = annot_path.split('/')[-1][:-4]
+    annot = pybedtools.BedTool(annot_path)
+    ct = contingency_table(test, background, annot)
+    odds, p = fisher_exact(ct)
+    enrichment = {
+        'test_set': k,
+        'background_set': background,
+        'annotation': annot_label,
+        'test_in_annot': ct[0, 0],
+        'test_not_annot': ct[0, 1],
+        'background_in_annot': ct[1, 0],
+        'background_not_annot': ct[1, 1],
+        'odds_ratio': odds,
+        'p': p
+    }
+    print(enrichment)
 
-background_sets = {
-    'dtss_maf_matched_background': background,
-}
-
-
-annotations = {}
-for f in glob.glob('/work-zfs/abattle4/marios/annotations/ct_annot/*.bed'):
-    key = f.split('/')[-1].split('_')[0]
-    annotations[key] = pybedtools.BedTool(f)
-
-annotations['enhancer'] = pybedtools.BedTool(
-    '/work-zfs/abattle4/marios/GTEx_v8/coloc/Enhancer_regions_cross_tissue_Roadmap_25state.bed'
-)
-
-annotations['promoter'] = pybedtools.BedTool(
-    '/work-zfs/abattle4/marios/GTEx_v8/coloc/Promoter_regions_cross_tissue_Roadmap_25state.bed'
-)
-
-results = []
-for annot in annotations:
-    print(annot)
-    annot_bed = annotations[annot]
-    for background in background_sets:
-        print('\t' + background)
-        background_bed = background_sets[background]
-        ct = contingency_table(test, background_bed, annot_bed)
-        odds, p = fisher_exact(ct)
-        enrichment = {
-            'test_set': k,
-            'background_set': background,
-            'annotation': annot,
-            'test_in_annot': ct[0, 0],
-            'test_not_annot': ct[0, 1],
-            'background_in_annot': ct[1, 0],
-            'background_not_annot': ct[1, 1],
-            'odds_ratio': odds,
-            'p': p
-        }
-        results.append(enrichment)
-    print('\tsaving...')
-    pd.DataFrame(results).to_csv(snakemake.output[0], sep='\t')
+pd.DataFrame(results).to_csv(snakemake.output[0], sep='\t')
