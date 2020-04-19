@@ -75,4 +75,5 @@ for annot in annotations:
             'p': p
         }
         results.append(enrichment)
+    print('\tsaving...')
     pd.DataFrame(results).to_csv(snakemake.output[0], sep='\t')
