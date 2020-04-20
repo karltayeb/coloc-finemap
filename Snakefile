@@ -43,8 +43,6 @@ tissues = [x.split('/')[-1].split('.')[0] for x in
 rule run_tissue_component_enrichment:
     input:
         expand('output/enrichment/tissue_specific_components/{tissue}.enrichment', tissue=tissues)
-        test='{path}/{group}.merged.bed',
-        background='{path}/{group}.background.merged.bed'
 
 rule repair_k20_model:
     input:
