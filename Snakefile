@@ -45,10 +45,6 @@ rule run_tissue_component_enrichment:
         expand('output/enrichment/tissue_specific_components/{tissue}.enrichment', tissue=tissues)
         test='{path}/{group}.merged.bed',
         background='{path}/{group}.background.merged.bed'
-    output:
-        "{path}/{group}.enrichment"
-    script:
-        "workflow/scripts/run_enrichment.py"
 
 rule repair_k20_model:
     input:
