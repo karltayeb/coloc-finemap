@@ -34,7 +34,7 @@ rule run_component_cluster_enrichment:
         test='{path}/{group}.merged.bed',
         background='{path}/{group}.background.merged.bed'
     output:
-        "output/enrichment/component_clusters/{group}.enrichment"
+        "{path}/{group}.enrichment"
     script:
         "workflow/scripts/run_enrichment.py"
 
