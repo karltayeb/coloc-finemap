@@ -24,7 +24,7 @@ def contingency_table(test, background, annotation):
     )
 
 # open beds
-k = snakemake.wildcards.cluster
+k = snakemake.wildcards.group
 
 test = pybedtools.BedTool(snakemake.input.test)
 
