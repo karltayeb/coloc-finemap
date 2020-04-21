@@ -76,14 +76,18 @@ def compute_records(model):
     """
     credible_sets, purity = model.get_credible_sets(0.999)
     active = np.array([purity[k] > 0.1 for k in range(model.dims['K'])])
-    
-    snps = np.concatenate([
-        credible_sets[k] for k in range(model.dims['K']) if active[k]])
+
+    try:
+        snps = np.unique(np.concatenate([
+            credible_sets[k] for k in range(model.dims['K']) if active[k]]))
+    except Exception:
+        snps = np.unique(np.concatenate([
+            credible_sets[k][:5] for k in range(model.dims['K'])]))
     mask = np.isin(model.snp_ids, snps)
-    
+
     wv = model.weight_vars[:, :, mask]
     wm = model.weight_means[:, :, mask]
-    
+
     records = {
         'active': active,
         'purity': purity,
