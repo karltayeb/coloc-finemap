@@ -83,16 +83,12 @@ fit_args = {
     'verbose': True
 }
 model.fit(**fit_args)
-compute_records(model)
-strip_and_dump(model)
 
 #save_model
 print('saving model')
+compute_records(model)
+strip_and_dump(model, snakemake.output.model)
 
-# purge_precompute
-for key in model.precompute:
-    model.precompute[key] = {}
-pickle.dump(model, open(snakemake.output.model, 'wb'))
 pickle.dump(info, open(snakemake.output.info, 'wb'))
 
 base_path = snakemake.output[0][:-len('.model')]
