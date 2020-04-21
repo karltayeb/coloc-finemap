@@ -33,7 +33,7 @@ rule run_component_cluster_enrichment:
     input:
         test='{path}/{group}.merged.bed',
         background='{path}/{group}.background.merged.bed',
-        eqtltop='{path}/{group}.eqtl.merged.bed'
+        eqtltop='{path}/{group}.eqtltop.merged.bed'
 
     output:
         "{path}/{group}.enrichment"
