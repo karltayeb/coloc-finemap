@@ -146,4 +146,3 @@ except Exception:
 print('saving susie')
 compute_records(susie)
 strip_and_dump(susie, snakemake.output.susie, save_data=True)
-pickle.dump(info, open(snakemake.output.info, 'wb'))
