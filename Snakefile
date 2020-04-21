@@ -57,14 +57,14 @@ rule repair_k20_model:
 run_genes = np.loadtxt('output/GTEx/run_genes.txt', dtype=str)
 
 
-k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/*/*/genotype.k20.model')]
+#k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/*/*/genotype.k20.model')]
 rule generate_genotype_reportsk20:
     input:
         expand(
             "{path}/genotype.k20.csets", path=k20_genes
         )
 
-k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/*/*/genotype.standardized.k20.model')]
+#k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/*/*/genotype.standardized.k20.model')]
 rule generate_standardized_genotype_reportsk20:
     input:
         expand(
