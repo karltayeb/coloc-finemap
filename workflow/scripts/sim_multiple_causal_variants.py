@@ -8,7 +8,7 @@ genotype_path = snakemake.input.genotype
 gene = snakemake.wildcards.gene
 
 gencode = pd.read_csv(
-    '../../output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t')
+    'output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t')
 gene = gencode.loc[gencode.gene == gene]
 chr_num = gene.iloc[0, 0]
 tss = gene.iloc[0, 1]
