@@ -1,8 +1,12 @@
+import pickle
+import numpy as np
+import panas as pd
+
 rule format_caviar_data_ld:
     input:
         '{path}/{prefix}.data'
     output:
-        ld_matrix = temp('{path}/caviar/{prefix}.data.ld')
+        ld_matrix = temp('{path}/caviar/{prefix}.data.ld'),
         zscores = temp(enumerate('output/{path}/caviar/{prefix}.data.zscores{tissue}', t=range(20)))
 
     run:
