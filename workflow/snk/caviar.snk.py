@@ -16,7 +16,7 @@ rule format_caviar_data_ld:
         LD = np.corrcoef(data['X'])
         np.savetxt(fname=output.ld_matrix, X=LD, delimiter='\t')
 
-        X = data['X'],
+        X = data['X']
         Y = data['Y']
         n = Y.shape[1]
         xx = np.einsum('nm,nm->n', X, X)
