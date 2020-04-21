@@ -20,7 +20,7 @@ rule format_coloc_data:
         	'zscores': Z,
         	'standard_errors': np.sqrt(S2)
         }
-        pickle.dump(data, open(output.coloc_data, 'rb'))
+        pickle.dump(data, open(output.coloc_data, 'wb'))
 
 rule run_coloc:
     input:
