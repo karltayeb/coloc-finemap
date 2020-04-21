@@ -85,12 +85,6 @@ fit_args = {
 model.fit(**fit_args)
 
 #save_model
-print('saving model')
-compute_records(model)
-strip_and_dump(model, snakemake.output.model)
-
-pickle.dump(info, open(snakemake.output.info, 'wb'))
-
 base_path = snakemake.output[0][:-len('.model')]
 print('generating scores and variant file')
 try:
@@ -99,3 +93,8 @@ try:
     make_variant_report(model, gene).to_csv('{}.variants.bed'.format(base_path), sep='\t')
 except Exception:
     print('There was an error generating secondary files')
+
+print('saving model')
+compute_records(model)
+strip_and_dump(model, snakemake.output.model, save_data=True)
+pickle.dump(info, open(snakemake.output.info, 'wb'))
