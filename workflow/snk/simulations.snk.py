@@ -1,3 +1,5 @@
+import glob
+
 # simulation rules
 rule simulate_single_causal_variant:
     input:
@@ -18,7 +20,8 @@ rule simulate_multiple_causal_variant:
     script:
         "workflow/scripts/multiple_causal_variant.py"
 
-chr_gene = ['a']
+chr_gene = glob.glob('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/chr2/*/*.standardized.k20.model')
+chr_gene = ['/'.join(x.split('/')[7:9]) for x in chr_gene][:1000]
 rule simulate:
     input:
         expand("output/sim/multiple/{chr_gene}/genotype.sim.t20.pve01.model", chr_gene=chr_gene),
