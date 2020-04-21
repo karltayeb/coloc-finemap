@@ -32,11 +32,11 @@ rule run_coloc:
     script:
         "../../workflow/scripts/run_coloc.R"
 
-paths = glob.glob('../../output/sim/multiple/chr2/*')
+paths = glob.glob('output/sim/multiple/chr2/*')
 rule run_coloc_sim:
 	input:
 		expand('{path}/genotype.sim.t20.pve{pve}.coloc',
-			path=paths, pve=['01', '0.5', '10'])
+			path=paths, pve=['01', '05', '10'])
 
 rule run_coloc2:
     input:
