@@ -32,7 +32,7 @@ rule run_coloc:
     script:
         "../../workflow/scripts/run_coloc.R"
 
-rule run_coloc:
+rule run_coloc2:
     input:
         "{path}/{prefix}.coloc.data"
     output:
