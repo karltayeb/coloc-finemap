@@ -40,7 +40,7 @@ rule get_gtex_associations:
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
         )
     output:
-        'output/GTEx/{chr}/{gene}/{gene}.associations'
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations'
     script:
         '../../workflow/scripts/get_gtex_associations.py'
 
