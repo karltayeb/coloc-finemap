@@ -89,11 +89,11 @@ def compute_records(model):
     }
     model.records = records
 
-print('generating data'_)
+print('generating data')
 data, info = make_simulation(X, T=20, pve=0.05, sparsity=0.1)
 model = M(**data, K=10)
 
-print('fitting model')
+print('fitting full model')
 fit_args = {
     'max_iter': 300,
     'update_covariate_weights': False,
