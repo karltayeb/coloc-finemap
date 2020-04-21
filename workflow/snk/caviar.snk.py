@@ -13,9 +13,11 @@ rule format_caviar_data_ld:
         prefix='[^/]+'
     run:
         data = pickle.load(open(input[0], 'rb'))
+        print('computing LD')
         LD = np.corrcoef(data['X'])
         np.savetxt(fname=output.ld_matrix, X=LD, delimiter='\t')
 
+        print('computing summary stats')
         X = data['X']
         Y = data['Y']
         n = Y.shape[1]
