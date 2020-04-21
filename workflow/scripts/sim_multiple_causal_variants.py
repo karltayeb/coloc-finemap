@@ -58,6 +58,7 @@ def make_simulation(X, T, pve, sparsity):
     }
     return data, sim_info
 
+
 def compute_sigma2(X, true_effect, pve):
     var = np.var(true_effect @ X)
     sigma2_t = var/pve - var
@@ -65,6 +66,7 @@ def compute_sigma2(X, true_effect, pve):
         # if variance is 0, there were no causal variants-- dont care what the variance is
         sigma2_t = 1.0
     return sigma2_t
+
 
 def compute_records(model):
     """
@@ -92,7 +94,8 @@ def compute_records(model):
         'snp_subset': mask
     }
     model.records = records
-    
+
+
 def strip_and_dump(model, path, save_data=False):
     """
     save the model with data a weight parameters removed
