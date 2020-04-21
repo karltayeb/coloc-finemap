@@ -113,10 +113,8 @@ compute_records(model)
 print('saving model')
 
 # purge_precompute
-model.precompute['Ew2'] = {}
-model.precompute['first_moments'] = {}
-model.precompute['Hw'] = {}
-
+for key in model.precompute:
+    model.precompute[key] = {}
 pickle.dump(model, open(snakemake.output.model, 'wb'))
 pickle.dump(info, open(snakemake.output.info, 'wb'))
 
