@@ -65,30 +65,6 @@ def compute_sigma2(X, true_effect, pve):
         sigma2_t = 1.0
     return sigma2_t
 
-def compute_records(model):
-    """
-    save the model with data a weight parameters removed
-    add 'mini_weight_measn' and 'mini_weight_vars' to model
-    the model can be reconstituted in a small number of iterations
-    """
-    PIP = 1 - np.exp(np.log(1 - model.pi + 1e-10).sum(0))
-    mask = (PIP > 0.01)
-    wv = model.weight_vars[:, :, mask]
-    wm = model.weight_means[:, :, mask]
-
-    credible_sets, purity = model.get_credible_sets(0.95)
-    active = np.array([purity[k] > 0.5 for k in range(model.dims['K'])])
-    records = {
-        'active': active,
-        'purity': purity,
-        'credible_sets': credible_sets,
-        'EXz': model.pi @ model.X,
-        'mini_wm': wm,
-        'mini_wv': wv,
-        'snp_subset': mask
-    }
-    model.records = records
-
 T = int(snakemake.wildcards.t)
 pve = float(snakemake.wildcards.pve) / 100
 print('generating data')
@@ -108,6 +84,7 @@ fit_args = {
 }
 model.fit(**fit_args)
 compute_records(model)
+strip_and_dump(model)
 
 #save_model
 print('saving model')
