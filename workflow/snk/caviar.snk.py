@@ -27,7 +27,7 @@ rule format_caviar_data_ld:
         Z = B / np.sqrt(S2)
         for t, z in enumerate(Z):
             zscores = pd.DataFrame(z, index=data['snp_ids'])
-            zscores.to_csv(output.z_scores[t], sep='\t', header=None)
+            zscores.to_csv(output.zscores[t], sep='\t', header=None)
 
 rule run_caviar:
     input:
