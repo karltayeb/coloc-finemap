@@ -100,7 +100,6 @@ compute_records(model)
 strip_and_dump(model, snakemake.output.model, save_data=True)
 pickle.dump(info, open(snakemake.output.info, 'wb'))
 
-
 ### RUN SUSIE
 print('training susie')
 susie = M(**data, K=100)
