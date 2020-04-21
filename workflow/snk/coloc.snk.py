@@ -2,7 +2,7 @@ rule format_coloc_data:
     input:
         '{path}/{prefix}.data'
     output:
-        coloc_data = temp('{path}/{prefix}.coloc.data'),
+        coloc_data = temp('{path}/{prefix}.coloc_data'),
     wildcard_constraints:
         prefix='[^/]+'
     run:
@@ -40,7 +40,7 @@ rule run_coloc_sim:
 
 rule run_coloc2:
     input:
-        "{path}/{prefix}.coloc.data"
+        "{path}/{prefix}.coloc_data"
     output:
         "{path}/{prefix}.coloc"
     wildcard_constraints:
