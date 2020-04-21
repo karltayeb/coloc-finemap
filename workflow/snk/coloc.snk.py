@@ -16,7 +16,7 @@ rule format_coloc_data:
         S2 = np.sum((Y[:, None] - B[..., None] * X)**2, 2) / (xx * (n-2))
         Z = B / np.sqrt(S2)
         data = {
-        	'Y': Y
+        	'Y': Y,
         	'zscores': Z,
         	'standard_errors': np.sqrt(S2)
         }
