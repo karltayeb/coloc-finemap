@@ -120,8 +120,13 @@ pve = float(snakemake.wildcards.pve) / 100
 print('generating data')
 print('\tT={}, pve={}'.format(T, pve))
 data, info = make_simulation(X, T=T, pve=pve, sparsity=0.1)
-model = M(**data, K=10)
 
+pickle.dump(info, open(snakemake.output.info, 'wb'))
+pickle.dump(data, open(snakemake.output.data, 'wb'))
+
+
+##### TRAIN CAFEH GENOTYPE
+model = M(**data, K=10)
 print('fitting full model')
 fit_args = {
     'max_iter': 300,
@@ -146,8 +151,7 @@ except Exception:
 
 print('saving model')
 compute_records(model)
-strip_and_dump(model, snakemake.output.model, save_data=True)
-pickle.dump(info, open(snakemake.output.info, 'wb'))
+strip_and_dump(model, snakemake.output.model, save_data=False)
 
 ### RUN SUSIE
 print('training susie')
@@ -194,4 +198,4 @@ except Exception:
 
 print('saving susie')
 compute_records(susie)
-strip_and_dump(susie, snakemake.output.susie, save_data=True)
+strip_and_dump(susie, snakemake.output.susie, save_data=False)
