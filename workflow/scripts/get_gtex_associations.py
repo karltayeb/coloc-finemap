@@ -7,7 +7,7 @@ import json
 
 association_indices = {
         x.split('/')[-1].split('.')[0]: json.load(open(x, 'r'))
-        for x in glob.glob('../../output/GTEx/index/*.index')
+        for x in glob.glob('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/index/*.index')
     }
 
 gene_tissue_map = {}
