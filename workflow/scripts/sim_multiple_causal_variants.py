@@ -66,6 +66,52 @@ def compute_sigma2(X, true_effect, pve):
         sigma2_t = 1.0
     return sigma2_t
 
+def compute_records(model):
+    """
+    save the model with data a weight parameters removed
+    add 'mini_weight_measn' and 'mini_weight_vars' to model
+    the model can be reconstituted in a small number of iterations
+    """
+    credible_sets, purity = model.get_credible_sets(0.999)
+    active = np.array([purity[k] > 0.1 for k in range(model.dims['K'])])
+    
+    snps = np.concatenate([
+        credible_sets[k] for k in range(model.dims['K']) if active[k]])
+    mask = np.isin(model.snp_ids, snps)
+    
+    wv = model.weight_vars[:, :, mask]
+    wm = model.weight_means[:, :, mask]
+    
+    records = {
+        'active': active,
+        'purity': purity,
+        'credible_sets': credible_sets,
+        'EXz': model.pi @ model.X,
+        'mini_wm': wm,
+        'mini_wv': wv,
+        'snp_subset': mask
+    }
+    model.records = records
+    
+def strip_and_dump(model, path, save_data=False):
+    """
+    save the model with data a weight parameters removed
+    add 'mini_weight_measn' and 'mini_weight_vars' to model
+    the model can be reconstituted in a small number of iterations
+    """
+    compute_records(model)
+
+    # purge precompute
+    for key in model.precompute:
+        model.precompute[key] = {}
+    model.__dict__.pop('weight_means', None)
+    model.__dict__.pop('weight_vars', None)
+    if not save_data:
+        model.__dict__.pop('X', None)
+        model.__dict__.pop('Y', None)
+        model.__dict__.pop('covariates', None)
+    pickle.dump(model, open(path, 'wb'))
+
 T = int(snakemake.wildcards.t)
 pve = float(snakemake.wildcards.pve) / 100
 print('generating data')
