@@ -111,8 +111,8 @@ compute_records(model)
 
 #save_model
 print('saving model')
-pickle.dump(model, open(snakemake.output.model))
-pickle.dump(info, open(snakemake.output.info))
+pickle.dump(model, open(snakemake.output.model, 'wb'))
+pickle.dump(info, open(snakemake.output.info, 'wb'))
 
 base_path = snakemake.output[0][:-len('.model')]
 print('generating scores and variant file')
