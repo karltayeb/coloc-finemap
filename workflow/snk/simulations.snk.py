@@ -23,8 +23,8 @@ rule simulate_multiple_causal_variant:
     input:
         genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
     output:
-        model="output/simulation/multiple_causal/{chr}/{gene}/genotype.model",
-        info="output/simulation/multiple_causal/{chr}/{gene}/sim.info",
+        model="output/sim/multiple_causal/{chr}/{gene}/genotype.model",
+        info="output/sim/multiple_causal/{chr}/{gene}/sim.info",
     wildcard_constraints:
         gene = "[^\/]+(?=\/)"
     script:
