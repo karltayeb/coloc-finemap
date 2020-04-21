@@ -21,10 +21,10 @@ rule simulate_multiple_causal_variant:
 
 rule simulate_multiple_causal_variant2:
     input:
-        genotype="../../output/GTEx/{chr}/{gene}/{gene}.raw"
+        genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
     output:
-        model="../../output/sim/multiple/{chr}/{gene}/genotype.sim.model",
-        info="../../output/sim/multiple/{chr}/{gene}/sim.info"
+        model="output/sim/multiple/{chr}/{gene}/genotype.sim.model",
+        info="output/sim/multiple/{chr}/{gene}/sim.info"
     wildcard_constraints:
         gene = "[^\/]+(?=\/)"
     script:
