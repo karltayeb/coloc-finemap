@@ -34,7 +34,9 @@ rule simulate_multiple_causal_variant2:
     output:
         model="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
         susie="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.susie",
-        info="output/sim/multiple/{chr}/{gene}/sim.t{t}.pve{pve}.info"
+        info="output/sim/multiple/{chr}/{gene}/sim.t{t}.pve{pve}.info",
+        model="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
+
     wildcard_constraints:
         gene = "[^\/]+(?=\/)"
     script:
