@@ -18,6 +18,11 @@ rule simulate_multiple_causal_variant:
     script:
         "workflow/scripts/multiple_causal_variant.py"
 
+rule simulate:
+    input:
+        expand("output/sim/multiple/{chr_gene}/genotype.sim.t20.pve01.model", chr_gene=chr_gene),
+        expand("output/sim/multiple/{chr_gene}/genotype.sim.t20.pve05.model", chr_gene=chr_gene),
+        expand("output/sim/multiple/{chr_gene}/genotype.sim.t20.pve10.model", chr_gene=chr_gene)
 
 rule simulate_multiple_causal_variant2:
     input:

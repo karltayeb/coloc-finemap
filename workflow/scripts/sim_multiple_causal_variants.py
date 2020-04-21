@@ -3,6 +3,7 @@ import pandas as pd
 from coloc.independent_model2 import IndependentFactorSER as M
 from coloc.independent_model_summary import IndependentFactorSER as M2
 from coloc.misc import *
+import scipy as sp
 
 genotype_path = snakemake.input.genotype
 gene = snakemake.wildcards.gene
@@ -86,6 +87,55 @@ model.fit(**fit_args)
 
 #save_model
 base_path = snakemake.output[0][:-len('.model')]
+print('generating scores and variant file')
+try:
+    component_scores(model).to_json('{}.scores'.format(base_path))
+    gene = base_path.split('/')[-2]
+    make_variant_report(model, gene).to_csv('{}.variants.bed'.format(base_path), sep='\t')
+except Exception:
+    print('There was an error generating secondary files')
+
+print('saving model')
+compute_records(model)
+strip_and_dump(model, snakemake.output.model, save_data=True)
+pickle.dump(info, open(snakemake.output.info, 'wb'))
+
+
+### RUN SUSIE
+print('training susie')
+susie = M(**data, K=100)
+a = sp.linalg.block_diag(*[np.ones((5)) * 1e10 for t in range(20)])
+a = 1 / (a + 1e-10)
+susie.a = a
+
+susie.b = np.ones((susie.dims['T'], susie.dims['K']))
+susie.weight_precision_a = susie.a
+
+fit_args = {
+    'max_iter': 2,
+    'update_covariate_weights': True,
+    'update_weights': True,
+    'update_pi': True,
+    'ARD_weights': True,
+    'update_variance': True,
+    'verbose': True,
+}
+susie.fit(**fit_args)
+
+fit_args = {
+    'max_iter': 20,
+    'update_covariate_weights': True,
+    'update_weights': True,
+    'update_pi': True,
+    'ARD_weights': True,
+    'update_variance': True,
+    'verbose': True,
+}
+
+for components in np.arange(5*T).reshape(-1, 5):
+    susie.fit(**fit_args, components=components)
+
+base_path = snakemake.output.susie
 print('generating scores and variant file')
 try:
     component_scores(model).to_json('{}.scores'.format(base_path))
