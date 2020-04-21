@@ -10,7 +10,7 @@ rule format_caviar_data_ld:
         zscores = temp(expand('output/{path}/caviar/{prefix}.data.zscores{t}',
             path='{path}', prefix='{prefix}', t=list(range(20))))
     wildcard_constraints:
-        path='[^/]+'
+        prefix='[^/]+'
     run:
         data = pickle.load(open(input[0], 'rb'))
         LD = np.corrcoef(data['X'])
@@ -36,7 +36,7 @@ rule run_caviar:
         '{path}/caviar/caviar.t{tissue}.post',
         '{path}/caviar/caviar.t{tissue}.set'
     wildcard_constraints:
-        path='[^/]+'
+        prefix='[^/]+'
     shell:
         "workflow/bin/caviar/CAVIAR "
         "-o output/{wildcards.path}/caviar/caviar.t{wildcards.tissue} "
