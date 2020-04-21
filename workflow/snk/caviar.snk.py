@@ -1,6 +1,6 @@
 import pickle
 import numpy as np
-import panas as pd
+import pandas as pd
 
 rule format_caviar_data_ld:
     input:
