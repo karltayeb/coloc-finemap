@@ -4,7 +4,7 @@ from coloc.independent_model2 import IndependentFactorSER as M
 from coloc.independent_model_summary import IndependentFactorSER as M2
 from coloc.misc import *
 
-genotype_path = snakemake.inputs.genotype
+genotype_path = snakemake.input.genotype
 gene = snakemake.wildcards.gene
 
 gencode = pd.read_csv(
@@ -89,8 +89,11 @@ def compute_records(model):
     }
     model.records = records
 
+T = int(snakemake.wildcards.t)
+pve = float(snakemake.wildcards.pve) / 100
 print('generating data')
-data, info = make_simulation(X, T=20, pve=0.05, sparsity=0.1)
+print('\tT={}, pve={}'.format(T, pve))
+data, info = make_simulation(X, T=T, pve=pve, sparsity=0.1)
 model = M(**data, K=10)
 
 print('fitting full model')
@@ -108,8 +111,8 @@ compute_records(model)
 
 #save_model
 print('saving model')
-pickle.dump(model, open(snakemake.outputs.model))
-pickle.dump(info, open(snakemake.outputs.info))
+pickle.dump(model, open(snakemake.output.model))
+pickle.dump(info, open(snakemake.output.info))
 
 base_path = snakemake.output[0][:-len('.model')]
 print('generating scores and variant file')
