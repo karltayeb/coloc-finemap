@@ -39,7 +39,7 @@ rule run_caviar:
         prefix='[^/]+'
     shell:
         "workflow/bin/caviar/CAVIAR "
-        "-o output/{wildcards.path}/caviar/caviar.t{wildcards.tissue} "
+        "-o output/{wildcards.path}/caviar/{wildcards.prefix}.caviar.t{wildcards.tissue} "
         "-l {input.ld_matrix} "
         "-z {input.z_scores} "
         "-c 3"
