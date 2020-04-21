@@ -46,6 +46,10 @@ rule run_tissue_component_enrichment:
     input:
         expand('output/enrichment/tissue_specific_components/{tissue}.enrichment', tissue=tissues)
 
+rule run_tissue_component_enrichment:
+    input:
+        expand('output/enrichment/tissue_components/{tissue}.enrichment', tissue=tissues)
+
 rule repair_k20_model:
     input:
         '{path}/genotype.standardized.k20.model'
