@@ -18,6 +18,7 @@ rule simulate_multiple_causal_variant:
     script:
         "workflow/scripts/multiple_causal_variant.py"
 
+chr_gene = ['a']
 rule simulate:
     input:
         expand("output/sim/multiple/{chr_gene}/genotype.sim.t20.pve01.model", chr_gene=chr_gene),
@@ -29,6 +30,7 @@ rule simulate_multiple_causal_variant2:
         genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
     output:
         model="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
+        susie="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.susie",
         info="output/sim/multiple/{chr}/{gene}/sim.t{t}.pve{pve}.info"
     wildcard_constraints:
         gene = "[^\/]+(?=\/)"
