@@ -46,7 +46,7 @@ rule run_tissue_component_enrichment:
     input:
         expand('output/enrichment/tissue_specific_components/{tissue}.enrichment', tissue=tissues)
 
-rule run_tissue_component_enrichment:
+rule run_tissue_component_enrichment2:
     input:
         expand('output/enrichment/tissue_components/{tissue}.enrichment', tissue=tissues)
 
