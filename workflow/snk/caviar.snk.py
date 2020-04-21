@@ -7,7 +7,7 @@ rule format_caviar_data_ld:
         '{path}/{prefix}.data'
     output:
         ld_matrix = temp('{path}/caviar/{prefix}.data.ld'),
-        zscores = temp(expand('output/{path}/caviar/{prefix}.data.zscores{t}',
+        zscores = temp(expand('{path}/caviar/{prefix}.data.zscores{t}',
             path='{path}', prefix='{prefix}', t=list(range(20))))
     wildcard_constraints:
         prefix='[^/]+'
