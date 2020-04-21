@@ -27,7 +27,7 @@ rule build_indices:
 #####
 
 BOGgenes = pd.read_csv(
-    'output/GTEx/BOGgenes.txt', sep='\t', index_col=0)
+    'output/GTEx/BOGgenes.txt', sep='\t', index_col=None)
 get_path = lambda row: 'output/GTEx/{}/{}/{}.associations'.format(row.chromosome, row.gene, row.gene)
 association_paths = [get_path(row) for _, row in BOGgenes.iterrows()]
 rule get_BOG_associations:
