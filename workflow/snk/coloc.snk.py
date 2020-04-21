@@ -36,7 +36,7 @@ rule run_coloc:
     input:
         "{path}/{prefix}.coloc.data"
     output:
-        "{output}/{prefix}.coloc}"
+        "{output}/{prefix}.coloc"
     wildcard_constraints:
         prefix='[^/]+'
     script:
