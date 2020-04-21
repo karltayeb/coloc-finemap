@@ -19,7 +19,7 @@ rule simulate_multiple_causal_variant:
         "workflow/scripts/multiple_causal_variant.py"
 
 
-rule simulate_multiple_causal_variant:
+rule simulate_multiple_causal_variant2:
     input:
         genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
     output:
