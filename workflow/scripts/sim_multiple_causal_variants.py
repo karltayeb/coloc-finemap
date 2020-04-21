@@ -86,7 +86,7 @@ fit_args = {
 model.fit(**fit_args)
 
 #save_model
-base_path = snakemake.output[0][:-len('.model')]
+base_path = snakemake.output.model
 print('generating scores and variant file')
 try:
     component_scores(model).to_json('{}.scores'.format(base_path))
@@ -117,7 +117,7 @@ fit_args = {
     'update_pi': True,
     'ARD_weights': True,
     'update_variance': True,
-    'verbose': True,
+    'verbose': False,
 }
 susie.fit(**fit_args)
 
@@ -128,7 +128,7 @@ fit_args = {
     'update_pi': True,
     'ARD_weights': True,
     'update_variance': True,
-    'verbose': True,
+    'verbose': False
 }
 
 for components in np.arange(5*T).reshape(-1, 5):
@@ -137,13 +137,13 @@ for components in np.arange(5*T).reshape(-1, 5):
 base_path = snakemake.output.susie
 print('generating scores and variant file')
 try:
-    component_scores(model).to_json('{}.scores'.format(base_path))
+    component_scores(susie).to_json('{}.scores'.format(base_path))
     gene = base_path.split('/')[-2]
-    make_variant_report(model, gene).to_csv('{}.variants.bed'.format(base_path), sep='\t')
+    make_variant_report(susie, gene).to_csv('{}.variants.bed'.format(base_path), sep='\t')
 except Exception:
     print('There was an error generating secondary files')
 
-print('saving model')
-compute_records(model)
-strip_and_dump(model, snakemake.output.model, save_data=True)
+print('saving susie')
+compute_records(susie)
+strip_and_dump(susie, snakemake.output.susie, save_data=True)
 pickle.dump(info, open(snakemake.output.info, 'wb'))
