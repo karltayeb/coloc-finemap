@@ -117,7 +117,7 @@ fit_args = {
     'update_pi': True,
     'ARD_weights': True,
     'update_variance': True,
-    'verbose': False,
+    'verbose': True,
 }
 susie.fit(**fit_args)
 
@@ -128,7 +128,7 @@ fit_args = {
     'update_pi': True,
     'ARD_weights': True,
     'update_variance': True,
-    'verbose': False
+    'verbose': True
 }
 
 for components in np.arange(5*T).reshape(-1, 5):
