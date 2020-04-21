@@ -1,38 +1,41 @@
 rule format_caviar_data_ld:
     input:
-        'output/{path}/data'
+        '{path}/{prefix}.data'
     output:
-        ld_matrix = temp('output/{path}/caviar/data.ld{tissue}')
-    run:
-        LD = pickle.load(open(input[0], 'rb'))['LD']
-        if np.ndim(LD) == 3:
-            LD = LD[int(wildcards.tissue)]
-        np.savetxt(fname=output.ld_matrix, X=LD, delimiter='\t')
+        ld_matrix = temp('{path}/caviar/{prefix}.data.ld')
+        zscores = temp(enumerate('output/{path}/caviar/{prefix}.data.zscores{tissue}', t=range(20)))
 
-rule format_caviar_data_zscore:
-    input:
-        'output/{path}/data'
-    output:
-        z_scores = temp('output/{path}/caviar/data.z{tissue}')
     run:
         data = pickle.load(open(input[0], 'rb'))
-        zscores = pd.DataFrame(data['zscores'][int(wildcards.tissue)])
-        zscores.to_csv(output.z_scores, sep='\t', header=None)
+        LD = np.corrcoef(data['X'])
+        LD = pickle.load(open(input[0], 'rb'))['LD']
+        np.savetxt(fname=output.ld_matrix, X=LD, delimiter='\t')
+
+        X = data['X'],
+        Y = data['Y']
+        n = Y.shape[1]
+        xx = np.einsum('nm,nm->n', X, X)
+        B = Y@X.T / xx
+        S2 = np.sum((Y[:, None] - B[..., None] * X)**2, 2) / (xx * (n-2))
+        Z = B / np.sqrt(S2)
+        for t, z in enumerate(Z):
+            zscores = pd.DataFrame(z, index=data['snp_ids'])
+            zscores.to_csv(output.z_scores[t], sep='\t', header=None)
 
 rule run_caviar:
     input:
-        ld_matrix = 'output/{path}/caviar/data.ld{tissue}',
-        z_scores = 'output/{path}/caviar/data.z{tissue}'
+        ld_matrix = '{path}/caviar/{prefix}.data.ld',
+        z_scores = '{path}/caviar/{prefix}.data.zscores{tissue}'
     output:
-        'output/{path}/caviar/caviar_t{tissue}.log',
-        'output/{path}/caviar/caviar_t{tissue}_post',
-        'output/{path}/caviar/caviar_t{tissue}_set'
+        '{path}/caviar/caviar.t{tissue}.log',
+        '{path}/caviar/caviar.t{tissue}.post',
+        '{path}/caviar/caviar.t{tissue}.set'
     shell:
         "workflow/bin/caviar/CAVIAR "
         "-o output/{wildcards.path}/caviar/caviar_t{wildcards.tissue} "
         "-l {input.ld_matrix} "
         "-z {input.z_scores} "
-        "-c 2"
+        "-c 3"
 
 rule make_ecaviar_table:
     input:
