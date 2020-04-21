@@ -32,9 +32,9 @@ rule run_caviar:
         ld_matrix = '{path}/caviar/{prefix}.data.ld',
         z_scores = '{path}/caviar/{prefix}.data.zscores{tissue}'
     output:
-        '{path}/caviar/caviar.t{tissue}.log',
-        '{path}/caviar/caviar.t{tissue}.post',
-        '{path}/caviar/caviar.t{tissue}.set'
+        '{path}/caviar/{prefix}.caviar.t{tissue}.log',
+        '{path}/caviar/{prefix}.caviar.t{tissue}.post',
+        '{path}/caviar/{prefix}.caviar.t{tissue}.set'
     wildcard_constraints:
         prefix='[^/]+'
     shell:
