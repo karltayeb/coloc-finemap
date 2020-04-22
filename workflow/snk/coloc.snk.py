@@ -14,10 +14,11 @@ rule format_coloc_data:
         xx = np.einsum('nm,nm->n', X, X)
         B = Y@X.T / xx
         S2 = np.sum((Y[:, None] - B[..., None] * X)**2, 2) / (xx * (n-2))
+        Z = B / np.sqrt(S2)
         data = {
         	'Y': Y,
         	'betas': B,
-        	's2': S2
+        	'standard_errors': np.sqrt(S2)
         }
         pickle.dump(data, open(output.coloc_data, 'wb'))
 
