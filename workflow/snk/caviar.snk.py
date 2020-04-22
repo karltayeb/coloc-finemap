@@ -6,9 +6,9 @@ rule format_caviar_data_ld:
     input:
         '{path}/{prefix}.data'
     output:
-        ld_matrix = '{path}/caviar/{prefix}.data.ld',
-        zscores = expand('{path}/caviar/{prefix}.data.zscores{t}',
-            path='{path}', prefix='{prefix}', t=list(range(10)))
+        ld_matrix = temp('{path}/caviar/{prefix}.data.ld'),
+        zscores = temp(expand('{path}/caviar/{prefix}.data.zscores{t}',
+            path='{path}', prefix='{prefix}', t=list(range(10))))
     wildcard_constraints:
         prefix='[^/]+'
     run:
