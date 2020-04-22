@@ -37,7 +37,7 @@ def make_simulation(genotype, T, pve):
     data = {
         'X': X,
         'Y': expression,
-        'snp_ids': genotype.columns.values,
+        'snp_ids': snp_ids,
     }
 
     sim_info = {
