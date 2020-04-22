@@ -48,7 +48,7 @@ rule run_caviar:
 
 rule make_ecaviar_table:
     input:
-        data = 'output/{path}/data',
+        data = '{path}/{prefix}.info',
         caviar_posteriors = expand(
             '{path}/caviar/{prefix}.caviar.t{t}.post',
             path='{path}', prefix='{prefix}', t=list(range(10)))
