@@ -49,7 +49,7 @@ rule run_caviar:
 rule make_ecaviar_table:
     input:
         caviar_posteriors = expand(
-            '{path}/caviar/{prefix}.caviar.t{t}.post',
+            '{path}/caviar/{prefix}.caviar.t{t}_post',
             path='{path}', prefix='{prefix}', t=list(range(10)))
         # todo get this to adapt to the number of tissues
     output:
