@@ -8,10 +8,9 @@ dfs = []
 key = []
 for p in snakemake.input.caviar_posteriors:
     dfs.append(pd.read_csv(p, sep='\t', usecols=[2]))
-    key.append(p.split('_')[-2])
+    key.append(p.split('.')[-1].split('_')[-2])
 
 df = pd.concat(dfs, keys=key, axis=1)
-import pdb; pdb.set_trace()
 table = []
 for t1, t2 in itertools.combinations(np.arange(len(key)), 2):
     clpp = (df.loc[:, 't{}'.format(t1)] * df.loc[:, 't{}'.format(t2)]).max()[0]
