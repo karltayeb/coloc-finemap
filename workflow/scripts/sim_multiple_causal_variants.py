@@ -131,7 +131,7 @@ T = int(snakemake.wildcards.t)
 pve = float(snakemake.wildcards.pve) / 100
 print('generating data')
 print('\tT={}, pve={}'.format(T, pve))
-data, info = make_simulation(genotype, T=T, pve=pve, sparsity=0.2)
+data, info = make_simulation(genotype, T=T, pve=pve, sparsity=0.1)
 
 pickle.dump(info, open(snakemake.output.info, 'wb'))
 pickle.dump(data, open(snakemake.output.data, 'wb'))
