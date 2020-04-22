@@ -29,6 +29,9 @@ def generate_data(X, sparsity=0.1, pve=0.1):
         np.random.binomial(1, sparsity, ((10, 5))) \
         * np.random.normal(size=(10, 5))
 
+    if snakemake.params.sample_effect_size:
+        true_effects = true_effects * np.random.normal(size=true_effects.shape)
+
     tissue_variance = np.array([
         compute_sigma2(X, te, pve) for te in true_effects])
 

@@ -5,34 +5,22 @@ from coloc.independent_model_summary import IndependentFactorSER as M2
 from coloc.misc import *
 import scipy as sp
 
-genotype_path = snakemake.input.genotype
-gene = snakemake.wildcards.gene
-
-gencode = pd.read_csv(
-    'output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t')
-gene = gencode.loc[gencode.gene == gene]
-chr_num = gene.iloc[0, 0]
-tss = gene.iloc[0, 1]
-gene_name = gene.iloc[0, 3]
-
-#load genotype
-genotype = pd.read_csv(genotype_path, sep=' ')
-genotype = genotype.set_index('IID').iloc[:, 5:]
-# center, mean immpute
-genotype = (genotype - genotype.mean(0))
-genotype = genotype.fillna(0)
-# standardize
-genotype = genotype / genotype.std(0, ddof=0)
-X = genotype.values.T
-
-def make_simulation(X, T, pve, sparsity):
+def make_simulation(genotype, T, pve, sparsity):
     # select snps
+    NN = genotype.shape[1]
+    start = np.random.choice(NN-1000)
+    X = genotype.values.T[start:start+1000]
+    snp_ids = genotype.columns.values[start:start+1000]
+
     N, M = X.shape
     causal_snps = np.random.choice(N, 5)
     true_effects = np.zeros((T, N))
     true_effects[:, causal_snps] = \
         np.random.binomial(1, sparsity, ((T, 5))) \
 
+    if snakemake.params.sample_effects:
+        true_effects = true_effects \
+            * np.random.normal(size=true_effects.shape)
     tissue_variance = np.array([
         compute_sigma2(X, te, pve) for te in true_effects
     ])
@@ -47,7 +35,7 @@ def make_simulation(X, T, pve, sparsity):
     data = {
         'X': X,
         'Y': expression,
-        'snp_ids': genotype.columns.values,
+        'snp_ids': snp_ids,
     }
 
     sim_info = {
@@ -119,11 +107,31 @@ def strip_and_dump(model, path, save_data=False):
         model.__dict__.pop('covariates', None)
     pickle.dump(model, open(path, 'wb'))
 
+######### GET GENOTYPE
+genotype_path = snakemake.input.genotype
+gene = snakemake.wildcards.gene
+
+gencode = pd.read_csv(
+    'output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t')
+gene = gencode.loc[gencode.gene == gene]
+chr_num = gene.iloc[0, 0]
+tss = gene.iloc[0, 1]
+gene_name = gene.iloc[0, 3]
+
+#load genotype
+genotype = pd.read_csv(genotype_path, sep=' ')
+genotype = genotype.set_index('IID').iloc[:, 5:]
+# center, mean immpute
+genotype = (genotype - genotype.mean(0))
+genotype = genotype.fillna(0)
+# standardize
+genotype = genotype / genotype.std(0, ddof=0)
+
 T = int(snakemake.wildcards.t)
 pve = float(snakemake.wildcards.pve) / 100
 print('generating data')
 print('\tT={}, pve={}'.format(T, pve))
-data, info = make_simulation(X, T=T, pve=pve, sparsity=0.1)
+data, info = make_simulation(genotype, T=T, pve=pve, sparsity=0.1)
 
 pickle.dump(info, open(snakemake.output.info, 'wb'))
 pickle.dump(data, open(snakemake.output.data, 'wb'))

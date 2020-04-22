@@ -23,6 +23,10 @@ def make_simulation(genotype, T, pve):
     for i, k in enumerate(np.random.choice(5, 10)):
         true_effects[i, causal_snps[k]] = 1
 
+    if snakemake.params.sample_effects:
+        true_effects = true_effects \
+            * np.random.normal(size=true_effects.shape)
+
     tissue_variance = np.array([
         compute_sigma2(X, te, pve) for te in true_effects
     ])
