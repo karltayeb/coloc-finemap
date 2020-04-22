@@ -21,7 +21,7 @@ for (t1 in c(1:num_tissues)){
 		i <- i + 1
 		beta1 = data$betas[t1,]
 		beta2 = data$betas[t2,]
-		v1 = data$standard_errors[t2,]^2
+		v1 = data$standard_errors[t1,]^2
 		v2 = data$standard_errors[t2,]^2
 		res = coloc.abf(
 			dataset1=list(beta=beta1, varbeta=v1, N=838, sdY=sd(data$Y[t1,]), type='quant'),
