@@ -13,10 +13,10 @@ def make_simulation(genotype, T, pve, sparsity):
     snp_ids = genotype.columns.values[start:start+1000]
 
     N, M = X.shape
-    causal_snps = np.random.choice(N, 5)
+    causal_snps = np.random.choice(N, 10)
     true_effects = np.zeros((T, N))
     true_effects[:, causal_snps] = \
-        np.random.binomial(1, sparsity, ((T, 5))) \
+        np.random.binomial(1, sparsity, ((T, 10))) \
 
     if snakemake.params.sample_effects:
         true_effects = true_effects \
