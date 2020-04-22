@@ -150,7 +150,7 @@ fit_args = {
     'update_variance': True,
     'verbose': True
 }
-data, info = make_simulation(genotype, 10, 0.1)
+model.fit(**fit_args)
 
 #save_model
 base_path = snakemake.output.model
