@@ -14,11 +14,11 @@ df = pd.concat(dfs, keys=key, axis=1)
 table = []
 for t1 in range(len(key)):
     for t2 in range(t1 + 1):
-    clpp = (df.loc[:, 't{}'.format(t1)] * df.loc[:, 't{}'.format(t2)]).max()[0]
-    table.append({
-        't1': t1,
-        't2': t2,
-        'CLPP': clpp
-    })
+        clpp = (df.loc[:, 't{}'.format(t1)] * df.loc[:, 't{}'.format(t2)]).max()[0]
+        table.append({
+            't1': t1,
+            't2': t2,
+            'CLPP': clpp
+        })
 table = pd.DataFrame(table)
 table.to_csv(snakemake.output[0], sep='\t', index=None)
