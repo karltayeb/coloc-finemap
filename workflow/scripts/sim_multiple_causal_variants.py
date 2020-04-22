@@ -39,7 +39,7 @@ def make_simulation(genotype, T, pve, sparsity):
     }
 
     sim_info = {
-        'causal_snps': causal_snps[true_effects[:, causal_snps].sum(0) > 0],
+        'causal_snps': causal_snps[np.abs(true_effects[:, causal_snps]).sum(0) > 0],
         'true_effects': true_effects,
         'tissue_variance': tissue_variance,
         'expression': expression
