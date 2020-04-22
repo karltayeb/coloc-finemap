@@ -138,7 +138,6 @@ data, info = make_simulation(genotype, T=T, pve=pve, sparsity=0.1)
 pickle.dump(info, open(snakemake.output.info, 'wb'))
 pickle.dump(data, open(snakemake.output.data, 'wb'))
 
-
 ##### TRAIN CAFEH GENOTYPE
 model = M(**data, K=10)
 print('fitting full model')
