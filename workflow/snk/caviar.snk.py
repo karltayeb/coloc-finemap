@@ -57,4 +57,4 @@ rule make_ecaviar_table:
     wildcard_constraints:
         prefix='[^/]+'
     script:
-        'workflow/scripts/make_ecaviar_table.py'
+        '../../workflow/scripts/make_ecaviar_table.py'
