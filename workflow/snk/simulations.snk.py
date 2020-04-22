@@ -24,7 +24,6 @@ rule simulate_multiple_causal_variant2:
     script:
         "../../workflow/scripts/sim_multiple_causal_variants.py"
 
-
 rule simulate_single:
     input:
         expand("output/sim/single/{chr_gene}/genotype.sim.t10.pve01.model", chr_gene=chr_gene),
