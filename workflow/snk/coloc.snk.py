@@ -15,7 +15,6 @@ rule format_coloc_data:
         B = Y@X.T / xx
         S2 = np.sum((Y[:, None] - B[..., None] * X)**2, 2) / (xx * (n-2))
         Z = B / np.sqrt(S2)
-        import pdb; pdb.set_trace()
         data = {
         	'Y': Y,
         	'betas': B,
