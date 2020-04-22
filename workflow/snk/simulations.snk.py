@@ -43,4 +43,4 @@ rule simulate_single_causal_variant2:
     wildcard_constraints:
         gene = "[^\/]+(?=\/)"
     script:
-        "../../workflow/scripts/sim_single_causal_variants.py"
+        "../../workflow/scripts/sim_single_causal_variant.py"
