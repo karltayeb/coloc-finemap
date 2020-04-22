@@ -19,10 +19,10 @@ i <- 0
 for (t1 in c(1:num_tissues)){
 	for (t2 in c(t1:num_tissues)){c()
 		i <- i + 1
-		beta1 = data$zscores[t1,]
-		beta2 = data$zscores[t2,]
-		v1 = data$standard_errors[t2,]^2
-		v2 = data$standard_errors[t2,]^2
+		beta1 = data$betas[t1,]
+		beta2 = data$betas[t2,]
+		v1 = data$s2[t2,]
+		v2 = data$s2[t2,]
 		res = coloc.abf(
 			dataset1=list(beta=beta1, varbeta=v1, N=838, sdY=sd(data$Y[t1,]), type='quant'),
 			dataset2=list(beta=beta2, varbeta=v2, N=838, sdY=sd(data$Y[t2,]), type='quant')
