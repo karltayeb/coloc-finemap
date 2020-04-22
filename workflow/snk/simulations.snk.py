@@ -25,7 +25,7 @@ rule simulate_multiple_causal_variant2:
         "../../workflow/scripts/sim_multiple_causal_variants.py"
 
 
-rule run_single_causal_variant_simulation:
+rule simulate_single:
     input:
         expand("output/sim/single/{chr_gene}/genotype.sim.t10.pve01.model", chr_gene=chr_gene),
         expand("output/sim/single/{chr_gene}/genotype.sim.t10.pve05.model", chr_gene=chr_gene),
@@ -37,7 +37,6 @@ rule simulate_single_causal_variant2:
         genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
     output:
         model="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
-        susie="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.susie",
         info="output/sim/multiple/{chr}/{gene}/sim.t{t}.pve{pve}.info",
         data="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
 
