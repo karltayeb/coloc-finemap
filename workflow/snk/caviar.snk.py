@@ -6,9 +6,9 @@ rule format_caviar_data_ld:
     input:
         '{path}/{prefix}.data'
     output:
-        ld_matrix = ('{path}/caviar/{prefix}.data.ld'),
-        zscores = (expand('{path}/caviar/{prefix}.data.zscores{t}',
-            path='{path}', prefix='{prefix}', t=list(range(10))))
+        ld_matrix = '{path}/caviar/{prefix}.data.ld',
+        zscores = expand('{path}/caviar/{prefix}.data.zscores{t}',
+            path='{path}', prefix='{prefix}', t=list(range(10)))
     wildcard_constraints:
         prefix='[^/]+'
     run:
@@ -44,17 +44,18 @@ rule run_caviar:
         "-o output/{wildcards.path}/caviar/{wildcards.prefix}.caviar.t{wildcards.tissue} "
         "-l {input.ld_matrix} "
         "-z {input.z_scores} "
-        "-c 3"
+        "-c 2"
 
 rule make_ecaviar_table:
     input:
         data = 'output/{path}/data',
         caviar_posteriors = expand(
-            'output/{path}/caviar/caviar_t{tissue}_post',
-            path='{path}', tissue=np.arange(7)
-        )
+            '{path}/caviar/{prefix}.caviar.t{t}.post',
+            path='{path}', prefix='{prefix}', t=list(range(10)))
         # todo get this to adapt to the number of tissues
     output:
-        'output/{path}/ecaviar'
+        "{path}/{prefix}.ecaviar"
+    wildcard_constraints:
+        prefix='[^/]+'
     script:
         'workflow/scripts/make_ecaviar_table.py'
