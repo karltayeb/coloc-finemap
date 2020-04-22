@@ -167,7 +167,7 @@ strip_and_dump(model, snakemake.output.model, save_data=False)
 
 ### RUN SUSIE
 print('training susie')
-susie = M(**data, K=100)
+susie = M(**data, K=T*5)
 a = sp.linalg.block_diag(*[np.ones((5)) * 1e10 for t in range(20)])
 a = 1 / (a + 1e-10)
 susie.a = a
