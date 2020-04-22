@@ -35,13 +35,13 @@ rule run_caviar:
         z_scores = '{path}/caviar/{prefix}.data.zscores{tissue}'
     output:
         '{path}/caviar/{prefix}.caviar.t{tissue}.log',
-        '{path}/caviar/{prefix}.caviar.t{tissue}.post',
-        '{path}/caviar/{prefix}.caviar.t{tissue}.set'
+        '{path}/caviar/{prefix}.caviar.t{tissue}_post',
+        '{path}/caviar/{prefix}.caviar.t{tissue}_set'
     wildcard_constraints:
         prefix='[^/]+'
     shell:
         "workflow/bin/caviar/CAVIAR "
-        "-o output/{wildcards.path}/caviar/{wildcards.prefix}.caviar.t{wildcards.tissue} "
+        "-o {wildcards.path}/caviar/{wildcards.prefix}.caviar.t{wildcards.tissue} "
         "-l {input.ld_matrix} "
         "-z {input.z_scores} "
         "-c 2"
