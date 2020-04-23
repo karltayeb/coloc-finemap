@@ -155,7 +155,6 @@ rule make_cafeh_plots:
     script:
         '../../workflow/scripts/cafeh_plots.py'
 
-
 rule report_genotype:
     input:
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',

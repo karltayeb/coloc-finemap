@@ -137,8 +137,8 @@ rule get_gtex_ld2:
         from_bp = lambda wildcards: np.maximum(0, gencode.loc[wildcards.gene].tss - 1000000),
         to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
     output:
-        'output/GTEx/{params.chrom}/{gene}/{gene}.ld',
-        'output/GTEx/{params.chrom}/{gene}/{gene}.snplist'
+        'output/GTEx/{chrom}/{gene}/{gene}.ld',
+        'output/GTEx/{chrom}/{gene}/{gene}.snplist'
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1 --r square'
