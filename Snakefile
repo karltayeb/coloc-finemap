@@ -32,9 +32,7 @@ rule repair_k20_models:
 rule run_component_cluster_enrichment:
     input:
         test='{path}/{group}.merged.bed',
-        background='{path}/{group}.background.merged.bed',
-        eqtltop='{path}/{group}.eqtltop.merged.bed'
-
+        background='{path}/{group}.background.merged.bed'
     output:
         "{path}/{group}.enrichment"
     script:
@@ -42,6 +40,12 @@ rule run_component_cluster_enrichment:
 
 tissues = [x.split('/')[-1].split('.')[0] for x in
     glob.glob('output/enrichment/tissue_specific_components/*.background.merged.bed')]
+
+rule run_tissue_component_enrichment:
+    input:
+        expand('output/enrichment/tissue_components2/{tissue}.enrichment', tissue=tissues),
+        expand('output/enrichment/eqtltop/{tissue}.eqtltop2.enrichment', tissue=tissues),
+
 rule run_tissue_component_enrichment:
     input:
         expand('output/enrichment/tissue_specific_components/{tissue}.enrichment', tissue=tissues)

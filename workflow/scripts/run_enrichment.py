@@ -31,9 +31,6 @@ test = pybedtools.BedTool(snakemake.input.test)
 background = pybedtools.BedTool(snakemake.input.background)
 background = background - test
 
-eqtltop = pybedtools.BedTool(snakemake.input.eqtltop)
-eqtltop = eqtltop
-
 results = []
 promoter_paths = glob.glob('output/enrichment/annotations/ct_annot/*.enhancer.bed')
 for annot_path in promoter_paths:
