@@ -46,10 +46,6 @@ rule run_tissue_component_enrichment:
         expand('output/enrichment/tissue_components2/{tissue}.enrichment', tissue=tissues),
         expand('output/enrichment/eqtltop/{tissue}.eqtltop2.enrichment', tissue=tissues),
 
-rule run_tissue_component_enrichment:
-    input:
-        expand('output/enrichment/tissue_specific_components/{tissue}.enrichment', tissue=tissues)
-
 rule run_tissue_component_enrichment2:
     input:
         expand('output/enrichment/tissue_components/{tissue}.enrichment', tissue=tissues)
