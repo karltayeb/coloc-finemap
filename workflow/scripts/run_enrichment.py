@@ -56,22 +56,7 @@ for annot_path in promoter_paths:
     }
     results.append(enrichment)
 
-    ct = contingency_table(test-eqtltop, eqtltop, annot)
-    odds, p = fisher_exact(ct)
-    enrichment = {
-        'test_set': k,
-        'background_set': 'eqtltop',
-        'annotation': annot_label,
-        'test_in_annot': ct[0, 0],
-        'test_not_annot': ct[0, 1],
-        'background_in_annot': ct[1, 0],
-        'background_not_annot': ct[1, 1],
-        'odds_ratio': odds,
-        'p': p
-    }
-    results.append(enrichment)
-
-promoter_paths = glob.glob('output/enrichment/annotations/ct_annot/*.promoter.bed')
+promoter_paths = glob.glob('output/enrichment/annotations/ct_annot/all.promoter.bed')
 for annot_path in promoter_paths:
     annot_label = annot_path.split('/')[-1][:-4]
     print(annot_label)
@@ -82,21 +67,6 @@ for annot_path in promoter_paths:
     enrichment = {
         'test_set': k,
         'background_set': 'dtss_maf_matched_background',
-        'annotation': annot_label,
-        'test_in_annot': ct[0, 0],
-        'test_not_annot': ct[0, 1],
-        'background_in_annot': ct[1, 0],
-        'background_not_annot': ct[1, 1],
-        'odds_ratio': odds,
-        'p': p
-    }
-    results.append(enrichment)
-
-    ct = contingency_table(test-eqtltop, eqtltop, annot)
-    odds, p = fisher_exact(ct)
-    enrichment = {
-        'test_set': k,
-        'background_set': 'eqtltop',
         'annotation': annot_label,
         'test_in_annot': ct[0, 0],
         'test_not_annot': ct[0, 1],
