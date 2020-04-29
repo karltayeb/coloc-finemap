@@ -147,12 +147,12 @@ data, info = make_simulation(genotype, U, V, T, pve)
 pickle.dump(info, open(snakemake.output.info, 'wb'))
 pickle.dump(data, open(snakemake.output.data, 'wb'))
 
-
 ##### TRAIN CAFEH GENOTYPE
-K = np.max([5, info['causal_snps'].size * 2])
+K = np.max([10, info['causal_snps'].size * 2])
 model = M(**data, K=K)
 
 print('fitting full model')
+print(model.dims)
 fit_args = {
     'max_iter': 300,
     'update_covariate_weights': False,

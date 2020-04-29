@@ -77,7 +77,7 @@ for t in range(10):
         'X': data['X'],
         'snp_ids': data['snp_ids']
     }
-    susie_t = M(**data_t, K=5)
+    susie_t = M(**data_t, K=10)
 
     fit_args = {
         'max_iter':100,
@@ -85,6 +85,7 @@ for t in range(10):
         'verbose': False
     }
     susie_t.tolerance = 1e-8
+    print(susie_t.dims)
     susie_t.fit(**fit_args)
     print('model fit:\n\titers:{}\n\tELBO:{}\n\trun-time:{}'.format(
         len(susie_t.elbos), susie_t.elbos[-1], susie_t.run_time))
