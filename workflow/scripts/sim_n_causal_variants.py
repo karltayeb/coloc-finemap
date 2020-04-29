@@ -29,7 +29,7 @@ def make_simulation(genotype, U, V, T, pve):
 
     for t in range(T):
         # select U causal snps to use in tissue t
-        causal_in_t = np.random.choice(causal_snps, U)
+        causal_in_t = np.random.choice(causal_snps, U, replace=False)
         true_effects[t, causal_in_t] = np.random.normal(size=causal_in_t.size)
 
     tissue_variance = np.array([
@@ -139,7 +139,7 @@ genotype = genotype / genotype.std(0, ddof=0)
 
 T = int(snakemake.wildcards.t)
 U = int(snakemake.wildcards.snps_per_tissue)
-V = U*3
+V = int(U * (T/3))
 
 pve = float(snakemake.wildcards.pve) / 100
 data, info = make_simulation(genotype, U, V, T, pve)
