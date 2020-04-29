@@ -58,27 +58,6 @@ def strip(model, save_data=False):
 # load data
 data = pickle.load(open(snakemake.input.data, 'rb'))
 
-### RUN SUSIE
-print('training susie')
-susie = M(**data, K=T*5)
-a = sp.linalg.block_diag(*[np.ones((5)) * 1e10 for t in range(T)])
-a = 1 / (a + 1e-10)
-susie.a = a
-
-susie.b = np.ones((susie.dims['T'], susie.dims['K']))
-susie.weight_precision_a = susie.a
-
-fit_args = {
-    'max_iter': 2,
-    'update_covariate_weights': True,
-    'update_weights': True,
-    'update_pi': True,
-    'ARD_weights': True,
-    'update_variance': True,
-    'verbose': True,
-}
-susie.fit(**fit_args)
-
 fit_args = {
     'max_iter': 20,
     'update_covariate_weights': True,
