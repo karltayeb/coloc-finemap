@@ -13,7 +13,9 @@ def make_simulation(genotype, U, V, T, pve):
     T is the number of tissues
     pve is the percent variance explained by genotype
     """
-
+    print('generating data')
+    print('\tT={}, \tU={}, \tV={},\tpve={}'.format(T, U, V, pve))
+    
     # select snps
     NN = genotype.shape[1]
     start = np.random.choice(NN-1000)
@@ -140,8 +142,6 @@ U = int(snakemake.wildcards.snps_per_tissue)
 V = U*3
 
 pve = float(snakemake.wildcards.pve) / 100
-print('generating data')
-print('\tT={}, pve={}'.format(T, pve))
 data, info = make_simulation(genotype, U, V, T, pve)
 
 pickle.dump(info, open(snakemake.output.info, 'wb'))
@@ -161,4 +161,7 @@ fit_args = {
     'verbose': False
 }
 model.fit(**fit_args)
-print('model fit:\n\titers:{}\n\tELBO:{}'.format(len(model.elbos), model.elbos[-1]))
+print('model fit:\n\titers:{}\n\tELBO:{}\n\trun-time:{}'.format(len(model.elbos), model.elbos[-1], model.run_time))
+
+strip_and_dump(model, snakemake.output.model, False)
+
