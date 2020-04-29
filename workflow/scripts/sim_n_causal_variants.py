@@ -45,7 +45,7 @@ def make_simulation(genotype, U, V, T, pve):
     data = {
         'X': X,
         'Y': expression,
-        'snp_ids': snp_ids,
+        'snp_ids': snp_ids
     }
 
     sim_info = {
@@ -149,7 +149,9 @@ pickle.dump(data, open(snakemake.output.data, 'wb'))
 
 
 ##### TRAIN CAFEH GENOTYPE
-model = M(**data, K=10)
+K = np.max([5, info['causal_snps'].size * 2])
+model = M(**data, K=K)
+
 print('fitting full model')
 fit_args = {
     'max_iter': 300,
