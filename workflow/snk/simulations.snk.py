@@ -58,7 +58,7 @@ rule simulate_n_causal_variant_random_effect_size:
         info="output/sim/{snps_per_tissue}/{chr}/{gene}/sim.t{t}.c{snps_per_tissue}.pve{pve}.info",
         data="output/sim/{snps_per_tissue}/{chr}/{gene}/sim.t{t}.c{snps_per_tissue}.pve{pve}.data"
     wildcard_constraints:
-        snps_per_tissue = "+d"
+        snps_per_tissue = "+d",
         gene = "[^\/]+(?=\/)"
     params:
         sample_effects=True
