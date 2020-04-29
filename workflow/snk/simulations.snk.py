@@ -50,6 +50,20 @@ rule run_susie_on_simulations:
     script:
         "../../workflow/scripts/sim_susie.py"
 
+rule simulate_n_causal_variant_random_effect_size:
+    input:
+        genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
+    output:
+        model="output/sim/multiple_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
+        info="output/sim/multiple_random/{chr}/{gene}/sim.t{t}.pve{pve}.info",
+        data="output/sim/multiple_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
+    wildcard_constraints:
+        gene = "[^\/]+(?=\/)"
+    params:
+        sample_effects=True
+    script:
+        "../../workflow/scripts/sim_n_causal_variants.py"
+
 rule simulate_multiple_causal_variant_fixed_effect_size:
     input:
         genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
