@@ -41,6 +41,7 @@ rule simulate_single:
 rule run_susie_on_simulations:
     input:
         data="output/sim/{sim}/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
+        info="output/sim/{sim}/{chr}/{gene}/sim.t{t}.pve{pve}.info"
     output:
         susie="output/sim/{sim}/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.susie",
     wildcard_constraints:
