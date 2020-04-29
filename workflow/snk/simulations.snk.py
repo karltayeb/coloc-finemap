@@ -2,6 +2,8 @@ import glob
 
 chr_gene = glob.glob('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/chr2/*/*.standardized.k20.model')
 chr_gene = ['/'.join(x.split('/')[7:9]) for x in chr_gene][:200]
+
+
 rule simulate_single:
     input:
         expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve01.model", chr_gene=chr_gene),
@@ -58,7 +60,7 @@ rule simulate_n_causal_variant_random_effect_size:
         info="output/sim/{snps_per_tissue}/{chr}/{gene}/sim.t{t}.c{snps_per_tissue}.pve{pve}.info",
         data="output/sim/{snps_per_tissue}/{chr}/{gene}/sim.t{t}.c{snps_per_tissue}.pve{pve}.data"
     wildcard_constraints:
-        snps_per_tissue = "+d",
+        snps_per_tissue = "\d+",
         gene = "[^\/]+(?=\/)"
     params:
         sample_effects=True
