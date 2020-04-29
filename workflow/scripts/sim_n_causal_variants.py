@@ -28,7 +28,7 @@ def make_simulation(genotype, U, V, T, pve):
     for t in range(T):
         # select U causal snps to use in tissue t
         causal_in_t = np.random.choice(causal_snps, U)
-        true_effects[t, causal_in_t] = np.random.normal(size=true_effects.size)
+        true_effects[t, causal_in_t] = np.random.normal(size=causal_in_t.size)
 
     tissue_variance = np.array([
         compute_sigma2(X, te, pve) for te in true_effects
