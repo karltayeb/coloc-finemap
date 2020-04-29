@@ -14,8 +14,8 @@ def make_simulation(genotype, U, V, T, pve):
     pve is the percent variance explained by genotype
     """
     print('generating data')
-    print('\tT={}, \tU={}, \tV={},\tpve={}'.format(T, U, V, pve))
-    
+    print('\tT={}\tU={}\tV={}\tpve={}'.format(T, U, V, pve))
+
     # select snps
     NN = genotype.shape[1]
     start = np.random.choice(NN-1000)
