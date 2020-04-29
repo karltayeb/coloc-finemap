@@ -84,6 +84,7 @@ for t in range(10):
         'verbose':True,
         'ARD_weights':False
     }
+    susie_t.tolerance = 1e-8
     susie_t.fit(**fit_args)
     compute_records(susie_t)
     strip(susie_t)
