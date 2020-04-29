@@ -81,11 +81,14 @@ for t in range(10):
 
     fit_args = {
         'max_iter':100,
-        'verbose':True,
-        'ARD_weights':False
+        'ARD_weights':False,
+        'verbose': False
     }
     susie_t.tolerance = 1e-8
     susie_t.fit(**fit_args)
+    print('model fit:\n\titers:{}\n\tELBO:{}\n\trun-time:{}'.format(
+        len(susie_t.elbos), susie_t.elbos[-1], susie_t.run_time))
+
     compute_records(susie_t)
     strip(susie_t)
     susies[t] = susie_t
