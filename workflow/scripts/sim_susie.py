@@ -5,57 +5,6 @@ from coloc.independent_model_summary import IndependentFactorSER as M2
 from coloc.misc import *
 import scipy as sp
 
-def make_simulation(genotype, T, pve, sparsity):
-    # select snps
-    NN = genotype.shape[1]
-    start = np.random.choice(NN-1000)
-    X = genotype.values.T[start:start+1000]
-    snp_ids = genotype.columns.values[start:start+1000]
-
-    N, M = X.shape
-    causal_snps = np.random.choice(N, 10)
-    true_effects = np.zeros((T, N))
-    true_effects[:, causal_snps] = \
-        np.random.binomial(1, sparsity, ((T, 10))) \
-
-    if snakemake.params.sample_effects:
-        true_effects = true_effects \
-            * np.random.normal(size=true_effects.shape)
-    tissue_variance = np.array([
-        compute_sigma2(X, te, pve) for te in true_effects
-    ])
-
-    #simulate expression
-    expression = (true_effects @ X) + \
-        np.random.normal(size=(T, M)) * np.sqrt(tissue_variance)[:, None]
-    expression = expression - expression.mean(1)[:, None]
-    pos = np.array([int(x.split('_')[1]) for x in genotype.columns.values])
-
-    # simulate expression 
-    data = {
-        'X': X,
-        'Y': expression,
-        'snp_ids': snp_ids,
-    }
-
-    sim_info = {
-        'causal_snps': causal_snps[np.abs(true_effects[:, causal_snps]).sum(0) > 0],
-        'true_effects': true_effects,
-        'tissue_variance': tissue_variance,
-        'expression': expression
-    }
-    return data, sim_info
-
-
-def compute_sigma2(X, true_effect, pve):
-    var = np.var(true_effect @ X)
-    sigma2_t = var/pve - var
-    if sigma2_t == 0:
-        # if variance is 0, there were no causal variants-- dont care what the variance is
-        sigma2_t = 1.0
-    return sigma2_t
-
-
 def compute_records(model):
     """
     save the model with data a weight parameters removed
@@ -88,7 +37,7 @@ def compute_records(model):
     model.records = records
 
 
-def strip(model):
+def strip(model, save_data=False):
     """
     save the model with data a weight parameters removed
     add 'mini_weight_measn' and 'mini_weight_vars' to model
@@ -107,7 +56,7 @@ def strip(model):
         model.__dict__.pop('covariates', None)
 
 # load data
-data = pickle.load(open(snakemake.input.info, 'rb'))
+data = pickle.load(open(snakemake.input.data, 'rb'))
 
 ### RUN SUSIE
 print('training susie')
