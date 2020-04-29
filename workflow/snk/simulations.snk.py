@@ -1,12 +1,12 @@
 import glob
 
 chr_gene = glob.glob('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/chr2/*/*.standardized.k20.model')
-chr_gene = ['/'.join(x.split('/')[7:9]) for x in chr_gene][:200]
+chr_gene = ['/'.join(x.split('/')[7:9]) for x in chr_gene][:100]
 
 rule simulate_n:
     input:
         expand("output/sim/n_causal_variants/{chr_gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.data",
-            chr_gene=chr_gene, t=10, snps_per_tissue=[1,2,3,4], pve=['01', '05', '10', '20'])
+            chr_gene=chr_gene, t=10, snps_per_tissue=[1,2,3,4,5], pve=['05', '10', '20'])
 
 rule simulate_single:
     input:
