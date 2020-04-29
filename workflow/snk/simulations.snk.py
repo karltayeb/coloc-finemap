@@ -69,7 +69,6 @@ rule simulate_multiple_causal_variant_random_effect_size:
         genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
     output:
         model="output/sim/multiple_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
-        susie="output/sim/multiple_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.susie",
         info="output/sim/multiple_random/{chr}/{gene}/sim.t{t}.pve{pve}.info",
         data="output/sim/multiple_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
     wildcard_constraints:
