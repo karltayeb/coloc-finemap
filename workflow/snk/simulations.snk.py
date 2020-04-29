@@ -54,10 +54,11 @@ rule simulate_n_causal_variant_random_effect_size:
     input:
         genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
     output:
-        model="output/sim/multiple_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
-        info="output/sim/multiple_random/{chr}/{gene}/sim.t{t}.pve{pve}.info",
-        data="output/sim/multiple_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
+        model="output/sim/{snps_per_tissue}/{chr}/{gene}/sim.t{t}.c{snps_per_tissue}.pve{pve}.genotype.model",
+        info="output/sim/{snps_per_tissue}/{chr}/{gene}/sim.t{t}.c{snps_per_tissue}.pve{pve}.info",
+        data="output/sim/{snps_per_tissue}/{chr}/{gene}/sim.t{t}.c{snps_per_tissue}.pve{pve}.data"
     wildcard_constraints:
+        snps_per_tissue = "+d"
         gene = "[^\/]+(?=\/)"
     params:
         sample_effects=True
