@@ -52,6 +52,19 @@ rule run_susie_on_simulations:
     script:
         "../../workflow/scripts/sim_susie.py"
 
+rule run_susie_on_n_causal_variant_simulations:
+    input:
+        data="output/sim/n_causal_variants/{chr}/{gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.data"
+    output:
+        susie="output/sim/n_causal_variants/{chr}/{gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.susie",
+    wildcard_constraints:
+        snps_per_tissue = "\d+",
+        gene = "[^\/]+(?=\/)"
+    params:
+        sample_effects=False
+    script:
+        "../../workflow/scripts/sim_susie.py"
+
 rule simulate_n_causal_variant_random_effect_size:
     input:
         genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
