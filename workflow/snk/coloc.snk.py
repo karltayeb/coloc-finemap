@@ -16,7 +16,7 @@ rule format_coloc_data:
         S2 = np.sum((Y[:, None] - B[..., None] * X)**2, 2) / (xx * (n-2))
         data = {
         	'Y': Y,
-            'sdY': Y.std(1)
+            'sdY': Y.std(1),
         	'betas': B,
         	's2': S2
         }
