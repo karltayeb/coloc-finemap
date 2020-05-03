@@ -11,7 +11,6 @@ def load_data(data_path):
     """
     return pickle.load(open(data_path, 'rb'))
 
-
 def load_model(data, genotype_model_path=None, summary_model_path=None):
     path = genotype_model_path or summary_model_path
     t1 = int(path.split('/')[-1].split('_')[1])
@@ -42,13 +41,11 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
         model.Y = sub_data['zscores']
     return model, sub_data
 
-
 data_path = snakemake.input.data_path
 model_paths = snakemake.input.summary_model_paths
 
 summary_pairs = []
 data = load_data(data_path)
-
 
 #sub_summary_paths = [x for x in model_paths if key in x]
 for summary_model_path in model_paths:
