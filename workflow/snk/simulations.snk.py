@@ -13,7 +13,6 @@ rule ecaviar_simulate_n:
         expand("output/sim/n_causal_variants/{chr_gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.ecaviar",
             chr_gene=chr_gene[:20], t=10, snps_per_tissue=[1,2,3,4,5], pve=['05', '10', '20'])
 
-
 rule coloc_simulate_n:
     input:
         expand("output/sim/n_causal_variants/{chr_gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.coloc",
