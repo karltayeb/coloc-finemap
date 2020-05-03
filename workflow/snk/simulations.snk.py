@@ -18,42 +18,6 @@ rule coloc_simulate_n:
         expand("output/sim/n_causal_variants/{chr_gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.coloc",
             chr_gene=chr_gene[:50], t=10, snps_per_tissue=[1,2,3,4,5], pve=['05', '10', '20'])
 
-rule simulate_single:
-    input:
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve01.model", chr_gene=chr_gene),
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve01.coloc", chr_gene=chr_gene),
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve01.ecaviar", chr_gene=chr_gene),
-
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve05.model", chr_gene=chr_gene),
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve05.coloc", chr_gene=chr_gene),
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve05.ecaviar", chr_gene=chr_gene),
-
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve10.model", chr_gene=chr_gene),
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve10.coloc", chr_gene=chr_gene),
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve10.ecaviar", chr_gene=chr_gene),
-
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve20.model", chr_gene=chr_gene),
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve20.coloc", chr_gene=chr_gene),
-        expand("output/sim/single_random/{chr_gene}/genotype.sim.t10.pve20.ecaviar", chr_gene=chr_gene),
-
-
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve01.model", chr_gene=chr_gene),
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve01.coloc", chr_gene=chr_gene),
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve01.ecaviar", chr_gene=chr_gene),
-
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve05.model", chr_gene=chr_gene),
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve05.coloc", chr_gene=chr_gene),
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve05.ecaviar", chr_gene=chr_gene),
-
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve10.model", chr_gene=chr_gene),
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve10.coloc", chr_gene=chr_gene),
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve10.ecaviar", chr_gene=chr_gene),
-
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve20.model", chr_gene=chr_gene),
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve20.coloc", chr_gene=chr_gene),
-        expand("output/sim/multiple_random/{chr_gene}/genotype.sim.t10.pve20.ecaviar", chr_gene=chr_gene)
-
-
 rule run_susie_on_simulations:
     input:
         data="output/sim/{sim}/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
