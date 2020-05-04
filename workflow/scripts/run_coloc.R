@@ -24,8 +24,8 @@ for (t1 in c(1:num_tissues)){
 		v1 = data$s2[t1,]
 		v2 = data$s2[t2,]
 		res = coloc.abf(
-			dataset1=list(beta=beta1, varbeta=v1, N=838, sdY=sd(data$sdY[t1]), type='quant'),
-			dataset2=list(beta=beta2, varbeta=v2, N=838, sdY=sd(data$sdY[t2]), type='quant')
+			dataset1=list(beta=beta1, varbeta=v1, N=838, sdY=sd(data$Y[t1,]), type='quant'),
+			dataset2=list(beta=beta2, varbeta=v2, N=838, sdY=sd(data$Y[t2,]), type='quant')
 		)
 		table$t1[i] <- t1
 		table$t2[i] <- t2
