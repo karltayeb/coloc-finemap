@@ -60,20 +60,6 @@ data = pickle.load(open(snakemake.input.data, 'rb'))
 info = pickle.load(open(snakemake.input.info, 'rb'))
 
 ##### TRAIN CAFEH GENOTYPE
-model = GSS(**data, K=10)
-print('fitting full model')
-fit_args = {
-    'max_iter': 300,
-    'update_covariate_weights': False,
-    'update_weights': True,
-    'update_pi': True,
-    'ARD_weights': True,
-    'update_variance': True,
-    'verbose': True
-}
-
-
-##### TRAIN CAFEH GENOTYPE
 K = np.max([10, info['causal_snps'].size * 2])
 model = GSS(**data, K=K)
 model.prior_activity = np.ones(K) * 0.1
