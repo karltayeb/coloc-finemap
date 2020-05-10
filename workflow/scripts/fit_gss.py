@@ -19,6 +19,9 @@ fit_args = {
     'update_variance': True,
     'verbose': True
 }
+print('training model')
+for arg in fit_args:
+    print('\t{}: {}'.format(arg, fit_args[arg]))
 model.fit(**fit_args)
 print('model fit:\n\titers:{}\n\tELBO:{}\n\trun-time:{}'.format(len(model.elbos), model.elbos[-1], model.run_time))
 strip_and_dump(model, snakemake.output.model, False)
