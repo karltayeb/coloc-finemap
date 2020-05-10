@@ -12,7 +12,7 @@ print(model.dims)
 fit_args = {
     'max_iter': 300,
     'update_covariate_weights': True,
-    'update_active': True,
+    'update_active': False,
     'update_weights': True,
     'update_pi': True,
     'ARD_weights': True,
