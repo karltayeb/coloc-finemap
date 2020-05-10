@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 from coloc.cafeh import CAFEH
-from coloc.independent_model_ss import IndependentFactorSER
+from coloc.independent_model_ss import IndependentFactorSER as GSS
 
 def load_data(data_path):
     """
@@ -20,7 +20,7 @@ def load_model(data, genotype_model_path=None, summary_model_path=None):
     path = genotype_model_path or summary_model_path
 
     if genotype_model_path is not None:
-        model = IndependentFactorSER(np.zeros((1, 1)), np.zeros((1, 1)), 1)
+        model = GSS(np.zeros((1, 1)), np.zeros((1, 1)), 1)
         assign(model, pickle.load(open(path, 'rb')))
         model.X = data['X']
         model.Y = data['Y']
