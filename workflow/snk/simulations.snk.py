@@ -45,9 +45,10 @@ rule run_susie_on_n_causal_variant_simulations:
 
 rule run_gss_on_n_causal_variant_simulations:
     input:
-        data="output/sim/n_causal_variants/{chr}/{gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.data"
+        data="output/sim/n_causal_variants/{chr}/{gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.data",
+        info="output/sim/n_causal_variants/{chr}/{gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.info"
     output:
-        susie="output/sim/n_causal_variants/{chr}/{gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.gss",
+        model="output/sim/n_causal_variants/{chr}/{gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.gss",
     wildcard_constraints:
         snps_per_tissue = "\d+",
         gene = "[^\/]+(?=\/)"
