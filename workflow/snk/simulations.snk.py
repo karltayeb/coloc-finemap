@@ -43,6 +43,19 @@ rule run_susie_on_n_causal_variant_simulations:
     script:
         "../../workflow/scripts/sim_susie.py"
 
+rule run_gss_on_n_causal_variant_simulations:
+    input:
+        data="output/sim/n_causal_variants/{chr}/{gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.data"
+    output:
+        susie="output/sim/n_causal_variants/{chr}/{gene}/sim.t{t}.n{snps_per_tissue}.pve{pve}.gss",
+    wildcard_constraints:
+        snps_per_tissue = "\d+",
+        gene = "[^\/]+(?=\/)"
+    params:
+        sample_effects=False
+    script:
+        "../../workflow/scripts/sim_gss.py"
+
 rule simulate_n_causal_variant_random_effect_size:
     input:
         genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
@@ -57,60 +70,3 @@ rule simulate_n_causal_variant_random_effect_size:
         sample_effects=True
     script:
         "../../workflow/scripts/sim_n_causal_variants.py"
-
-rule simulate_multiple_causal_variant_fixed_effect_size:
-    input:
-        genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
-    output:
-        model="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
-        info="output/sim/multiple/{chr}/{gene}/sim.t{t}.pve{pve}.info",
-        data="output/sim/multiple/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
-    wildcard_constraints:
-        gene = "[^\/]+(?=\/)"
-    params:
-        sample_effects=False
-    script:
-        "../../workflow/scripts/sim_multiple_causal_variants.py"
-
-rule simulate_multiple_causal_variant_random_effect_size:
-    input:
-        genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
-    output:
-        model="output/sim/multiple_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
-        info="output/sim/multiple_random/{chr}/{gene}/sim.t{t}.pve{pve}.info",
-        data="output/sim/multiple_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
-    wildcard_constraints:
-        gene = "[^\/]+(?=\/)"
-    params:
-        sample_effects=True
-    script:
-        "../../workflow/scripts/sim_multiple_causal_variants.py"
-
-rule simulate_single_causal_variant_fixed_effect_size:
-    input:
-        genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
-    output:
-        model="output/sim/single/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
-        info="output/sim/single/{chr}/{gene}/sim.t{t}.pve{pve}.info",
-        data="output/sim/single/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
-    wildcard_constraints:
-        gene = "[^\/]+(?=\/)"
-    params:
-        sample_effects=False
-    script:
-        "../../workflow/scripts/sim_single_causal_variant.py"
-
-
-rule simulate_single_causal_variant_random_effect_size:
-    input:
-        genotype="output/GTEx/{chr}/{gene}/{gene}.raw"
-    output:
-        model="output/sim/single_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.model",
-        info="output/sim/single_random/{chr}/{gene}/sim.t{t}.pve{pve}.info",
-        data="output/sim/single_random/{chr}/{gene}/genotype.sim.t{t}.pve{pve}.data"
-    wildcard_constraints:
-        gene = "[^\/]+(?=\/)"
-    params:
-        sample_effects=True
-    script:
-        "../../workflow/scripts/sim_single_causal_variant.py"

@@ -96,4 +96,3 @@ for t in range(10):
 
 print('saving susie')
 pickle.dump(susies, open(snakemake.output.susie, 'wb'))
-
