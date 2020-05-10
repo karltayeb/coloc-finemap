@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 from coloc.cafeh import CAFEH
-from coloc.independent_model import IndependentFactorSER
+from coloc.independent_model_ss import IndependentFactorSER
 
 def load_data(data_path):
     """
