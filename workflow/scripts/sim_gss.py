@@ -76,17 +76,18 @@ fit_args = {
 ##### TRAIN CAFEH GENOTYPE
 K = np.max([10, info['causal_snps'].size * 2])
 model = GSS(**data, K=K)
-
+model.prior_activity = np.ones(K) * 0.1
 print('fitting full model')
 print(model.dims)
 fit_args = {
     'max_iter': 300,
     'update_covariate_weights': False,
+    'update_active': True,
     'update_weights': True,
     'update_pi': True,
     'ARD_weights': True,
     'update_variance': True,
-    'verbose': False
+    'verbose': True
 }
 model.fit(**fit_args)
 print('model fit:\n\titers:{}\n\tELBO:{}\n\trun-time:{}'.format(len(model.elbos), model.elbos[-1], model.run_time))
