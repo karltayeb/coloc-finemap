@@ -87,7 +87,7 @@ fit_args = {
     'update_pi': True,
     'ARD_weights': True,
     'update_variance': True,
-    'verbose': True
+    'verbose': False
 }
 model.fit(**fit_args)
 print('model fit:\n\titers:{}\n\tELBO:{}\n\trun-time:{}'.format(len(model.elbos), model.elbos[-1], model.run_time))
