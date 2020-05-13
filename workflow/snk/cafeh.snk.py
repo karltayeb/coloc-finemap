@@ -62,13 +62,15 @@ rule fit_gss20:
 
 rule fit_standardized_gss20:
     input:
-        "output/{path}/genotype.standardized.data"
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        model="output/GTEx/{chr}/{gene}/genotype.standardized.k20.model"
     output:
-        "output/{path}/cafeh.standardized.k20.gss"
+        "output/GTEx/{chr}/{gene}/gss.standardized.k20.model"
     params:
         k=20
     script:
-        "../../workflow/scripts/fit_gss.py"
+        "../../workflow/scripts/genotype_model_to_gss.py"
 
 rule fit_genotype_model20:
     input:
