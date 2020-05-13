@@ -6,13 +6,13 @@ from coloc.misc import component_scores, make_variant_report, strip_and_dump
 
 data = pickle.load(open(snakemake.input[0], 'rb'))
 model = GSS(**data, K=snakemake.params.k)
-model.prior_activity = np.ones(snakemake.params.k) * 0.1
+model.prior_activity = np.ones(snakemake.params.k) * 0.01
+
 print('fitting full model')
 print(model.dims)
 fit_args = {
     'max_iter': 300,
     'update_covariate_weights': False,
-    'update_active': True,
     'update_weights': True,
     'update_pi': True,
     'ARD_weights': True,
@@ -22,7 +22,10 @@ fit_args = {
 print('training model')
 for arg in fit_args:
     print('\t{}: {}'.format(arg, fit_args[arg]))
-model.fit(**fit_args)
+
+model.fit(**fit_args, update_active=False)
+model.fit(**fit_args, update_active=True)
+
 print('model fit:\n\titers:{}\n\tELBO:{}\n\trun-time:{}'.format(len(model.elbos), model.elbos[-1], model.run_time))
 
 
