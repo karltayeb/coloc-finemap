@@ -81,6 +81,17 @@ rule fit_standardized_genotype_model20:
     script:
         "../../workflow/scripts/fit_cafeh_genotype.py"
 
+rule genotype_model_to_gss:
+    input:
+        data = "output/{path}/genotype.standardized.data",
+        model = "output/{path}/genotype.standardized.k20.model"
+    output:
+        "output/{path}/standardized.k20.gss"
+    params:
+        k=20
+    script:
+        "../../workflow/scripts/genotype_model_to_gss.py"
+
 rule fit_standardized_genotype_model40:
     input:
         "output/{path}/genotype.standardized.data"
