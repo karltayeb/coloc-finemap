@@ -2,6 +2,7 @@ import pickle
 from coloc.independent_model_ss import IndependentFactorSER as GSS
 from coloc.misc import *
 
+print('loading data')
 data = make_gtex_genotype_data_dict(snakemake.input.expression, snakemake.input.genotype)
 
 # load and rehydrate model
@@ -11,7 +12,7 @@ rehydrate_model(model)
 # instantiate gss model
 K = model.dims['K']
 gss = GSS(**data, K=model.dims['K'])
-gss.prior_activity = np.ones(K) * 0.01
+gss.prior_activity = np.ones(K) * snakemake.params.pi
 
 # initialize with genotype model
 model.__dict__.pop('X', None)

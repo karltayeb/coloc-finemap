@@ -66,9 +66,10 @@ rule fit_standardized_gss20:
         genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         model="output/GTEx/{chr}/{gene}/genotype.standardized.k20.model"
     output:
-        "output/GTEx/{chr}/{gene}/gss.standardized.k20.model"
+        "output/GTEx/{chr}/{gene}/gss.standardized.k20.pi01.model"
     params:
-        k=20
+        k=20,
+        pi=0.01
     script:
         "../../workflow/scripts/genotype_model_to_gss.py"
 
