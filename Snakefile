@@ -29,6 +29,11 @@ rule repair_k20_models:
             "{path}/genotype.standardized.k20.repaired.log", path=k20_genes
         )
 
+g_to_gss = pd.read_csv('output/GTEx/g_to_gss.txt').values.flatten()
+rule fit_gss_from_g:
+    input:
+        list(g_to_gss[:1000])
+
 rule run_component_cluster_enrichment:
     input:
         test='{path}/{group}.merged.bed',
