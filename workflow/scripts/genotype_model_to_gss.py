@@ -9,6 +9,7 @@ K = model.dims['K']
 gss = GSS(**data, K=model.dims['K'])
 gss.prior_activity = np.ones(K) * 0.01
 
+
 fit_args = {
     'max_iter': 300,
     'update_covariate_weights': True,
@@ -25,4 +26,4 @@ for arg in fit_args:
 gss.fit(**fit_args)
 
 print('saving model')
-strip_and_dump(model, snakemake.output[0])
+strip_and_dump(gss, snakemake.output[0])
