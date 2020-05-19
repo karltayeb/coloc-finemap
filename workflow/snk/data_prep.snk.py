@@ -131,6 +131,19 @@ rule get_gtex_genotype2:
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1'
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene} --write-snplist --recodeA'
 
+rule get_1kG_EUR_genotype:
+    params:
+        chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
+        from_bp = lambda wildcards: np.maximum(0, gencode.loc[wildcards.gene].tss - 1000000),
+        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
+    output:
+        'output/GTEx/{chrom}/{gene}/{gene}.snplist',
+        'output/GTEx/{chrom}/{gene}/{gene}.raw'
+    shell:
+        'plink --bfile /work-zfs/abattle4/marios/annotations/1kG_plink/1kG_hg38_ERU'
+        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1'
+        ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}.1kG.hg38.EUR --write-snplist --recodeA'
+
 rule get_gtex_ld2:
     params:
         chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
