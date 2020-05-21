@@ -105,6 +105,20 @@ rule fit_standardized_genotype_model40:
         "../../workflow/scripts/fit_cafeh_genotype.py"
 
 
+rule gss_css_gtex:
+    input:
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+    output:
+        gss='output/GTEx/{chr}/{gene}/common.gss',
+        css='output/GTEx/{chr}/{gene}/common.recompute.css',
+        gtex_css='output/GTEx/{chr}/{gene}/common.gtex.css',
+
+    script:
+        "../../workflow/scripts/gss_css_gtex.py"
+
+
 rule fit_pairwise_summary_model:
     input:
         "output/{path}/data"

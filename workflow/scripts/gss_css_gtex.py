@@ -225,7 +225,7 @@ print('fitting gss')
 gss.fit(**fit_args, update_active=False)
 gss.fit(**fit_args, update_active=True)
 compute_records_gss(gss)
-strip_and_dump(gss, 'gss')
+strip_and_dump(gss, snakemake.output.gss)
 
 #fit css
 LD = np.corrcoef(X)
@@ -243,6 +243,7 @@ css.prior_activity = np.ones(20) * 0.01
 css.fit(**fit_args, update_active=False, max_iter=50)
 css.fit(**fit_args, update_active=True, max_iter=50)
 compute_records_css(css)
+strip_and_dump(css, snakemake.output.css)
 
 #fit css.gtex
 fit_args = {
@@ -258,5 +259,4 @@ css.prior_activity = np.ones(20) * 0.01
 css.fit(**fit_args, update_active=False, max_iter=50)
 css.fit(**fit_args, update_active=True, max_iter=50)
 compute_records_css(css)
-strip_and_dump(css, 'css')
-strip_and_dump(css, 'css')
+strip_and_dump(css, snakemake.output.gtex_css)
