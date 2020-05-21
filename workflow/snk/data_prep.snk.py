@@ -129,7 +129,8 @@ rule get_gtex_genotype2:
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1'
-        ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene} --write-snplist --recodeA'
+        ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}'
+        ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
 
 rule get_1kG_genotype:
     params:
@@ -143,7 +144,7 @@ rule get_1kG_genotype:
         'plink --bfile /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1'
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}.1kG'
-        ' --write-snplist --recode A --allow-no-sex'
+        ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
 
 rule get_gtex_ld2:
     params:
