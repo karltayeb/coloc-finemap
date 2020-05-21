@@ -93,8 +93,8 @@ def compute_summary_stats(data):
         V = np.einsum('ij,ij->i', r, r) / np.einsum('ij,ij->i', Xc, Xc) / (yc.size)
         S[tissue] = np.sqrt(B[tissue]**2/yc.size + V)
 
-    B = pd.DataFrame(B, index=snp_ids).T
-    S = pd.DataFrame(S, index=snp_ids).T
+    B = pd.DataFrame(B, index=data['snp_ids']).T
+    S = pd.DataFrame(S, index=data['snp_ids']).T
     return B, S
 
 def get_summary_stats_from_gtex(ap):
