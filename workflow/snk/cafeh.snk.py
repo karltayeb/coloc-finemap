@@ -105,6 +105,11 @@ rule fit_standardized_genotype_model40:
         "../../workflow/scripts/fit_cafeh_genotype.py"
 
 
+common = pd.read_csv('../../output/GTEx/gss_css_common.txt', header=None).values.flatten()
+rule run_gss_css_gtex:
+    input:
+        list(common[:100])
+
 rule gss_css_gtex:
     input:
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
