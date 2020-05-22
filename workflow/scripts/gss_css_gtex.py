@@ -10,101 +10,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 ep = snakemake.input.expression
-gp = snakemake.input.genotype
 ap = snakemake.input.associations
-
-def need_to_flip(variant_id):
-    _, _, major, minor, _, ref = variant_id.strip().split('_')
-    if minor != ref:
-        return True
-    else:
-        return False
-
-flip = lambda x: (x-1)*-1 + 1
-
-def make_gtex_genotype_data_dict(ep, gp):
-    gene_expression = pd.read_csv(ep, sep='\t', index_col=0)
-
-    #load genotype
-    genotype = pd.read_csv(gp, sep=' ')
-    genotype = genotype.set_index('IID').iloc[:, 5:]
-
-    # recode genotypes
-    coded_snp_ids = np.array([x.strip() for x in genotype.columns])
-    snp_ids = np.array(['_'.join(x.strip().split('_')[:-1]) for x in coded_snp_ids])
-
-    flips = np.array([need_to_flip(vid) for vid in coded_snp_ids])
-    genotype.iloc[:, flips] = genotype.iloc[:, flips].applymap(flip)
-
-    # center, mean immpute
-    genotype = (genotype - genotype.mean(0))
-    genotype = genotype.fillna(0)
-
-    # standardize
-    genotype = genotype / genotype.std(0)
-
-    # drop individuals that do not have recorded expression
-    gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
-
-    # filter down to relevant individuals
-    genotype = genotype.loc[gene_expression.columns]
-
-    # filter down to common individuals
-    individuals = np.intersect1d(genotype.index.values, gene_expression.columns.values)
-    genotype = genotype.loc[individuals]
-    gene_expression = gene_expression.loc[:, individuals]
-
-    # load covariates
-    covariates = pd.read_csv('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/covariates.csv',
-                             sep='\t', index_col=[0, 1])
-    covariates = covariates.loc[gene_expression.index]
-    covariates = covariates.loc[:, genotype.index.values]
-
-    X = genotype.values.T
-
-    data = {
-        'X': X,
-        'Y': gene_expression.values,
-        'covariates': covariates,
-        'snp_ids': snp_ids,
-        'sample_ids': genotype.index.values,
-        'tissue_ids': gene_expression.index.values
-    }
-    return data
-
-def compute_summary_stats(data):
-    B = {}
-    S = {}
-    for i, tissue in enumerate(data['tissue_ids']):
-        cov = data['covariates'].loc[tissue]
-        mask = ~np.isnan(cov.iloc[0])
-        cov = cov.values[:, mask]
-        y = data['Y'][i, mask]
-        X = data['X'][:, mask]
-
-        #H = cov.T @ np.linalg.solve(cov @ cov.T, cov)
-        H = (np.linalg.pinv(cov) @ cov)
-        yc = y - y @ H
-        Xc = X - X @ H
-
-        # prep css data
-        B[tissue] = (Xc @ yc) / np.einsum('ij,ij->i', Xc, Xc)
-        r = yc - B[tissue][:, None]*Xc
-        V = np.einsum('ij,ij->i', r, r) / np.einsum('ij,ij->i', Xc, Xc) / (yc.size)
-        S[tissue] = np.sqrt(B[tissue]**2/yc.size + V)
-
-    B = pd.DataFrame(B, index=data['snp_ids']).T
-    S = pd.DataFrame(S, index=data['snp_ids']).T
-    return B, S
-
-def get_summary_stats_from_gtex(ap):
-    associations = pd.read_csv(ap)
-    associations.loc[:, 'sample_size'] = (associations.ma_count / associations.maf / 2)
-    Ba = associations.pivot('tissue', 'variant_id', 'slope')
-    Va = associations.pivot('tissue', 'variant_id', 'slope_se')**2
-    n = associations.pivot('tissue', 'variant_id', 'sample_size')
-    Sa = np.sqrt(Ba**2/n + Va)
-    return Ba, Sa, n
+gp = snakemake.input.genotype
 
 def compute_records_gss(model):
     """
@@ -135,6 +42,7 @@ def compute_records_gss(model):
     }
     model.records = records
 
+
 def compute_records_css(model):
     """
     save the model with data a weight parameters removed
@@ -164,6 +72,7 @@ def compute_records_css(model):
     }
     model.records = records
 
+
 def strip_and_dump(model, path, save_data=False):
     """
     save the model with data a weight parameters removed
@@ -191,7 +100,7 @@ print('computing summary stats...')
 B, S = compute_summary_stats(data)
 
 print('fetching GTEx summary stats...')
-Ba, Sa, n = get_summary_stats_from_gtex(ap)
+Ba, Sa, n = get_gtex_summary_stats(ap)
 
 common_snps = np.intersect1d(Ba.columns, B.columns)
 X = pd.DataFrame(data['X'], index=data['snp_ids']).loc[common_snps].values
