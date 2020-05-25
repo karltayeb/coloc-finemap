@@ -90,6 +90,10 @@ rule get_1kG_genotype:
     output:
         'output/GTEx/{chrom}/{gene}/{gene}.1kG.snplist',
         'output/GTEx/{chrom}/{gene}/{gene}.1kG.raw'
+    params:
+        chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
+        from_bp = lambda wildcards: np.maximum(0, gencode.loc[wildcards.gene].tss - 1000000),
+        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
     shell:
         'plink --bfile /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
         ' --chr {params.chrom} --extract {input}  --maf 0.01  --geno 0.1'
