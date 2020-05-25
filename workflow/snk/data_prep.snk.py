@@ -96,7 +96,7 @@ rule get_1kG_genotype:
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}.1kG'
         ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
 
-rule get_1kG_genotype:
+rule get_1kG_genotype2:
     params:
         chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
         from_bp = lambda wildcards: np.maximum(0, gencode.loc[wildcards.gene].tss - 1000000),
