@@ -84,6 +84,12 @@ rule get_gtex_genotype2:
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}'
         ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
 
+rule snpid2rsid:
+    input:
+        'output/GTEx/{chrom}/{gene}/{gene}.snplist'
+    output:
+        'output/GTEx/{chrom}/{gene}/{gene}.rsids'
+        'output/GTEx/{chrom}/{gene}/{gene}.snp2rsid.json'
 rule get_1kG_genotype:
     input:
         'output/GTEx/{chrom}/{gene}/{gene}.rsids',
