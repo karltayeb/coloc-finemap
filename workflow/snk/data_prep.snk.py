@@ -105,7 +105,7 @@ rule get_1kG_genotype:
         to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
     shell:
         'plink --bfile /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
-        ' --chr {params.chrom} --extract {input}  --maf 0.01  --geno 0.1'
+        ' --chr {params.chrom} --extract {input}'
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}.1kG'
         ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
 
