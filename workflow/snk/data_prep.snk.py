@@ -91,7 +91,7 @@ rule snpid2rsid:
         'output/GTEx/{chrom}/{gene}/{gene}.rsids',
         'output/GTEx/{chrom}/{gene}/{gene}.snp2rsid.json'
     script:
-        "../../workflow/scripts/snpid2rsid.py"
+        "../../workflow/scripts/variantid2rsid.py"
 
 rule get_1kG_genotype:
     input:
