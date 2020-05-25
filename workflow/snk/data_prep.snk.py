@@ -7,12 +7,6 @@ from collections import defaultdict
 gencode = pd.read_csv(
     'output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t', index_col=0)
 
-rule get_cis_variants:
-    output:
-        "output/genotypes/{gene}_cis_variants"
-    script:
-        "workflow/scripts/get_cis_variants.py"
-
 tissues = [x.split('.')[0].split('/')[-1] for x in glob.glob(
     '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/*allpairs.txt')]
 rule build_indices:
@@ -25,15 +19,6 @@ rule build_indices:
 #####
 # GATHER DATA
 #####
-
-BOGgenes = pd.read_csv(
-    'output/GTEx/BOGgenes.txt', sep='\t', index_col=None)
-get_path = lambda row: 'output/GTEx/{}/{}/{}.associations'.format(row.chromosome, row.gene, row.gene)
-association_paths = [get_path(row) for _, row in BOGgenes.iterrows()]
-rule get_BOG_associations:
-    input:
-        association_paths
-
 rule get_gtex_associations:
     input:
         expand(
@@ -43,16 +28,6 @@ rule get_gtex_associations:
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations'
     script:
         '../../workflow/scripts/get_gtex_associations.py'
-
-rule get_gtex_expression:
-    input:
-        expand(
-            'output/GTEx/index/{tissue}.association.index', tissue=tissues
-        )
-    output:
-        'output/GTEx/gene_{gene}/{gene}.expression'
-    script:
-        '../../workflow/scripts/get_gtex_expression.py'
 
 rule get_gtex_ld:
     input:
@@ -70,30 +45,7 @@ rule get_gtex_ld:
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01 --r square'
         ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene} --write-snplist --recodeA'
 
-rule get_gtex_data:
-    input:
-        associations = 'output/GTEx/gene_{gene}/{gene}.associations',
-        ld = 'output/GTEx/gene_{gene}/{gene}.ld',
-        snps = 'output/GTEx/gene_{gene}/{gene}.snplist'
-    output:
-        "output/GTEx/gene_{gene}/data"
-    wildcard_constraints:
-        gene = "(?!\/)[^\/]+(?=\/)"
-    script:
-        "../../workflow/scripts/get_gtex_data.py"
-
-rule get_gtex_genotype_data:
-    input:
-        expression = 'output/GTEx/gene_{gene}/{gene}.expression',
-        genotype = 'output/GTEx/gene_{gene}/{gene}.raw',
-    output:
-        "output/GTEx/gene_{gene}/genotype_data"
-    wildcard_constraints:
-        gene = "(?!\/)[^\/]+(?=\/)"
-    script:
-        "../../workflow/scripts/get_gtex_genotype_model_data.py"
-
-
+#####
 # GATHER DATA
 #####
 rule get_gtex_associations2:
@@ -133,13 +85,25 @@ rule get_gtex_genotype2:
         ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
 
 rule get_1kG_genotype:
+    input:
+        'output/GTEx/{chrom}/{gene}/{gene}.rsids',
+    output:
+        'output/GTEx/{chrom}/{gene}/{gene}.1kG.snplist',
+        'output/GTEx/{chrom}/{gene}/{gene}.1kG.raw'
+    shell:
+        'plink --bfile /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
+        ' --chr {params.chrom} --extract {input}  --maf 0.01  --geno 0.1'
+        ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}.1kG'
+        ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
+
+rule get_1kG_genotype:
     params:
         chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
         from_bp = lambda wildcards: np.maximum(0, gencode.loc[wildcards.gene].tss - 1000000),
         to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
     output:
-        'output/GTEx/{chrom}/{gene}/{gene}.1kG.snplist',
-        'output/GTEx/{chrom}/{gene}/{gene}.1kG.raw'
+        'output/GTEx/{chrom}/{gene}/{gene}.1kG.snplist2',
+        'output/GTEx/{chrom}/{gene}/{gene}.1kG.raw2'
     shell:
         'plink --bfile /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1'
