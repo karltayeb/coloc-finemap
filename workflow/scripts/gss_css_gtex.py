@@ -57,7 +57,7 @@ annotations = pd.read_csv(
 ep = snakemake.input.expression
 gp = snakemake.input.genotype_gtex
 gp1kG = snakemake.input.genotype_1kG
-ap = snakemake.input.assocations
+ap = snakemake.input.associations
 
 v2r = json.load(open(snakemake.input.snp2rsid, 'r'))
 
