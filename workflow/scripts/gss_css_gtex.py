@@ -97,7 +97,7 @@ L1kG = L1kG / np.sqrt(np.nansum(L1kG**2, 0))
 K = 10
 
 gss_init_args = {
-    'X': X,
+    'X': X.T,
     'Y': data['Y'],
     'covariates': data['covariates'],
     'snp_ids': common_snps,
