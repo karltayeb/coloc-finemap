@@ -113,13 +113,15 @@ rule run_gss_css_gtex:
 rule gss_css_gtex:
     input:
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
-        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        genotype_1kG = 'output/GTEx/{chr}/{gene}/{gene}.1kG.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        snp2rsid = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid.json',
     output:
-        gss='output/GTEx/{chr}/{gene}/common.gss',
-        css='output/GTEx/{chr}/{gene}/common.recompute.css',
-        gtex_css='output/GTEx/{chr}/{gene}/common.gtex.css',
-
+        gss='output/GTEx/{chr}/{gene}/{gene}.gss',
+        css_gtex='output/GTEx/{chr}/{gene}/{gene}.gtex.css',
+        css_1kG='output/GTEx/{chr}/{gene}/{gene}.1kG.css',
+        css_1kG_corrected='output/GTEx/{chr}/{gene}/{gene}.1kG.corrected.css'
     script:
         "../../workflow/scripts/gss_css_gtex.py"
 
