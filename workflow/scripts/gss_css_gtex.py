@@ -2,6 +2,8 @@ import pandas as pd
 import pickle
 import numpy as np
 import json
+import os
+import sys
 
 from coloc.independent_model_ss import IndependentFactorSER as GSS
 from coloc.cafeh_ss import CAFEH as CSS
@@ -11,17 +13,13 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 def fit_css(LD, B, S, K, fit_args, path):
-    if os.path.isfile(path):
-        print('loading model')
-        css = pickle.load(open(path, 'rb'))
-    else:
-        print('fitting model')
-        css = CSS(LD, B, S, K=20)
-        css.prior_activity = np.ones(20) * 0.01
-        css.fit(**fit_args, update_active=False)
-        css.fit(**fit_args, update_active=True)
-        compute_records_css(css)
-        strip_and_dump(css, path)
+    print('fitting model')
+    css = CSS(LD, B, S, K=20)
+    css.prior_activity = np.ones(20) * 0.01
+    css.fit(**fit_args, update_active=False)
+    css.fit(**fit_args, update_active=True)
+    compute_records_css(css)
+    strip_and_dump(css, path)
     rehydrate_model(css)
     css.LD = LD
     css.B = B
@@ -29,21 +27,16 @@ def fit_css(LD, B, S, K, fit_args, path):
     return css
 
 def fit_gss(X, Y, covariates, snps, tissues, samples, K, fit_args, path):
-    if os.path.isfile(path):
-        print('loading model')
-        gss = pickle.load(open(path, 'rb'))
-    else:
-        print('fitting model')
-        gss = GSS(
-            X=X, Y=Y, covariates=covariates,
-            snp_ids=snps, tissue_ids=tissues, sample_ids=samples,
-            K=20)
-        gss.prior_activity = np.ones(20) * 0.01
-        gss.fit(**fit_args, update_active=False)
-        gss.fit(**fit_args, update_active=True)
-        compute_records_gss(gss)
-        strip_and_dump(gss, path)
-    
+    print('fitting model')
+    gss = GSS(
+        X=X, Y=Y, covariates=covariates,
+        snp_ids=snps, tissue_ids=tissues, sample_ids=samples,
+        K=20)
+    gss.prior_activity = np.ones(20) * 0.01
+    gss.fit(**fit_args, update_active=False)
+    gss.fit(**fit_args, update_active=True)
+    compute_records_gss(gss)
+    strip_and_dump(gss, path)
     rehydrate_model(gss)
     gss.X = X
     gss.Y = Y
