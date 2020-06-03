@@ -107,7 +107,7 @@ gss_init_args = {
 }
 # fit gss
 gss_fit_args = {
-    'max_iter': 3,
+    'max_iter': 50,
     'update_covariate_weights': True,
     'update_weights': True,
     'update_pi': True,
@@ -124,7 +124,7 @@ css_fit_args = {
     'ARD_weights': True,
     'update_variance': False,
     'verbose': True,
-    'max_iter': 3
+    'max_iter': 20
 }
 # fit css with LD estimate from GTEx
 css_init_args = {
