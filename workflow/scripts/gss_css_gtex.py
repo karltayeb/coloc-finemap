@@ -22,9 +22,6 @@ def fit_css(init_args, fit_args, path):
     compute_records_css(css)
     strip_and_dump(css, path)
     rehydrate_model(css)
-    css.LD = LD
-    css.B = B
-    css.S = S
     return css
 
 def fit_gss(init_args, fit_args, path):
@@ -36,9 +33,6 @@ def fit_gss(init_args, fit_args, path):
     compute_records_gss(gss)
     strip_and_dump(gss, path)
     rehydrate_model(gss)
-    gss.X = X
-    gss.Y = Y
-    gss.covariates = covariates
     return gss
 
 annotations = pd.read_csv(
@@ -107,8 +101,8 @@ gss_init_args = {
     'Y': data['Y'],
     'covariates': data['covariates'],
     'snp_ids': common_snps,
-    'tissue_ids': tissues,
-    'sample_ids': samples,
+    'tissue_ids': data['tissue_ids'],
+    'sample_ids': data['sample_ids'],
     'K': 20
 }
 # fit gss
@@ -121,10 +115,7 @@ gss_fit_args = {
     'update_variance': True,
     'verbose': True
 }
-gss = fit_gss(
-    X.T, data['Y'], data['covariates'],
-    common_snps, data['tissue_ids'], data['sample_ids'],
-    K, gss_fit_args, snakemake.output.gss)
+gss = fit_gss(gss_init_args, gss_fit_args, snakemake.output.gss)
 
 
 css_fit_args = {
