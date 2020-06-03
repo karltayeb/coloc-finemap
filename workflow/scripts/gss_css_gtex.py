@@ -12,9 +12,10 @@ from coloc.misc import *
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def fit_css(LD, B, S, K, fit_args, path):
+
+def fit_css(init_args, fit_args, path):
     print('fitting model')
-    css = CSS(LD, B, S, K=20)
+    css = CSS(**init_args)
     css.prior_activity = np.ones(20) * 0.01
     css.fit(**fit_args, update_active=False)
     css.fit(**fit_args, update_active=True)
@@ -26,12 +27,9 @@ def fit_css(LD, B, S, K, fit_args, path):
     css.S = S
     return css
 
-def fit_gss(X, Y, covariates, snps, tissues, samples, K, fit_args, path):
+def fit_gss(init_args, fit_args, path):
     print('fitting model')
-    gss = GSS(
-        X=X, Y=Y, covariates=covariates,
-        snp_ids=snps, tissue_ids=tissues, sample_ids=samples,
-        K=20)
+    gss = GSS(**init_args)
     gss.prior_activity = np.ones(20) * 0.01
     gss.fit(**fit_args, update_active=False)
     gss.fit(**fit_args, update_active=True)
@@ -103,6 +101,16 @@ L1kG = np.nan_to_num(
 L1kG = L1kG / np.sqrt(np.nansum(L1kG**2, 0))
 
 K = 10
+
+gss_init_args = {
+    'X': X,
+    'Y': data['Y'],
+    'covariates': data['covariates'],
+    'snp_ids': common_snps,
+    'tissue_ids': tissues,
+    'sample_ids': samples,
+    'K': 20
+}
 # fit gss
 gss_fit_args = {
     'max_iter': 3,
@@ -118,6 +126,7 @@ gss = fit_gss(
     common_snps, data['tissue_ids'], data['sample_ids'],
     K, gss_fit_args, snakemake.output.gss)
 
+
 css_fit_args = {
     'update_weights': True,
     'update_pi': True,
@@ -127,13 +136,36 @@ css_fit_args = {
     'max_iter': 3
 }
 # fit css with LD estimate from GTEx
-css = fit_css(L.T @ L, B.values, S.values, K, css_fit_args, snakemake.output.css_gtex)
+css_init_args = {
+    'LD': L.T @ L,
+    'B': B.values,
+    'S': S.values,
+    'K': K,
+    'snp_ids': common_snps,
+    'tissue_ids': B.index.values
+}
+css = fit_css(css_init_args, css_fit_args, snakemake.output.css_gtex)
 
+css_init_args = {
+    'LD': L1kG.T @ L1kG,
+    'B': B.values,
+    'S': S.values,
+    'K': K,
+    'snp_ids': common_snps,
+    'tissue_ids': B.index.values
+}
 # fit css with LD estimate from 1kG
-css = fit_css(L1kG.T @ L1kG, B.values, S.values, K, css_fit_args, snakemake.output.css_1kG)
+css = fit_css(css_init_args, css_fit_args, snakemake.output.css_1kG)
 
 # fit css with corrected LD estimate from 1kG
 alpha = 0.9
 LD = alpha * L1kG.T @ L1kG + (1-alpha) * np.corrcoef(B.T)
-css = fit_css(LD, B.values, S.values, K, css_fit_args, snakemake.output.css_1kG_corrected)
-
+css_init_args = {
+    'LD': LD,
+    'B': B.values,
+    'S': S.values,
+    'K': K,
+    'snp_ids': common_snps,
+    'tissue_ids': B.index.values
+}
+css = fit_css(css_init_args, css_fit_args, snakemake.output.css_1kG_corrected)
