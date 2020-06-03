@@ -85,6 +85,14 @@ print('filtering down to common snps')
 common_snps = np.intersect1d(
     np.intersect1d(genotype1kG.columns, genotype.columns), B.columns)
 
+B = B.loc[data['tissue_ids'], common_snps]
+S = S.loc[data['tissue_ids'], common_snps]
+V = V.loc[data['tissue_ids'], common_snps]
+
+mask = ~np.isnan(S.values)
+B.fillna(0, inplace=True)
+S.fillna(1e2, inplace=True)
+V.fillna(1e2, inplace=True)
 
 X = np.nan_to_num(
     (genotype - genotype.mean(0)).loc[:, common_snps].values)
@@ -94,10 +102,10 @@ L1kG = np.nan_to_num(
     (genotype1kG - genotype1kG.mean(0)).loc[:, common_snps].values)
 L1kG = L1kG / np.sqrt(np.nansum(L1kG**2, 0))
 
-K = 20
+K = 10
 # fit gss
 gss_fit_args = {
-    'max_iter': 100,
+    'max_iter': 3,
     'update_covariate_weights': True,
     'update_weights': True,
     'update_pi': True,
@@ -116,7 +124,7 @@ css_fit_args = {
     'ARD_weights': True,
     'update_variance': False,
     'verbose': True,
-    'max_iter': 20
+    'max_iter': 3
 }
 # fit css with LD estimate from GTEx
 css = fit_css(L.T @ L, B.values, S.values, K, css_fit_args, snakemake.output.css_gtex)
