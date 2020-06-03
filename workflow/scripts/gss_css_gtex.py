@@ -10,10 +10,6 @@ from coloc.misc import *
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-ep = snakemake.input.expression
-ap = snakemake.input.associations
-gp = snakemake.input.genotype
-
 def fit_css(LD, B, S, K, fit_args, path):
     if os.path.isfile(path):
         print('loading model')
