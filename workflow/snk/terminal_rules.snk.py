@@ -13,7 +13,7 @@ rule get_BOG_associations:
         association_paths
 
 
-css_1kG_paths = np.loadtxt('../../output/GTEx/gss_css_1kG.txt', dtype=str)
+css_1kG_paths = np.loadtxt('output/GTEx/gss_css_1kG.txt', dtype=str)
 rule gss_css_1kG_gtex:
     input:
         css_1kG_paths[:100]
