@@ -35,6 +35,30 @@ def fit_gss(init_args, fit_args, path):
     rehydrate_model(gss)
     return gss
 
+def make_snp_format_table(gp, gp1kG, v2rp):
+    with open(gp, 'r') as f:
+        snps = f.readline().strip().split()[6:]
+
+    with open(gp1kG, 'r') as f:
+        rsids = f.readline().strip().split()[6:]
+
+    v2r = json.load(open(v2rp, 'r'))
+
+    vid_codes = {'_'.join(x.split('_')[:-1]): x.split('_')[-1] for x in snps}
+    rsid_codes = {x.split('_')[0]: x.split('_')[1] for x in rsids}
+    table = []
+    for vid in vid_codes:
+        ref = vid.split('_')[-2]
+        rsid = v2r.get(vid, '-')
+        table.append({
+            'variant_id': vid,
+            'rsid': v2r.get(vid, '-'),
+            'ref': ref,
+            'flip_gtex': ref != vid_codes.get(vid, '-'),
+            'flip_1kG': ref != rsid_codes.get(rsid, '-')
+        })
+    return pd.DataFrame(table)
+
 annotations = pd.read_csv(
     '/work-zfs/abattle4/lab_data/GTEx_v8/sample_annotations/'
     'GTEx_Analysis_2017-06-05_v8_Annotations_SubjectPhenotypesDS.txt', sep='\t', index_col=0)
@@ -43,24 +67,21 @@ ep = snakemake.input.expression
 gp = snakemake.input.genotype_gtex
 gp1kG = snakemake.input.genotype_1kG
 ap = snakemake.input.associations
+v2rp = snakemake.input.snp2rsid
+v2r = json.load(open(v2rp, 'r'))
 
-v2r = json.load(open(snakemake.input.snp2rsid, 'r'))
+table = make_snp_format_table(gp, gp1kG, v2rp)
 
 # Load GTEx and 1kG genotype
+# flip genotype encoding to be consistent with GTEx associations
 print('loading genotypes...')
 genotype, ref = load_genotype(gp)
-genotype1kG, ref1kG = load_genotype(gp1kG)
+flip_gtex = table[table.flip_gtex].variant_id.values
+genotype.loc[:, flip_gtex] = genotype.loc[:, flip_gtex].applymap(flip)
 genotype.rename(columns=v2r, inplace=True)
 
-# flip 1kG genotypes to agrese with GTEx encoding
-flip_1kG = {}
-for snp in ref.keys():
-    if snp in v2r and v2r[snp] in ref1kG:
-        rsid = v2r[snp]
-        flip_1kG[rsid] = ref[snp] == ref1kG[rsid]
-
-flip_1kG = pd.Series(flip_1kG)
-flip_1kG = flip_1kG[~flip_1kG].index.values
+genotype1kG, ref1kG = load_genotype(gp1kG)
+flip_1kG = table[table.flip_1kG & (table.rsid != '-')].rsid.values
 genotype1kG.loc[:, flip_1kG] = genotype1kG.loc[:, flip_1kG].applymap(flip)
 
 # load data
@@ -81,6 +102,7 @@ B = B.loc[data['tissue_ids'], common_snps]
 S = S.loc[data['tissue_ids'], common_snps]
 V = V.loc[data['tissue_ids'], common_snps]
 
+# replace missnig values with uninformative values
 mask = ~np.isnan(S.values)
 B.fillna(0, inplace=True)
 S.fillna(1e2, inplace=True)
