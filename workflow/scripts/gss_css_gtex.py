@@ -95,8 +95,8 @@ B, S, V, n = get_gtex_summary_stats(ap)
 
 # filter down to list of snps present in GTEx and 1kG
 print('filtering down to common snps')
-common_snps = np.intersect1d(
-    np.intersect1d(genotype1kG.columns, genotype.columns), B.columns)
+common_snps = np.intersect1d(B.columns, table.rsid)
+common_snps = np.intersect1d(common_snps, genotype1kG.columns)
 
 B = B.loc[data['tissue_ids'], common_snps]
 S = S.loc[data['tissue_ids'], common_snps]
