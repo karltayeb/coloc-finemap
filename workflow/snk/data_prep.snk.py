@@ -109,20 +109,6 @@ rule get_1kG_genotype:
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}.1kG'
         ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
 
-rule get_1kG_genotype2:
-    params:
-        chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
-        from_bp = lambda wildcards: np.maximum(0, gencode.loc[wildcards.gene].tss - 1000000),
-        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
-    output:
-        'output/GTEx/{chrom}/{gene}/{gene}.1kG.snplist2',
-        'output/GTEx/{chrom}/{gene}/{gene}.1kG.raw2'
-    shell:
-        'plink --bfile /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
-        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1'
-        ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}.1kG'
-        ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
-
 rule get_gtex_ld2:
     params:
         chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
