@@ -75,6 +75,7 @@ table = make_snp_format_table(gp, gp1kG, v2rp)
 # Load GTEx and 1kG genotype
 # flip genotype encoding to be consistent with GTEx associations
 print('loading genotypes...')
+import pdb; pdb.set_trace()
 genotype, ref = load_genotype(gp)
 flip_gtex = table[table.flip_gtex].variant_id.values
 genotype.loc[:, flip_gtex] = genotype.loc[:, flip_gtex].applymap(flip)
