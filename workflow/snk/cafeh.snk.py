@@ -126,6 +126,18 @@ rule gss_css_gtex:
         "../../workflow/scripts/gss_css_gtex.py"
 
 
+rule gss_css_gtex:
+    input:
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
+        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        genotype_1kG = 'output/GTEx/{chr}/{gene}/{gene}.1kG.raw',
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        snp2rsid = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid.json',
+    output:
+        gss='output/GTEx/{chr}/{gene}/{gene}.fixedvar.gss',
+    script:
+        "../../workflow/scripts/gss_fixed_var.py"
+
 rule fit_pairwise_summary_model:
     input:
         "output/{path}/data"
