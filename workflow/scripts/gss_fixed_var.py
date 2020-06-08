@@ -13,21 +13,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def fit_css(init_args, fit_args, path):
-    print('fitting model')
-    css = CSS(**init_args)
-    css.prior_activity = np.ones(20) * 0.01
-    css.fit(**fit_args, update_active=False)
-    css.fit(**fit_args, update_active=True)
-    compute_records_css(css)
-    strip_and_dump(css, path)
-    rehydrate_model(css)
-    return css
-
 def fit_gss(init_args, fit_args, path):
-    
     print('fitting model')
     gss = GSS(**init_args)
+    gss.tissue_precision_b = np.nanvar(gss.Y, 1)
+
     gss.prior_activity = np.ones(20) * 0.01
     gss.fit(**fit_args, update_active=False)
     gss.fit(**fit_args, update_active=True)
@@ -82,11 +72,6 @@ flip_gtex = np.intersect1d(flip_gtex, genotype.columns)
 genotype.loc[:, flip_gtex] = genotype.loc[:, flip_gtex].applymap(flip)
 genotype.rename(columns=v2r, inplace=True)
 
-genotype1kG, ref1kG = load_genotype(gp1kG)
-flip_1kG = table[table.flip_1kG & (table.rsid != '-')].rsid.values
-flip_1kG = np.intersect1d(flip_1kG, genotype1kG.columns)
-genotype1kG.loc[:, flip_1kG] = genotype1kG.loc[:, flip_1kG].applymap(flip)
-
 # load data
 print('loading data...')
 data = make_gtex_genotype_data_dict(ep, gp)
@@ -101,23 +86,8 @@ print('filtering down to common snps')
 common_snps = np.intersect1d(B.columns, table.rsid)
 common_snps = np.intersect1d(common_snps, genotype1kG.columns)
 
-B = B.loc[data['tissue_ids'], common_snps]
-S = S.loc[data['tissue_ids'], common_snps]
-V = V.loc[data['tissue_ids'], common_snps]
-
-# replace missnig values with uninformative values
-mask = ~np.isnan(S.values)
-B.fillna(0, inplace=True)
-S.fillna(1e2, inplace=True)
-V.fillna(1e2, inplace=True)
-
 X = np.nan_to_num(
     (genotype - genotype.mean(0)).loc[:, common_snps].values)
-L = X / np.sqrt(np.nansum(X**2, 0))
-
-L1kG = np.nan_to_num(
-    (genotype1kG - genotype1kG.mean(0)).loc[:, common_snps].values)
-L1kG = L1kG / np.sqrt(np.nansum(L1kG**2, 0))
 
 K = 10
 
@@ -137,51 +107,7 @@ gss_fit_args = {
     'update_weights': True,
     'update_pi': True,
     'ARD_weights': True,
-    'update_variance': True,
+    'update_variance': False,
     'verbose': True
 }
 gss = fit_gss(gss_init_args, gss_fit_args, snakemake.output.gss)
-
-
-css_fit_args = {
-    'update_weights': True,
-    'update_pi': True,
-    'ARD_weights': True,
-    'update_variance': False,
-    'verbose': True,
-    'max_iter': 20
-}
-# fit css with LD estimate from GTEx
-css_init_args = {
-    'LD': L.T @ L,
-    'B': B.values,
-    'S': S.values,
-    'K': K,
-    'snp_ids': common_snps,
-    'tissue_ids': B.index.values
-}
-css = fit_css(css_init_args, css_fit_args, snakemake.output.css_gtex)
-
-css_init_args = {
-    'LD': L1kG.T @ L1kG,
-    'B': B.values,
-    'S': S.values,
-    'K': K,
-    'snp_ids': common_snps,
-    'tissue_ids': B.index.values
-}
-# fit css with LD estimate from 1kG
-css = fit_css(css_init_args, css_fit_args, snakemake.output.css_1kG)
-
-# fit css with corrected LD estimate from 1kG
-alpha = 0.9
-LD = alpha * L1kG.T @ L1kG + (1-alpha) * np.corrcoef(B.T)
-css_init_args = {
-    'LD': LD,
-    'B': B.values,
-    'S': S.values,
-    'K': K,
-    'snp_ids': common_snps,
-    'tissue_ids': B.index.values
-}
-css = fit_css(css_init_args, css_fit_args, snakemake.output.css_1kG_corrected)
