@@ -18,6 +18,6 @@ rule gss_css_1kG_gtex:
         expand('{path}', path=css_1kG_paths[:200])
 
 fixedvar_paths = [x[:-7] + 'fixedvar.gss' for x in css_1kG_paths]
-rule gss_fixedvar:
+rule fit_gss_fixedvar:
     input:
         expand('{path}', path=fixedvar_paths[:200])
