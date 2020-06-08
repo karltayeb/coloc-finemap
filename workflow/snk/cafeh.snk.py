@@ -126,7 +126,7 @@ rule gss_css_gtex:
         "../../workflow/scripts/gss_css_gtex.py"
 
 
-rule gss_css_gtex:
+rule gss_fixed_var:
     input:
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
