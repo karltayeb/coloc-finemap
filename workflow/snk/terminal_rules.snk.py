@@ -26,5 +26,5 @@ genes = pd.read_csv('output/GTEx/1kgenes.txt', sep='\t', header=None).values[:, 
 rule get_genotypes_for_sim:
 	input:
 		expand('{path}.raw', path=genes),
-		expand('{path}}.1kG.raw', path=genes),
+		expand('{path}.1kG.raw', path=genes),
 		expand('{path}.snp2rsid.json', path=genes)
