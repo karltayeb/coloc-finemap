@@ -21,3 +21,9 @@ fixedvar_paths = [x[:-7] + 'fixedvar.gss' for x in css_1kG_paths]
 rule fit_gss_fixedvar:
     input:
         expand('{path}', path=fixedvar_paths[:200])
+
+genes = pd.read_csv('../../output/GTEx/1000genes.txt', sep='\t', header=None).values[:, 0]
+rule get_genotypes_for_sim:
+	input:
+		expand('output/GTEx/{gene}/{gene}.raw', gene=gene),
+		expand('output/GTEx/{gene}/{gene}.1kG.raw', gene=gene)
