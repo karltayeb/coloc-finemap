@@ -2,17 +2,33 @@ import pandas as pd
 import pickle
 import numpy as np
 from coloc.independent_model_ss import IndependentFactorSER as GSS
-from coloc.misc import component_scores, make_variant_report, strip_and_dump
+from coloc.misc import *
 
-data = pickle.load(open(snakemake.input[0], 'rb'))
-model = GSS(**data, K=snakemake.params.k)
-model.prior_activity = np.ones(snakemake.params.k) * 0.01
+def init_gss(data, K=10, p=1.0):
+    print('initializing genotype model')
+    gss = GSS(
+        X=center_mean_impute(data.genotype_gtex).values.T,
+        Y=data.expression.values,
+        K=K,
+        covariates=data.covariates,
+        snp_ids=data.common_snps,
+        tissue_ids=data.expression.index.values,
+        sample_ids=data.expression.columns.values
+    )
+    gss.prior_activity = np.ones(K) * p
+    return gss
 
-print('fitting full model')
-print(model.dims)
+#data = pickle.load(open(snakemake.input[0], 'rb'))
+data = load_gene_data(snakemake.wildcards.gene)
+
+K = snakemake.params.k
+p = snakemake.params.pi0
+
+gss = init_gss(data, K, p)
+
 fit_args = {
     'max_iter': 300,
-    'update_covariate_weights': False,
+    'update_covariate_weights': True,
     'update_weights': True,
     'update_pi': True,
     'ARD_weights': True,
@@ -22,20 +38,13 @@ fit_args = {
 print('training model')
 for arg in fit_args:
     print('\t{}: {}'.format(arg, fit_args[arg]))
-
-model.fit(**fit_args, update_active=False)
-model.fit(**fit_args, update_active=True)
-
-print('model fit:\n\titers:{}\n\tELBO:{}\n\trun-time:{}'.format(len(model.elbos), model.elbos[-1], model.run_time))
+gss.fit(**fit_args, update_active=False)
+gss.fit(**fit_args, update_active=True)
 
 
-base_path = snakemake.output[0][:-len('.model')]
-print('generating scores and variant file')
-try:
-    gene = base_path.split('/')[-2]
-    make_variant_report(model, gene).to_csv('{}.variants.bed'.format(base_path), sep='\t')
-except Exception:
-    print('There was an error generating secondary files')
+print('model fit:\n\titers:{}\n\tELBO:{}\n\trun-time:{}'.format(
+    len(gss.elbos), gss.elbos[-1], gss.run_time))
 
 print('saving model')
-strip_and_dump(model, snakemake.output[0])
+compute_records(gss)
+strip_and_dump(gss, snakemake.output[0])

@@ -60,6 +60,20 @@ rule fit_gss20:
     script:
         "../../workflow/scripts/fit_gss.py"
 
+rule fit_gss_k_pi:
+    input:
+        # TODO get all inputs
+        "output/{path}/{gene}.raw",
+        "output/{path}/{gene}.1kG.raw",
+        "output/{path}/{gene}.associations"
+    output:
+        "output/{path}/{gene}.k20.pi01.gss"
+    params:
+        k=20
+        pi = 0.01
+    script:
+        "../../workflow/scripts/fit_gss.py"
+
 rule fit_standardized_gss20:
     input:
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
