@@ -55,7 +55,11 @@ ld_functions = {
     'z3': z3_ld
 }
 
-gss = load(snakemake.input[0])
+#gss = load(snakemake.input[0])
+gene = snakemake.wildcards.gene
+gss = load('output/GTEx/{}/{}/{}.k20.pi01.gss'.format(
+    get_chromosome(gene), gene, gene
+))
 sim_data = sim_from_model(gene, gss, thin=True, sim_id=snakemake.wildcards.simid)
 
 # fit GSS to simulation data
