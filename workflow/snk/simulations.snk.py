@@ -78,8 +78,6 @@ rule simulate_n_causal_variant_random_effect_size:
         "../../workflow/scripts/sim_n_causal_variants.py"
 
 rule sim_from_model:
-    input:
-        'output/{path}/{gene}.k20.pi01.gss'
     output:
         'output/sim/ld/{simid}/simid-{simid}_gene-{gene}_k-10_pi-0.01.gss'
     script:
