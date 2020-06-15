@@ -7,14 +7,16 @@ from coloc.misc import *
 def init_gss(data, K=10, p=1.0):
     print('initializing genotype model')
     gss = GSS(
-        X=center_mean_impute(data.genotype_gtex).values.T,
+        X=center_mean_impute(
+            data.genotype_gtex.loc[data.expression.columns]).values.T,
         Y=data.expression.values,
         K=K,
-        covariates=data.covariates,
+        covariates=data.covariates.loc[:, data.expression.columns],
         snp_ids=data.common_snps,
         tissue_ids=data.expression.index.values,
         sample_ids=data.expression.columns.values
     )
+    
     gss.prior_activity = np.ones(K) * p
     return gss
 
