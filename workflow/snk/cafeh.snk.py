@@ -69,7 +69,7 @@ rule fit_gss_k_pi:
     output:
         "output/{path}/{gene}.k20.pi01.gss"
     params:
-        k=20
+        k=20,
         pi = 0.01
     script:
         "../../workflow/scripts/fit_gss.py"
