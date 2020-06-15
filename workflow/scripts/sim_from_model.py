@@ -6,6 +6,7 @@ from coloc.cafeh_ss import CAFEH as CSS
 
 from coloc.misc import *
 from coloc.simulation import *
+from coloc.covariance import *
 
 def init_css(data, ld_type, K=10, p=1.0, d=1.0):
     init_args = {
