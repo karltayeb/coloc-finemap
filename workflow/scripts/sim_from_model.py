@@ -4,8 +4,8 @@ import numpy as np
 from coloc.independent_model_ss import IndependentFactorSER as GSS
 from coloc.cafeh_ss import CAFEH as CSS
 
-from .misc import *
-from .simulation import *
+from coloc.misc import *
+from coloc.simulation import *
 
 def init_css(data, ld_type, K=10, p=1.0, d=1.0):
     init_args = {
