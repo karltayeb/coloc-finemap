@@ -79,7 +79,7 @@ rule simulate_n_causal_variant_random_effect_size:
 
 rule sim_from_model:
     input:
-        '{path}/{gene}.k20.pi01.gss'
+        'output/{path}/{gene}.k20.pi01.gss'
     output:
         'output/sim/ld/{simid}/simid-{simid}_gene-{gene}_k-10_pi-0.01.gss'
     script:
