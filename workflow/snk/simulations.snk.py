@@ -81,6 +81,6 @@ rule sim_from_model:
     input:
         '{path}/{gene}.k20.pi01.gss'
     output:
-        'output/sim/ld/{simid}/simid-{simid}_gene-{gene}_k-10_pi-0.01_d-1.0.ld-sample.css'
+        'output/sim/ld/{simid}/simid-{simid}_gene-{gene}_k-10_pi-0.01.gss'
     script:
         '../../workflow/scripts/sim_from_model.py'
