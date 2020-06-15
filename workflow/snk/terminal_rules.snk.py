@@ -29,3 +29,9 @@ rule get_genotypes_for_sim:
 		expand('{path}.1kG.raw', path=genes),
 		expand('{path}.snp2rsid.json', path=genes),
 		expand('{path}.associations', path=genes)
+
+
+gss_1kG_paths = np.loadtxt('output/requests/1kgenes.k20.pi01.gss.txt', dtype=str)
+rule gss_1kG_random_k20_pi01:
+	input:
+		expand('{path}', path=gss_1kG_paths)
