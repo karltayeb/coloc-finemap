@@ -85,6 +85,6 @@ rule sim_from_model:
     input:
         get_model
     output:
-        'output/sim/ld/{gene}/{gene}.sim',
+        'output/sim/ld/{gene}/{sim_id}.sim',
     script:
         '../../workflow/scripts/sim_from_model.py'
