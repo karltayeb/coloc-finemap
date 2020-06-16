@@ -88,9 +88,3 @@ rule sim_from_model:
         'output/sim/ld/{gene}/{gene}.sim',
     script:
         '../../workflow/scripts/sim_from_model.py'
-
-rule sim_from_model:
-    output:
-        'output/sim/ld/{simid}/simid-{simid}_gene-{gene}_k-10_pi-0.01.gss'
-    script:
-        '../../workflow/scripts/sim_from_model.py'
