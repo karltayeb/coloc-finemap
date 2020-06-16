@@ -63,7 +63,7 @@ ld_functions = {
 #gss = load(snakemake.input[0])
 gene = snakemake.wildcards.gene
 sim_spec = pd.read_csv('output/sim/ld/sim_spec.txt', sep='\t')
-sim_data = load_sim_from_model_data(gene, sim_spec)
+sim_data, sim_expression = load_sim_from_model_data(gene, sim_spec)
 
 # make model_spec
 pi0s = [0.01, 0.1, 0.5]
@@ -84,8 +84,12 @@ fit_args = {
     'max_iter': 50
 }
 
+pickle.dump(sim_expression, open(snakemake.output[0], 'wb'))
+
 bp = '/'.join(snakemake.output[0].split('/')[:-1])
 for i, row in model_spec.iterrows():
+    for arg in row.to_dict():
+        print('\t{}: {}'.format(arg, row.to_dict()[arg]))
     css = init_css(sim_data, **row.to_dict())
     css.fit(**fit_args, update_active=False)
     css.fit(**fit_args, update_active=True)
