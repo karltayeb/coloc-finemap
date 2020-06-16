@@ -77,6 +77,18 @@ rule simulate_n_causal_variant_random_effect_size:
     script:
         "../../workflow/scripts/sim_n_causal_variants.py"
 
+
+sim_spec = pd.read_csv('output/sim/ld/sim_spec.txt', sep='\t')
+def get_model(wildcards):
+    return sim_spec[sim_spec.sim_id == wildcards.sim_id].source_model_path.values[0]
+rule sim_from_model:
+    input:
+        get_model
+    output:
+        'output/sim/ld/{gene}/{gene}.sim',
+    script:
+        '../../workflow/scripts/sim_from_model.py'
+
 rule sim_from_model:
     output:
         'output/sim/ld/{simid}/simid-{simid}_gene-{gene}_k-10_pi-0.01.gss'

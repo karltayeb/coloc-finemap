@@ -8,21 +8,24 @@ from coloc.misc import *
 from coloc.simulation import *
 from coloc.covariance import *
 
-def init_css(data, ld_type, K=10, p=1.0, d=1.0):
+from itertools import product
+
+def init_css(data, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0):
+    # TODO epsilon--- smooth expression?
     init_args = {
-        'LD': ld_functions[ld_type](data),
+        'LD': ld_functions[ld](data),
         'B': data.B.values,
         'S': data.S.values,
         'K': K,
         'snp_ids': data.B.columns.values,
         'tissue_ids': data.B.index.values
     }
-    name = 'sim-{}_gene-{}_k-{}_pi-{}_d-{}.ld-{}.css'.format(
-        data.id, data.gene, K, p, d, ld_type)
+    name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}.e-{}_ld-{}.css'.format(
+        data.id, data.gene, K, pi0, dispersion, epsilon, ld)
     print('initializing summary stat model')
     css = CSS(**init_args)
-    css.prior_activity = np.ones(K) * p
-    css.tissue_precision_b = np.ones(css.dims['T']) * d
+    css.prior_activity = np.ones(K) * pi0
+    css.tissue_precision_b = np.ones(css.dims['T']) * dispersion
     css.name = name
     return css
 
@@ -42,6 +45,7 @@ def init_gss(data, K=10, p=1.0):
     gss.prior_activity = np.ones(K) * p
     gss.name = name
     return gss
+
 ld_functions = {
     'sample': sample_ld,
     'eur1kG': eur_ld,
@@ -58,11 +62,40 @@ ld_functions = {
 
 #gss = load(snakemake.input[0])
 gene = snakemake.wildcards.gene
-gss = load('output/GTEx/{}/{}/{}.k20.pi01.gss'.format(
-    get_chromosome(gene), gene, gene
-))
-sim_data = sim_from_model(gene, gss, thin=True, sim_id=snakemake.wildcards.simid)
+sim_spec = pd.read_csv('output/sim/ld/sim_spec.txt', sep='\t')
+sim_data = load_sim_from_model_data(gene, sim_spec)
 
+# make model_spec
+pi0s = [0.01, 0.1, 0.5]
+ld_types = list(ld_functions.keys())
+dispersions = [0.5, 1.0, 5.0]
+epsilons = [0.0]
+model_spec = pd.DataFrame(
+    list(product(ld_types, pi0s, dispersions, epsilons)),
+    columns=['ld', 'pi0', 'dispersion', 'epsilon'])
+
+# fit CSS to simulation data
+fit_args = {
+    'update_weights': True,
+    'update_pi': True,
+    'ARD_weights': True,
+    'update_variance': False,
+    'verbose': False,
+    'max_iter': 50
+}
+
+bp = '/'.join(snakemake.output[0].split('/')[:-1])
+for i, row in model_spec.iterrows():
+    css = init_css(sim_data, **row.to_dict())
+    css.fit(**fit_args, update_active=False)
+    css.fit(**fit_args, update_active=True)
+    compute_records_css(css)
+    save_path = bp + '/' + css.name
+    print('saving model to {}'.format(save_path))
+    strip_and_dump(css, save_path)
+    rehydrate_model(css)
+
+"""
 # fit GSS to simulation data
 gss_sim = init_gss(sim_data, 10, 0.1)
 fit_args = {
@@ -82,27 +115,4 @@ gss_sim.fit(**fit_args, update_active=True)
 compute_records_gss(gss_sim)
 print('saving model to {}'.format(snakemake.output[0]))
 strip_and_dump(gss_sim, snakemake.output[0], False)
-
-
-# fit CSS to simulation data
-fit_args = {
-'update_weights': True,
-'update_pi': True,
-'ARD_weights': True,
-'update_variance': False,
-'verbose': False,
-'max_iter': 50
-}
-
-bp = '/'.join(snakemake.output[0].split('/')[:-1])
-for ld_type in ld_functions:
-    print(ld_type)
-    css = init_css(sim_data, ld_type, 20, 0.1, 1.0)
-    css.fit(**fit_args, update_active=False)
-    css.fit(**fit_args, update_active=True)
-
-    compute_records_css(css)
-    save_path = bp + '/' + css.name
-    print('saving model to {}'.format(save_path))
-    strip_and_dump(css, save_path)
-    rehydrate_model(css)
+"""
