@@ -10,6 +10,54 @@ from coloc.covariance import *
 
 from itertools import product
 
+superpop2samples = pickle.load(open('output/superpop2samples_1kG', 'rb'))
+eur_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.genotype_1kG.loc[superpop2samples['EUR']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['EUR'].size))
+)
+
+asn_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.genotype_1kG.loc[superpop2samples['ASN']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['ASN'].size))
+
+)
+
+afr_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.genotype_1kG.loc[superpop2samples['AFR']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['AFR'].size))
+
+)
+
+sea_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.genotype_1kG.loc[superpop2samples['SEA']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['SEA'].size))
+
+)
+
+amr_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.genotype_1kG.loc[superpop2samples['AMR']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['AMR'].size))
+)
+
+ld_functions = {
+    'sample': sample_ld,
+    'eur_ld': eur_ld,
+    'asn_ld': asn_ld,
+    'afr_ld': afr_ld,
+    'reference': refernce_ld,
+    'z': z_ld,
+    'lw_sample': ledoit_wolf_sample_ld,
+    'lw_refence': ledoit_wolf_reference_ld,
+    'lw_z': ledoit_wolf_z_ld,
+    'ref_z': ref_z_ld,
+    'z3': z3_ld
+}
+
 def init_css(data, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0):
     # TODO epsilon--- smooth expression?
     init_args = {
