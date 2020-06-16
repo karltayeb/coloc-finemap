@@ -90,10 +90,9 @@ rule sim_from_model:
     script:
         '../../workflow/scripts/sim_from_model.py'
 
-
 sim_files = []
 for i, row in sim_spec.iterrows():
     sim_files.append('output/sim/ld/{}/{}.sim'.format(row.gene, row.sim_id))
 rule run_sim_from_model:
     input:
-        expand({path}, path=sim_files)
+        expand('{path}', path=sim_files)
