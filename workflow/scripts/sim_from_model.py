@@ -3,11 +3,9 @@ import pickle
 import numpy as np
 from coloc.independent_model_ss import IndependentFactorSER as GSS
 from coloc.cafeh_ss import CAFEH as CSS
-
 from coloc.misc import *
 from coloc.simulation import *
 from coloc.covariance import *
-
 from itertools import product
 
 superpop2samples = pickle.load(open('output/superpop2samples_1kG', 'rb'))
@@ -16,7 +14,6 @@ eur_ld = lambda data: np.corrcoef(
         data.genotype_1kG.loc[superpop2samples['EUR']]).values.T
     + np.random.normal(scale=1e-10, size=(1000, superpop2samples['EUR'].size))
 )
-
 asn_ld = lambda data: np.corrcoef(
     center_mean_impute(
         data.genotype_1kG.loc[superpop2samples['ASN']]).values.T
@@ -101,10 +98,9 @@ ld_functions = {
     'afr1kG': afr_ld,
     'reference1kG': refernce_ld,
     'z': z_ld,
-    'lw_sample': ledoit_wolf_sample_ld,
-    'lw_refence': ledoit_wolf_reference_ld,
-    'lw_z': ledoit_wolf_z_ld,
-    'ref_z': ref_z_ld,
+    'lwrefence': ledoit_wolf_reference_ld,
+    'lwz': ledoit_wolf_z_ld,
+    'refz': ref_z_ld,
     'z3': z3_ld
 }
 
@@ -114,13 +110,14 @@ sim_spec = pd.read_csv('output/sim/ld/sim_spec.txt', sep='\t')
 sim_data, sim_expression = load_sim_from_model_data(gene, sim_spec)
 
 # make model_spec
-pi0s = [0.01, 0.1, 0.5]
+pi0s = [0.1]
+Ks = [10]
 ld_types = list(ld_functions.keys())
 dispersions = [0.5, 1.0, 5.0]
 epsilons = [0.0]
 model_spec = pd.DataFrame(
-    list(product(ld_types, pi0s, dispersions, epsilons)),
-    columns=['ld', 'pi0', 'dispersion', 'epsilon'])
+    list(product(ld_types, Ks, pi0s, dispersions, epsilons)),
+    columns=['ld', 'K', 'pi0', 'dispersion', 'epsilon'])
 
 # fit CSS to simulation data
 fit_args = {
@@ -136,9 +133,12 @@ pickle.dump(sim_expression, open(snakemake.output[0], 'wb'))
 
 bp = '/'.join(snakemake.output[0].split('/')[:-1])
 for i, row in model_spec.iterrows():
+    print('model spec:')
     for arg in row.to_dict():
         print('\t{}: {}'.format(arg, row.to_dict()[arg]))
+    #TODO dont fit if we already have it
     css = init_css(sim_data, **row.to_dict())
+    print('fitting model')
     css.fit(**fit_args, update_active=False)
     css.fit(**fit_args, update_active=True)
     compute_records_css(css)
@@ -146,6 +146,8 @@ for i, row in model_spec.iterrows():
     print('saving model to {}'.format(save_path))
     strip_and_dump(css, save_path)
     rehydrate_model(css)
+
+# TODO fit GSS
 
 """
 # fit GSS to simulation data
