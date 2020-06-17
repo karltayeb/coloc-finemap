@@ -150,11 +150,6 @@ model_spec = pd.DataFrame(
     list(product(ld_types, Ks, pi0s, dispersions, epsilons)),
     columns=['ld', 'K', 'pi0', 'dispersion', 'epsilon'])
 
-
-smoothed_data = {}
-for epsilon in model_spec.epsilon.unique():
-    smoothed_data[epsilon] = smooth_betas(sim_data, epsilon)
-
 for i, row in model_spec.iterrows():
     print('model spec:')
     for arg in row.to_dict():
@@ -167,7 +162,8 @@ for i, row in model_spec.iterrows():
         row.to_dict()['ld'])
     save_path = bp + '/' + name
     if not os.path.isfile(save_path):
-        css = init_css(smoothed_data[row.epsilon], **row.to_dict())
+        smoothed_data = smooth_betas(sim_data, row.ld, row.epsilon)
+        css = init_css(smoothed_data, **row.to_dict())
         print('fitting model')
         css.fit(**fit_args, update_active=False)
         css.fit(**fit_args, update_active=True)
