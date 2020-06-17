@@ -168,7 +168,7 @@ model_spec = pd.DataFrame(
 
 smoothed_data = {}
 for epsilon in model_spec.epsilon.unique():
-    smoothed_data[epsilon] = smooth_data(sim_data, epsilon)
+    smoothed_data[epsilon] = smooth_betas(sim_data, epsilon)
 
 for i, row in model_spec.iterrows():
     print('model spec:')
