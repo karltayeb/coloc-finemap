@@ -9,37 +9,6 @@ from coloc.covariance import *
 from itertools import product
 
 superpop2samples = pickle.load(open('output/superpop2samples_1kG', 'rb'))
-eur_ld = lambda data: np.corrcoef(
-    center_mean_impute(
-        data.genotype_1kG.loc[superpop2samples['EUR']]).values.T
-    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['EUR'].size))
-)
-asn_ld = lambda data: np.corrcoef(
-    center_mean_impute(
-        data.genotype_1kG.loc[superpop2samples['ASN']]).values.T
-    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['ASN'].size))
-
-)
-
-afr_ld = lambda data: np.corrcoef(
-    center_mean_impute(
-        data.genotype_1kG.loc[superpop2samples['AFR']]).values.T
-    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['AFR'].size))
-
-)
-
-sea_ld = lambda data: np.corrcoef(
-    center_mean_impute(
-        data.genotype_1kG.loc[superpop2samples['SEA']]).values.T
-    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['SEA'].size))
-
-)
-
-amr_ld = lambda data: np.corrcoef(
-    center_mean_impute(
-        data.genotype_1kG.loc[superpop2samples['AMR']]).values.T
-    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['AMR'].size))
-)
 
 ld_functions = {
     'sample': sample_ld,
@@ -54,6 +23,22 @@ ld_functions = {
     'ref_z': ref_z_ld,
     'z3': z3_ld
 }
+
+def smooth_betas(data, ld, epsilon=1.0):
+    """
+    return a copy of data with smoothed effect sizes
+    beta_sooth = SRS(SRS + epsilonS^2)^{-1} beta
+    """
+    Bs = []
+    R = ld_functions['ld'](data)
+    for i in range(data.S.shape[0]):
+        S = np.diag(data.S.iloc[i].values)
+        B = data.B.iloc[i].values
+        SRS = S @ R @ S
+        Bs.append(SRS @ np.linalg.solve(SRS + epsilon * S**2, B))
+    data_smooth = deepcopy(data)
+    data_smooth.B = Bs
+    return data_smooth
 
 def init_css(data, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0):
     # TODO epsilon--- smooth expression?
