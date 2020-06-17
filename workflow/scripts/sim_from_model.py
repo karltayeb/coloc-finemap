@@ -9,8 +9,8 @@ from coloc.covariance import *
 from itertools import product
 import sys
 
-log = open(snakemake.output[0], "a")
-sys.stdout = log
+#log = open(snakemake.output[0], "a")
+#sys.stdout = log
 
 superpop2samples = pickle.load(open('output/superpop2samples_1kG', 'rb'))
 
