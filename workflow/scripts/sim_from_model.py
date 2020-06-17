@@ -81,10 +81,9 @@ def init_gss(data, K=10, p=1.0):
 
 #gss = load(snakemake.input[0])
 gene = snakemake.wildcards.gene
-sim_spec = pd.read_csv('output/sim/ld/sim_spec.txt', sep='\t')
+sim_spec = pd.read_csv('output/sim/ld/sim_spec2.txt', sep='\t')
 
 spec = sim_spec[sim_spec.gene == gene].iloc[0]
-import pdb; pdb.set_trace()
 sim_data = load_sim_from_model_data(gene, sim_spec)
 
 # make model_spec
