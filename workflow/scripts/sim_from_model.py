@@ -37,7 +37,7 @@ def smooth_betas(data, ld, epsilon=1.0):
         SRS = S @ R @ S
         Bs.append(SRS @ np.linalg.solve(SRS + epsilon * S**2, B))
     data_smooth = deepcopy(data)
-    data_smooth.B = Bs
+    data_smooth.B = pd.DataFrame(np.stack(Bs), columns=data.B.columns)
     return data_smooth
 
 def init_css(data, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0):
