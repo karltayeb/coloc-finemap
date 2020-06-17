@@ -139,7 +139,7 @@ for i, row in model_spec.iterrows():
 
     #TODO dont fit if we already have it
     name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}_e-{}_ld-{}.css'.format(
-        data.id, data.gene, K, pi0, dispersion, epsilon, ld)
+        sim_data.id, sim_data.gene, **row.to_dict())
     save_path = bp + '/' + name
     if ~os.path.isfile(save_path):
         css = init_css(sim_data, **row.to_dict())
