@@ -156,6 +156,43 @@ for i, row in model_spec.iterrows():
     else:
         print('{} alread fit'.format(name))
 
+pi0s = [0.1]
+Ks = [10]
+ld_types = list(ld_functions.keys())
+dispersions = [1.0]
+epsilons = [0.1, 1.0, 10.0]
+model_spec = pd.DataFrame(
+    list(product(ld_types, Ks, pi0s, dispersions, epsilons)),
+    columns=['ld', 'K', 'pi0', 'dispersion', 'epsilon'])
+
+
+smoothed_data = {}
+for epsilon in model_spec.epsilon.unique():
+    smoothed_data[epsilon] = smooth_data(sim_data, epsilon)
+
+for i, row in model_spec.iterrows():
+    print('model spec:')
+    for arg in row.to_dict():
+        print('\t{}: {}'.format(arg, row.to_dict()[arg]))
+
+    name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}_e-{}_ld-{}.css'.format(
+        sim_data.id, sim_data.gene,
+        row.to_dict()['K'], row.to_dict()['pi0'],
+        row.to_dict()['dispersion'], row.to_dict()['epsilon'],
+        row.to_dict()['ld'])
+    save_path = bp + '/' + name
+    if not os.path.isfile(save_path):
+        css = init_css(smoothed_data[row.epsilon], **row.to_dict())
+        print('fitting model')
+        css.fit(**fit_args, update_active=False)
+        css.fit(**fit_args, update_active=True)
+        compute_records_css(css)
+        print('saving model to {}'.format(save_path))
+        strip_and_dump(css, save_path)
+        rehydrate_model(css)
+    else:
+        print('{} alread fit'.format(name))
+
 # TODO fit GSS
 
 """
