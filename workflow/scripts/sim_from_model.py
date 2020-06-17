@@ -144,8 +144,7 @@ for i, row in model_spec.iterrows():
         row.to_dict()['dispersion'], row.to_dict()['epsilon'],
         row.to_dict()['ld'])
     save_path = bp + '/' + name
-    import pdb; pdb.set_trace()
-    if ~os.path.isfile(save_path):
+    if not os.path.isfile(save_path):
         css = init_css(sim_data, **row.to_dict())
         print('fitting model')
         css.fit(**fit_args, update_active=False)
