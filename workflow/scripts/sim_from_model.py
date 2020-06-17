@@ -30,7 +30,7 @@ def smooth_betas(data, ld, epsilon=1.0):
     beta_sooth = SRS(SRS + epsilonS^2)^{-1} beta
     """
     Bs = []
-    R = ld_functions['ld'](data)
+    R = ld_functions[ld](data)
     for i in range(data.S.shape[0]):
         S = np.diag(data.S.iloc[i].values)
         B = data.B.iloc[i].values
