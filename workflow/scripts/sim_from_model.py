@@ -12,15 +12,14 @@ superpop2samples = pickle.load(open('output/superpop2samples_1kG', 'rb'))
 
 ld_functions = {
     'sample': sample_ld,
-    'eur_ld': eur_ld,
-    'asn_ld': asn_ld,
-    'afr_ld': afr_ld,
-    'reference': refernce_ld,
+    'eur1kG': eur_ld,
+    'asn1kG': asn_ld,
+    'afr1kG': afr_ld,
+    'reference1kG': refernce_ld,
     'z': z_ld,
-    'lw_sample': ledoit_wolf_sample_ld,
-    'lw_refence': ledoit_wolf_reference_ld,
-    'lw_z': ledoit_wolf_z_ld,
-    'ref_z': ref_z_ld,
+    'lwrefence': ledoit_wolf_reference_ld,
+    'lwz': ledoit_wolf_z_ld,
+    'refz': ref_z_ld,
     'z3': z3_ld
 }
 
@@ -75,19 +74,6 @@ def init_gss(data, K=10, p=1.0):
     gss.prior_activity = np.ones(K) * p
     gss.name = name
     return gss
-
-ld_functions = {
-    'sample': sample_ld,
-    'eur1kG': eur_ld,
-    'asn1kG': asn_ld,
-    'afr1kG': afr_ld,
-    'reference1kG': refernce_ld,
-    'z': z_ld,
-    'lwrefence': ledoit_wolf_reference_ld,
-    'lwz': ledoit_wolf_z_ld,
-    'refz': ref_z_ld,
-    'z3': z3_ld
-}
 
 #gss = load(snakemake.input[0])
 gene = snakemake.wildcards.gene
