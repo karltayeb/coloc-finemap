@@ -7,6 +7,10 @@ from coloc.misc import *
 from coloc.simulation import *
 from coloc.covariance import *
 from itertools import product
+import sys
+
+log = open(snakemake.output[0], "a")
+sys.stdout = log
 
 superpop2samples = pickle.load(open('output/superpop2samples_1kG', 'rb'))
 
@@ -78,7 +82,7 @@ def init_gss(data, K=10, p=1.0):
 #gss = load(snakemake.input[0])
 gene = snakemake.wildcards.gene
 sim_spec = pd.read_csv('output/sim/ld/sim_spec.txt', sep='\t')
-sim_data, sim_expression = load_sim_from_model_data(gene, sim_spec)
+sim_data = load_sim_from_model_data(gene, sim_spec)
 
 # make model_spec
 pi0s = [0.1]
@@ -100,15 +104,8 @@ fit_args = {
     'max_iter': 50
 }
 
-pickle.dump(sim_expression, open(snakemake.output[0], 'wb'))
-
 bp = '/'.join(snakemake.output[0].split('/')[:-1])
 for i, row in model_spec.iterrows():
-    print('model spec:')
-    for arg in row.to_dict():
-        print('\t{}: {}'.format(arg, row.to_dict()[arg]))
-
-    #TODO dont fit if we already have it
     name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}_e-{}_ld-{}.css'.format(
         sim_data.id, sim_data.gene,
         row.to_dict()['K'], row.to_dict()['pi0'],
@@ -137,10 +134,6 @@ model_spec = pd.DataFrame(
     columns=['ld', 'K', 'pi0', 'dispersion', 'epsilon'])
 
 for i, row in model_spec.iterrows():
-    print('model spec:')
-    for arg in row.to_dict():
-        print('\t{}: {}'.format(arg, row.to_dict()[arg]))
-
     name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}_e-{}_ld-{}.css'.format(
         sim_data.id, sim_data.gene,
         row.to_dict()['K'], row.to_dict()['pi0'],
