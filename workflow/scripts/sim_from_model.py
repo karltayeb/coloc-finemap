@@ -65,7 +65,7 @@ def init_css(data, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0):
         'snp_ids': data.B.columns.values,
         'tissue_ids': data.B.index.values
     }
-    name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}.e-{}_ld-{}.css'.format(
+    name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}_e-{}_ld-{}.css'.format(
         data.id, data.gene, K, pi0, dispersion, epsilon, ld)
     print('initializing summary stat model')
     css = CSS(**init_args)
@@ -136,16 +136,22 @@ for i, row in model_spec.iterrows():
     print('model spec:')
     for arg in row.to_dict():
         print('\t{}: {}'.format(arg, row.to_dict()[arg]))
+
     #TODO dont fit if we already have it
-    css = init_css(sim_data, **row.to_dict())
-    print('fitting model')
-    css.fit(**fit_args, update_active=False)
-    css.fit(**fit_args, update_active=True)
-    compute_records_css(css)
-    save_path = bp + '/' + css.name
-    print('saving model to {}'.format(save_path))
-    strip_and_dump(css, save_path)
-    rehydrate_model(css)
+    name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}_e-{}_ld-{}.css'.format(
+        data.id, data.gene, K, pi0, dispersion, epsilon, ld)
+    save_path = bp + '/' + name
+    if ~os.path.isfile(save_path):
+        css = init_css(sim_data, **row.to_dict())
+        print('fitting model')
+        css.fit(**fit_args, update_active=False)
+        css.fit(**fit_args, update_active=True)
+        compute_records_css(css)
+        print('saving model to {}'.format(save_path))
+        strip_and_dump(css, save_path)
+        rehydrate_model(css)
+    else:
+        print('{} alread fit'.format(name))
 
 # TODO fit GSS
 
