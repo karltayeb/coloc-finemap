@@ -201,9 +201,8 @@ score_functions = {
 
 def score(row):
     try:
-        model_path = '{}{}'.format(row[1].sim_path[:-14], row[1].model_key)
         sim = pickle.load(open(row[1].sim_path, 'rb'))
-        model = load(model_path)
+        model = load(row[1].model_path)
         scores = [f(model, sim) for f in score_functions.values()]
         row_dict = row[1].to_dict()
         [s.update(row_dict) for s in scores]
@@ -216,8 +215,12 @@ def gen_sim_table(sim_spec, model_spec):
     a = sim_spec.sim_id
     b = model_spec.model_key
     index = pd.MultiIndex.from_product([a, b], names = ['sim_id', 'model_key'])
-    df = pd.DataFrame(index = index).reset_index()
-    return df.merge(sim_spec, on='sim_id').merge(model_spec, on='model_key')
+    sim_table = pd.DataFrame(index = index).reset_index()
+    sim_table = sim_table.merge(sim_spec, on='sim_id').merge(model_spec, on='model_key')
+
+    make_model_path = lambda x: '{}{}'.format(x.sim_path[:-14], x.model_key)
+    sim_table.loc[:, 'model_path'] = sim_table.apply(make_model_path, axis=1).iloc[0]
+    return sim_table
 
 sim_spec = pd.read_csv(snakemake.input[0], sep='\t')
 model_spec = pd.read_csv(snakemake.input[1], sep='\t')
@@ -229,4 +232,4 @@ with multiprocessing.Pool(processes=20) as pool:
         pool.map(score, sim_table.iterrows())))
 
 results = pd.DataFrame(pool_results)
-results.to_csv(snakemake.output[1], sep='\t')
+results.to_csv(snakemake.output[0], sep='\t')
