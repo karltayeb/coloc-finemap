@@ -210,6 +210,7 @@ def score(row):
     except Exception:
          return []
 
+make_model_path = lambda x: '{}{}'.format(x.sim_path[:-14], x.model_key)
 
 def gen_sim_table(sim_spec, model_spec):
     a = sim_spec.sim_id
@@ -217,9 +218,7 @@ def gen_sim_table(sim_spec, model_spec):
     index = pd.MultiIndex.from_product([a, b], names = ['sim_id', 'model_key'])
     sim_table = pd.DataFrame(index = index).reset_index()
     sim_table = sim_table.merge(sim_spec, on='sim_id').merge(model_spec, on='model_key')
-
-    make_model_path = lambda x: '{}{}'.format(x.sim_path[:-14], x.model_key)
-    sim_table.loc[:, 'model_path'] = sim_table.apply(make_model_path, axis=1).iloc[0]
+    sim_table.loc[:, 'model_path'] = sim_table.apply(make_model_path, axis=1)
     return sim_table
 
 sim_spec = pd.read_csv(snakemake.input[0], sep='\t')
