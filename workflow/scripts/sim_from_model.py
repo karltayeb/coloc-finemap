@@ -15,8 +15,52 @@ with open(snakemake.output[0], 'w') as f:
 log = open(snakemake.output[0], "a")
 sys.stdout = log
 
-superpop2samples = pickle.load(open('output/superpop2samples_1kG', 'rb'))
+superpop2samples = pickle.load(open(
+    '/work-zfs/abattle4/karl/cosie_analysis/output/superpop2samples_1kG', 'rb'))
 
+def cov2corr(X):
+    """
+    scale covariance matrix to correlaton matrix
+    """
+    diag = np.sqrt(np.diag(X))
+    return (1/diag[:, None]) * X * (1/diag[None])
+
+sample_ld = lambda data: np.corrcoef(data.data.X.T)
+refernce_ld = lambda data: np.corrcoef(data.data.X1kG.T)
+z_ld = lambda data: np.corrcoef(data.summary_stats.B.T.values / np.sqrt(data.summary_stats.V.T.values))
+ledoit_wolf_sample_ld = lambda data: cov2corr(covariance.ledoit_wolf(data.X)[0])
+ledoit_wolf_reference_ld = lambda data: cov2corr(covariance.ledoit_wolf(data.X1kG)[0])
+ledoit_wolf_z_ld = lambda data: cov2corr(covariance.ledoit_wolf(data.summary_stats.B.values / np.sqrt(data.summary_stats.V.values))[0])
+z3_ld = lambda data: z_ld(data)**3
+
+eur_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.data.genotype_1kG.loc[superpop2samples['EUR']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['EUR'].size))
+)
+asn_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.data.genotype_1kG.loc[superpop2samples['ASN']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['ASN'].size))
+
+)
+afr_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.data.genotype_1kG.loc[superpop2samples['AFR']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['AFR'].size))
+
+)
+sea_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.data.genotype_1kG.loc[superpop2samples['SEA']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['SEA'].size))
+
+)
+amr_ld = lambda data: np.corrcoef(
+    center_mean_impute(
+        data.data.genotype_1kG.loc[superpop2samples['AMR']]).values.T
+    + np.random.normal(scale=1e-10, size=(1000, superpop2samples['AMR'].size))
+)
 ld_functions = {
     'sample': sample_ld,
     'eur1kG': eur_ld,
@@ -35,29 +79,30 @@ def smooth_betas(data, ld, epsilon=1.0):
     return a copy of data with smoothed effect sizes
     beta_sooth = SRS(SRS + epsilonS^2)^{-1} beta
     """
+    if np.isclose(epsilon, 0):
+        return data
     Bs = []
     R = ld_functions[ld](data)
-    for i in range(data.S.shape[0]):
-        S = np.diag(data.S.iloc[i].values)
-        B = data.B.iloc[i].values
+    for i in range(data.summary_stats.S.shape[0]):
+        S = np.diag(data.summary_stats.S.iloc[i].values)
+        B = data.summary_stats.B.iloc[i].values
         SRS = S @ R @ S
         Bs.append(SRS @ np.linalg.solve(SRS + epsilon * S**2, B))
     data_smooth = deepcopy(data)
-    data_smooth.B = pd.DataFrame(np.stack(Bs), columns=data.B.columns)
+    data_smooth.summary_stats.B = pd.DataFrame(np.stack(Bs), columns=data.summary_stats.B.columns)
     return data_smooth
 
-def init_css(data, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0):
+def init_css(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0, **kwargs):
     # TODO epsilon--- smooth expression?
     init_args = {
-        'LD': ld_functions[ld](data),
-        'B': data.B.values,
-        'S': data.S.values,
+        'LD': ld_functions[ld](sim.data),
+        'B': sim.summary_stats.B.values,
+        'S': sim.summary_stats.S.values,
         'K': K,
-        'snp_ids': data.B.columns.values,
-        'tissue_ids': data.B.index.values
+        'snp_ids': sim.summary_stats.B.columns.values,
+        'tissue_ids': sim.summary_stats.B.index.values
     }
-    name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}_e-{}_ld-{}.css'.format(
-        data.id, data.gene, K, pi0, dispersion, epsilon, ld)
+    name = ms.model_key
     print('initializing summary stat model')
     css = CSS(**init_args)
     css.prior_activity = np.ones(K) * pi0
@@ -70,7 +115,7 @@ def init_gss(data, K=10, p=1.0):
     name = 'sim-{}_gene-{}_k-{}_pi-{}_ld-{}.gss'.format(
         data.id, data.gene, K, p, ld_type)
     gss = GSS(
-        X=center_mean_impute(data.genotype_gtex).values.T,
+        X=center_mean_impute(data.data.genotype_gtex).values.T,
         Y=data.expression.values,
         K=K,
         covariates=None,
@@ -82,22 +127,11 @@ def init_gss(data, K=10, p=1.0):
     gss.name = name
     return gss
 
-#gss = load(snakemake.input[0])
-gene = snakemake.wildcards.gene
-sim_spec = pd.read_csv('output/sim/ld/sim_spec2.txt', sep='\t')
 
-spec = sim_spec[sim_spec.gene == gene].iloc[0]
-sim_data = load_sim_from_model_data(gene, sim_spec)
-
-# make model_spec
-pi0s = [0.1]
-Ks = [10]
-ld_types = list(ld_functions.keys())
-dispersions = [0.5, 1.0, 5.0]
-epsilons = [0.0]
-model_spec = pd.DataFrame(
-    list(product(ld_types, Ks, pi0s, dispersions, epsilons)),
-    columns=['ld', 'K', 'pi0', 'dispersion', 'epsilon'])
+sim_spec = pd.read_csv(snakemake.input[0], sep='\t')
+model_spec = pd.read_csv(snakemake.input[1], sep='\t')
+spec = sim_spec[sim_spec.sim_id == snakemake.wildcards.sim_id].iloc[0]
+sim_data = load_sim_data(spec)
 
 # fit CSS to simulation data
 fit_args = {
@@ -110,40 +144,8 @@ fit_args = {
 }
 
 bp = '/'.join(snakemake.output[0].split('/')[:-1])
-for i, row in model_spec.iterrows():
-    name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}_e-{}_ld-{}.css'.format(
-        sim_data.id, sim_data.gene,
-        row.to_dict()['K'], row.to_dict()['pi0'],
-        row.to_dict()['dispersion'], row.to_dict()['epsilon'],
-        row.to_dict()['ld'])
-    save_path = bp + '/' + name
-    if not os.path.isfile(save_path):
-        css = init_css(sim_data, **row.to_dict())
-        print('fitting model')
-        css.fit(**fit_args, update_active=False)
-        css.fit(**fit_args, update_active=True)
-        compute_records_css(css)
-        print('saving model to {}'.format(save_path))
-        strip_and_dump(css, save_path)
-        rehydrate_model(css)
-    else:
-        print('{} alread fit'.format(name))
-
-pi0s = [0.1]
-Ks = [10]
-ld_types = list(ld_functions.keys())
-dispersions = [1.0]
-epsilons = [0.1, 1.0, 10.0]
-model_spec = pd.DataFrame(
-    list(product(ld_types, Ks, pi0s, dispersions, epsilons)),
-    columns=['ld', 'K', 'pi0', 'dispersion', 'epsilon'])
-
-for i, row in model_spec.iterrows():
-    name = 'simid-{}_gene-{}_k-{}_pi0-{}_d-{}_e-{}_ld-{}.css'.format(
-        sim_data.id, sim_data.gene,
-        row.to_dict()['K'], row.to_dict()['pi0'],
-        row.to_dict()['dispersion'], row.to_dict()['epsilon'],
-        row.to_dict()['ld'])
+for _, row in model_spec.iterrows():
+    name = row.model_key
     save_path = bp + '/' + name
     if not os.path.isfile(save_path):
         smoothed_data = smooth_betas(sim_data, row.ld, row.epsilon)

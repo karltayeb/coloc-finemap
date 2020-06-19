@@ -79,17 +79,19 @@ rule simulate_n_causal_variant_random_effect_size:
 
 
 sim_spec = pd.read_csv('output/sim/ld/sim_spec2.txt', sep='\t')
-def get_model(wildcards):
-    return sim_spec[sim_spec.sim_id == wildcards.sim_id].source_model_path.values[0]
+def get_log_file(wildcards):
+    return sim_spec[sim_spec.sim_id == wildcards.sim_id].log_path.values[0]
 
 rule sim_from_model:
     input:
-        get_model
+        'output/sim/{sim}/sim_spec.txt',
+        'output/sim/{sim}/model_spec.txt'
     output:
-        'output/sim/ld/{gene}/{sim_id}/{sim_id}.log',
+        'output/sim/ld/{sim}/{sim_id}/{sim_id}.log',
     script:
         '../../workflow/scripts/sim_from_model.py'
 
+sim_spec = pd.read_csv('output/sim/from_gss/sim_spec.txt', sep='\t', index_col=0)
 rule run_sim_from_model:
     input:
         expand('{path}', path=sim_spec.log_path.values[:200])
