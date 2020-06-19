@@ -61,6 +61,15 @@ amr_ld = lambda data: np.corrcoef(
         data.data.genotype_1kG.loc[superpop2samples['AMR']]).values.T
     + np.random.normal(scale=1e-10, size=(1000, superpop2samples['AMR'].size))
 )
+
+def ref_z_ld(data, alpha=None):
+    """
+    mix reference ld and zscore ld
+    """
+    if alpha is None:
+        alpha = data.data.X1kG.shape[0] / (data.data.X1kG.shape[0] + data.B.shape[0])
+    return alpha * refernce_ld(data) + (1 - alpha) * z_ld(data)
+
 ld_functions = {
     'sample': sample_ld,
     'eur1kG': eur_ld,
