@@ -84,7 +84,7 @@ rule sim_from_model:
         'output/sim/{sim}/sim_spec.txt',
         'output/sim/{sim}/model_spec.txt'
     output:
-        'output/sim/ld/{sim}/{sim_id}/{sim_id}.log',
+        'output/sim/{sim}/{sim_id}/{sim_id}.log',
     script:
         '../../workflow/scripts/sim_from_model.py'
 
