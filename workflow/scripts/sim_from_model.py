@@ -143,6 +143,8 @@ fit_args = {
     'max_iter': 50
 }
 
+import pdb; pdb.set_trace()
+
 bp = '/'.join(snakemake.output[0].split('/')[:-1])
 for _, row in model_spec.iterrows():
     name = row.model_key
