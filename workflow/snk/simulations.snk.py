@@ -78,9 +78,6 @@ rule simulate_n_causal_variant_random_effect_size:
         "../../workflow/scripts/sim_n_causal_variants.py"
 
 
-sim_spec = pd.read_csv('output/sim/ld/sim_spec2.txt', sep='\t')
-def get_log_file(wildcards):
-    return sim_spec[sim_spec.sim_id == wildcards.sim_id].log_path.values[0]
 
 rule sim_from_model:
     input:
