@@ -67,7 +67,7 @@ def ref_z_ld(data, alpha=None):
     mix reference ld and zscore ld
     """
     if alpha is None:
-        alpha = data.data.X1kG.shape[0] / (data.data.X1kG.shape[0] + data.B.shape[0])
+        alpha = data.data.X1kG.shape[0] / (data.data.X1kG.shape[0] + data.summary_stats.B.shape[0])
     return alpha * refernce_ld(data) + (1 - alpha) * z_ld(data)
 
 ld_functions = {
