@@ -88,7 +88,7 @@ rule sim_from_model:
     script:
         '../../workflow/scripts/sim_from_model.py'
 
-sim_spec = pd.read_csv('output/sim/from_gss/sim_spec.txt', sep='\t', index_col=0
+sim_spec = pd.read_csv('output/sim/from_gss/sim_spec.txt', sep='\t', index_col=0)
 log_files = sim_spec.log_path.values
 log_files = [x[len('/work-zfs/abattle4/karl/cosie_analysis/'):] for x in log_files]
 rule run_sim_from_model:
