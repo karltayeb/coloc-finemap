@@ -111,24 +111,6 @@ def init_css(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0, **kwa
     return css
 
 
-def init_gss(data, K=10, p=1.0):
-    print('initializing genotype model')
-    name = 'sim-{}_gene-{}_k-{}_pi-{}_ld-{}.gss'.format(
-        data.id, data.gene, K, p, ld_type)
-    gss = GSS(
-        X=center_mean_impute(data.data.genotype_gtex).values.T,
-        Y=data.expression.values,
-        K=K,
-        covariates=None,
-        snp_ids=data.common_snps,
-        tissue_ids=data.expression.index.values,
-        sample_ids=data.expression.columns.values
-    )
-    gss.prior_activity = np.ones(K) * p
-    gss.name = name
-    return gss
-
-
 sim_spec = pd.read_csv(snakemake.input[0], sep='\t')
 model_spec = pd.read_csv(snakemake.input[1], sep='\t')
 spec = sim_spec[sim_spec.sim_id == snakemake.wildcards.sim_id].iloc[0]
