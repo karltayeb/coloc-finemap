@@ -28,8 +28,8 @@ def cov2corr(X):
 sample_ld = lambda data: np.corrcoef(data.data.X.T)
 refernce_ld = lambda data: np.corrcoef(data.data.X1kG.T)
 z_ld = lambda data: np.corrcoef(data.summary_stats.B.T.values / np.sqrt(data.summary_stats.V.T.values))
-ledoit_wolf_sample_ld = lambda data: cov2corr(covariance.ledoit_wolf(data.X)[0])
-ledoit_wolf_reference_ld = lambda data: cov2corr(covariance.ledoit_wolf(data.X1kG)[0])
+ledoit_wolf_sample_ld = lambda data: cov2corr(covariance.ledoit_wolf(data.data.X)[0])
+ledoit_wolf_reference_ld = lambda data: cov2corr(covariance.ledoit_wolf(data.data.X1kG)[0])
 ledoit_wolf_z_ld = lambda data: cov2corr(covariance.ledoit_wolf(data.summary_stats.B.values / np.sqrt(data.summary_stats.V.values))[0])
 z3_ld = lambda data: z_ld(data)**3
 
