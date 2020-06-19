@@ -95,7 +95,7 @@ def smooth_betas(data, ld, epsilon=1.0):
 def init_css(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0, **kwargs):
     # TODO epsilon--- smooth expression?
     init_args = {
-        'LD': ld_functions[ld](sim.data),
+        'LD': ld_functions[ld](sim),
         'B': sim.summary_stats.B.values,
         'S': sim.summary_stats.S.values,
         'K': K,
@@ -109,6 +109,7 @@ def init_css(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0, **kwa
     css.tissue_precision_b = np.ones(css.dims['T']) * dispersion
     css.name = name
     return css
+
 
 def init_gss(data, K=10, p=1.0):
     print('initializing genotype model')
@@ -142,8 +143,6 @@ fit_args = {
     'verbose': False,
     'max_iter': 50
 }
-
-import pdb; pdb.set_trace()
 
 bp = '/'.join(snakemake.output[0].split('/')[:-1])
 for _, row in model_spec.iterrows():
