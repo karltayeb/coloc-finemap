@@ -94,3 +94,13 @@ log_files = [x[len('/work-zfs/abattle4/karl/cosie_analysis/'):] for x in log_fil
 rule run_sim_from_model:
     input:
         expand('{path}', path=log_files)
+
+
+rule score_sim:
+    input:
+        'output/sim/{sim}/sim_spec.txt',
+        'output/sim/{sim}/model_spec.txt'
+    output:
+        'output/sim/{sim}/score.txt',
+    script:
+        '../../workflow/scripts/score_sim.py'
