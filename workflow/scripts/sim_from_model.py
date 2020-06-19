@@ -102,7 +102,7 @@ def init_css(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0, **kwa
         'snp_ids': sim.summary_stats.B.columns.values,
         'tissue_ids': sim.summary_stats.B.index.values
     }
-    name = ms.model_key
+    name = kwargs['model_key']
     print('initializing summary stat model')
     css = CSS(**init_args)
     css.prior_activity = np.ones(K) * pi0
