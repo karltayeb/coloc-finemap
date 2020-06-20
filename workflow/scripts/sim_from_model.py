@@ -83,7 +83,7 @@ ld_functions = {
     'z3': z3_ld
 }
 
-def smooth_betas(data, ld, epsilon=1.0):
+def smooth_betas(data, ld='sample', epsilon=0.0):
     """
     return a copy of data with smoothed effect sizes
     beta_sooth = SRS(SRS + epsilonS^2)^{-1} beta
@@ -101,7 +101,41 @@ def smooth_betas(data, ld, epsilon=1.0):
     data_smooth.summary_stats.B = pd.DataFrame(np.stack(Bs), columns=data.summary_stats.B.columns)
     return data_smooth
 
-def init_css(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0, **kwargs):
+
+def init_gss(sim, update_variance=False, K=10, pi0=1.0, **kwargs):
+    # TODO epsilon--- smooth expression?
+    init_args = {
+        'X': sim.data.X.T,
+        'Y': sim.simulation.expression.values,
+        'K': K,
+        'snp_ids': sim.summary_stats.B.columns.values,
+        'tissue_ids': sim.summary_stats.B.index.values
+    }
+    fit_args = {
+        'update_weights': True,
+        'update_pi': True,
+        'ARD_weights': True,
+        'update_variance': update_variance,
+        'verbose': True,
+        'max_iter': 50
+    }
+    name = kwargs['model_key']
+    print('initializing summary stat model')
+    gss = GSS(**init_args)
+    gss.prior_activity = np.ones(K) * pi0
+    gss.name = name
+    return gss, fit_args
+
+def fit_gss(sim, model_spec):
+    print('fitting model')
+    gss, fit_args = init_gss(sim, **model_spec.dropna().to_dict())
+    gss.fit(**fit_args, update_active=False)
+    gss.fit(**fit_args, update_active=True)
+    compute_records_gss(gss)
+    print('saving model to {}'.format(save_path))
+    strip_and_dump(gss, save_path)
+
+def init_css(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, **kwargs):
     # TODO epsilon--- smooth expression?
     init_args = {
         'LD': ld_functions[ld](sim),
@@ -111,13 +145,30 @@ def init_css(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, epsilon=0.0, **kwa
         'snp_ids': sim.summary_stats.B.columns.values,
         'tissue_ids': sim.summary_stats.B.index.values
     }
+    fit_args = {
+        'update_weights': True,
+        'update_pi': True,
+        'ARD_weights': True,
+        'update_variance': False,
+        'verbose': False,
+        'max_iter': 50
+    }
     name = kwargs['model_key']
     print('initializing summary stat model')
     css = CSS(**init_args)
     css.prior_activity = np.ones(K) * pi0
     css.tissue_precision_b = np.ones(css.dims['T']) * dispersion
     css.name = name
-    return css
+    return css, fit_args
+
+def fit_css(data, model_spec):
+    css, fit_args = init_css(data, **model_spec.to_dict())
+    print('fitting model')
+    css.fit(**fit_args, update_active=False)
+    css.fit(**fit_args, update_active=True)
+    compute_records_css(css)
+    print('saving model to {}'.format(save_path))
+    strip_and_dump(css, save_path)
 
 
 sim_spec = pd.read_csv(snakemake.input[0], sep='\t')
@@ -125,53 +176,18 @@ model_spec = pd.read_csv(snakemake.input[1], sep='\t')
 spec = sim_spec[sim_spec.sim_id == snakemake.wildcards.sim_id].iloc[0]
 sim_data = load_sim_data(spec)
 
-# fit CSS to simulation data
-fit_args = {
-    'update_weights': True,
-    'update_pi': True,
-    'ARD_weights': True,
-    'update_variance': False,
-    'verbose': False,
-    'max_iter': 50
-}
+
 
 bp = '/'.join(snakemake.output[0].split('/')[:-1])
-for _, row in model_spec.iterrows():
+for _, ms in model_spec.iterrows():
     name = row.model_key
     save_path = bp + '/' + name
     if not os.path.isfile(save_path):
-        smoothed_data = smooth_betas(sim_data, row.ld, row.epsilon)
-        css = init_css(smoothed_data, **row.to_dict())
-        print('fitting model')
-        css.fit(**fit_args, update_active=False)
-        css.fit(**fit_args, update_active=True)
-        compute_records_css(css)
-        print('saving model to {}'.format(save_path))
-        strip_and_dump(css, save_path)
-        rehydrate_model(css)
+        smoothed_data = smooth_betas(sim, **ms.dropna().to_dict())
+        if ms.model == 'gss':
+            fit_gss(smoothed_data, **ms.dropna())
+        if ms.model == 'css':
+            fit_css(smoothed_data, **ms.dropna())
     else:
         print('{} alread fit'.format(name))
 
-# TODO fit GSS
-
-"""
-# fit GSS to simulation data
-gss_sim = init_gss(sim_data, 10, 0.1)
-fit_args = {
-    'max_iter': 300,
-    'update_covariate_weights': True,
-    'update_weights': True,
-    'update_pi': True,
-    'ARD_weights': True,
-    'update_variance': True,
-    'verbose': False
-}
-print('training model')
-for arg in fit_args:
-    print('\t{}: {}'.format(arg, fit_args[arg]))
-gss_sim.fit(**fit_args, update_active=False)
-gss_sim.fit(**fit_args, update_active=True)
-compute_records_gss(gss_sim)
-print('saving model to {}'.format(snakemake.output[0]))
-strip_and_dump(gss_sim, snakemake.output[0], False)
-"""
