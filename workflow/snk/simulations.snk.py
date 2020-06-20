@@ -78,6 +78,8 @@ rule simulate_n_causal_variant_random_effect_size:
         "../../workflow/scripts/sim_n_causal_variants.py"
 
 
+def get_group(wildcards):
+    return wildcards.sim_id[-1]
 
 rule sim_from_model:
     input:
@@ -85,6 +87,7 @@ rule sim_from_model:
         'output/sim/{sim}/model_spec.txt'
     output:
         'output/sim/{sim}/{sim_id}/{sim_id}.log',
+    group: get_group
     script:
         '../../workflow/scripts/sim_from_model.py'
 
