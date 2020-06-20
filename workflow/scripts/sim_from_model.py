@@ -180,14 +180,13 @@ sim_data = load_sim_data(spec)
 
 bp = '/'.join(snakemake.output[0].split('/')[:-1])
 for _, ms in model_spec.iterrows():
-    name = row.model_key
+    name = ms.model_key
     save_path = bp + '/' + name
     if not os.path.isfile(save_path):
-        smoothed_data = smooth_betas(sim, **ms.dropna().to_dict())
+        smoothed_data = smooth_betas(sim_data, **ms.dropna().to_dict())
         if ms.model == 'gss':
             fit_gss(smoothed_data, **ms.dropna())
         if ms.model == 'css':
             fit_css(smoothed_data, **ms.dropna())
     else:
         print('{} alread fit'.format(name))
-
