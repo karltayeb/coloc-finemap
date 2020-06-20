@@ -150,7 +150,7 @@ def init_css(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, **kwargs):
         'update_pi': True,
         'ARD_weights': True,
         'update_variance': False,
-        'verbose': False,
+        'verbose': True,
         'max_iter': 50
     }
     name = kwargs['model_key']
