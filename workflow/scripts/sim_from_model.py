@@ -83,7 +83,7 @@ ld_functions = {
     'z3': z3_ld
 }
 
-def smooth_betas(data, ld='sample', epsilon=0.0):
+def smooth_betas(data, ld='sample', epsilon=0.0, **kwargs):
     """
     return a copy of data with smoothed effect sizes
     beta_sooth = SRS(SRS + epsilonS^2)^{-1} beta
