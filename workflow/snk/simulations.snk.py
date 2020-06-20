@@ -96,6 +96,13 @@ rule run_sim_from_model:
         expand('{path}', path=log_files)
 
 
+sim_spec = pd.read_csv('output/sim/n_causal/sim_spec.txt', sep='\t', index_col=0)
+log_files = sim_spec.log_path.values
+log_files = [x[len('/work-zfs/abattle4/karl/cosie_analysis/'):] for x in log_files]
+rule run_sim_n_causal:
+    input:
+        expand('{path}', path=log_files)
+
 rule score_sim:
     input:
         'output/sim/{sim}/sim_spec.txt',
