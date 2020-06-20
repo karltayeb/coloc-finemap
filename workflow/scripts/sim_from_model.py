@@ -185,8 +185,8 @@ for _, ms in model_spec.iterrows():
     if not os.path.isfile(save_path):
         smoothed_data = smooth_betas(sim_data, **ms.dropna().to_dict())
         if ms.model == 'gss':
-            fit_gss(smoothed_data, **ms.dropna())
+            fit_gss(smoothed_data, ms.dropna())
         if ms.model == 'css':
-            fit_css(smoothed_data, **ms.dropna())
+            fit_css(smoothed_data, ms.dropna())
     else:
         print('{} alread fit'.format(name))
