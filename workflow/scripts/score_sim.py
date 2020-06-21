@@ -182,15 +182,17 @@ def score_matched_component_coloc(model, sim, thresh=0.99):
     return r
 
 def score_effect_size_error(model, sim):
-    errors = model.weight_means[:, :, sim.causal_snps].sum(1) - sim.true_effects
+    causal_snp_error = model.expected_effects[:, sim.causal_snps] - sim.true_effects
+    non_causal_error = np.delete(model.expected_effects, sim.causal_snps, axis=1)
+    all_error = np.concatenate([causal_snp_error.flatten(), non_causal_error.flatten()])
     return {
         'score': 'effect_size_error',
-        'mean_error': np.mean(errors),
-        'mean_squared_error': np.mean(errors**2),
-        'active_mean_error': np.mean(errors * (sim.true_effects !=0)),
-        'active_mean_squared_error': np.mean(errors**2 * (sim.true_effects !=0)),
-        'null_mean_error': np.mean(errors * (sim.true_effects ==0)),
-        'null_mean_squared_error': np.mean(errors**2 * (sim.true_effects ==0))
+        'mean_error': np.mean(all_error),
+        'mean_squared_error': np.mean(all_error**2),
+        'causal_effect_error': np.mean(causal_snp_error),
+        'active_mean_squared_error': np.mean(causal_snp_error**2),
+        'null_mean_error': np.mean(non_causal_error),
+        'null_mean_squared_error': np.mean(non_causal_error**2)
     }
 
 score_functions = {
