@@ -26,10 +26,9 @@ import itertools
 
 def get_component_activity(model, active_thresh=0.5, purity_thresh=0.7):
     #component_activity = model.active.max(0) > active_thresh
-    component_activity = 1 - np.exp(np.sum(np.log(1 - model.active + 1e-10), 0))
+    component_activity = (1 - np.exp(np.sum(np.log(1 - model.active + 1e-10), 0))) > 0.5
     component_purity = np.array(
-        [model.records['purity'][k] > purity_thresh 
-         for k in range(model.dims['K'])])
+        [model.records['purity'][k] > purity_thresh for k in range(model.dims['K'])])
     return component_purity & component_activity
 
 def all_credible_snps(model, active_thresh=0.5, purity_thresh=0.7):
@@ -48,8 +47,9 @@ def score_finemapping(model, sim, active_thresh=0.5, purity_thresh=0.7):
     causal_snps = model.snp_ids[sim.causal_snps]
     K = model.dims['K']
     active = get_component_activity(model)
-    cs_with_causal = np.array([np.any(np.isin(causal_snps, credible_sets[k]))
-                            for k in range(K) if active[k]]).sum()
+    cs_with_causal = np.array(
+        [np.any(np.isin(causal_snps, credible_sets[k]))
+         for k in range(K) if active[k]]).sum()
     active_components = active.sum()
     num_causal = causal_snps.size
     snps_in_cs = all_credible_snps(model)
@@ -65,9 +65,11 @@ def score_finemapping(model, sim, active_thresh=0.5, purity_thresh=0.7):
     }
     return row
 
-p_coloc = lambda model, t1, t2: 1 - np.exp(np.sum(np.log(1e-10 + 1 - model.active[t1] * model.active[t2])))
+p_coloc = lambda model, t1, t2: 1 - \
+    np.exp(np.sum(np.log(1e-10 + 1 - model.active[t1] * model.active[t2])))
 p_coloc_in_active = lambda model, active, t1, t2: \
-    1 - np.exp(np.sum(np.log(1e-10 + 1 - model.active[t1, active] * model.active[t2, active])))
+    1 - np.exp(np.sum(np.log(
+        1e-10 + 1 - model.active[t1, active] * model.active[t2, active])))
 
 def score_coloc(model, sim, thresh=0.99):
     """
@@ -125,12 +127,12 @@ def score_causal_component_coloc(model, sim, thresh=0.99):
     causal_snps = model.snp_ids[sim.causal_snps]
     K = model.dims['K']
     active = get_component_activity(model)
-    cs_has_causal = np.array([np.any(np.isin(causal_snps, credible_sets[k]))
-                            for k in range(K)])
+    cs_has_causal = np.array(
+        [np.any(np.isin(causal_snps, credible_sets[k])) for k in range(K)])
     active = active & cs_has_causal
-    model_coloc = np.concatenate([[p_coloc_in_active(model, active, t1, t2)
-                                for t1 in range(t2)]
-                               for t2 in range(model.dims['T'])])
+    model_coloc = np.concatenate(
+        [[p_coloc_in_active(model, active, t1, t2)
+        for t1 in range(t2)] for t2 in range(model.dims['T'])])
     model_coloc = model_coloc > thresh
     return {
         'score': 'coloc_in_causal',
@@ -159,10 +161,10 @@ def score_matched_component_coloc(model, sim, thresh=0.99):
     active = get_component_activity(model)
 
     r = {
-    'true_positive': 0,
-    'true_negative': 0,
-    'false_positive': 0,
-    'false_negative': 0
+        'true_positive': 0,
+        'true_negative': 0,
+        'false_positive': 0,
+        'false_negative': 0
     }
     for i, causal_snp in enumerate(causal_snps):
         # tissues colocalizing with this causal snp
@@ -209,7 +211,7 @@ def score(row):
         [s.update(row_dict) for s in scores]
         return scores
     except Exception:
-         return []
+        return []
 
 make_model_path = lambda x: '{}{}'.format(x.sim_path[:-14], x.model_key)
 
