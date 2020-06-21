@@ -25,7 +25,8 @@ import multiprocessing
 import itertools
 
 def get_component_activity(model, active_thresh=0.5, purity_thresh=0.7):
-    component_activity = model.active.max(0) > active_thresh
+    #component_activity = model.active.max(0) > active_thresh
+    component_activity = 1 - np.exp(np.sum(np.log(1 - model.active + 1e-10), 0))
     component_purity = np.array(
         [model.records['purity'][k] > purity_thresh 
          for k in range(model.dims['K'])])
@@ -76,9 +77,9 @@ def score_coloc(model, sim, thresh=0.99):
     tril = np.tril_indices(model.dims['T'], k=-1)
     true_coloc = (sim.true_effects @ sim.true_effects.T != 0)[tril]
 
-    model_coloc = np.concatenate([[p_coloc(model, t1, t2)
-                                for t1 in range(t2)]
-                               for t2 in range(model.dims['T'])])
+    model_coloc = np.concatenate(
+        [[p_coloc(model, t1, t2) for t1 in range(t2)]
+          for t2 in range(model.dims['T'])])
     model_coloc = model_coloc > thresh
     return {
         'score': 'coloc',
@@ -97,9 +98,9 @@ def score_active_component_coloc(model, sim, thresh=0.99):
     tril = np.tril_indices(model.dims['T'], k=-1)
     true_coloc = (sim.true_effects @ sim.true_effects.T != 0)[tril]
     active = get_component_activity(model)
-    model_coloc = np.concatenate([[p_coloc_in_active(model, active, t1, t2)
-                                for t1 in range(t2)]
-                                for t2 in range(model.dims['T'])])
+    model_coloc = np.concatenate(
+        [[p_coloc_in_active(model, active, t1, t2)
+          for t1 in range(t2)] for t2 in range(model.dims['T'])])
     model_coloc = model_coloc > thresh
     return {
         'score': 'coloc_in_active',
