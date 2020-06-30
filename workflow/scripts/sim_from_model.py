@@ -112,7 +112,7 @@ def fisher_average_ld(R1, R2, w1, w2):
     A = np.tanh(weighted_mean(z1, z2, w1, w2))
     return tril2symm(A)
 
-def data2ld(data, population='GTEx', ld='sample', **kwargs):
+def data2ld(data, population='GTEx', ld='sample', zweight=1.0, **kwargs):
     superpop2samples = pickle.load(open(
         '/work-zfs/abattle4/karl/cosie_analysis/output/superpop2samples_1kG', 'rb'))
     if population == 'GTEx':
@@ -136,9 +136,9 @@ def data2ld(data, population='GTEx', ld='sample', **kwargs):
     if ld == 'sample':
         return R_sample
     elif ld == 'meanz':
-        return average_ld(R_sample, R_z, w_sample, w_z)
+        return average_ld(R_sample, R_z, w_sample, zweight * w_z)
     elif ld == 'fisherz':
-        return fisher_average_ld(R_sample, R_z, w_sample, w_z)
+        return fisher_average_ld(R_sample, R_z, w_sample, zweight* w_z)
     else:
         raise NotImplementedError
 
