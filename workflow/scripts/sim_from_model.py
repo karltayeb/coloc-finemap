@@ -115,19 +115,24 @@ def fisher_average_ld(R1, R2, w1, w2):
 def data2ld(data, population='GTEx', ld='sample', **kwargs):
     superpop2samples = pickle.load(open(
         '/work-zfs/abattle4/karl/cosie_analysis/output/superpop2samples_1kG', 'rb'))
-
     if population == 'GTEx':
         X = data.data.X
-    elif population != '1kG':
-        X = data.data.genotype_1kG.loc[superpop2samples[population]].values
+        R_sample = np.corrcoef(X.T)
+        w_sample = X.shape[0]
+    elif population == '1kG':
+        R_sample = refernce_ld(data)
+        w_sample = data.data.genotype_1kG.shape[0]
+    elif population == 'EUR':
+        R_sample = eur_ld(data)
+        w_sample = superpop2samples['EUR'].size
+    elif population == 'AFR':
+        R_sample = afr_ld(data)
+        w_sample = superpop2samples['AFR'].size
     else:
-        X = data.data.genotype_1kG.values
-    R_sample = np.corrcoef(X.T)
-    w_sample = X.shape[0]
-    
+        raise NotImplementedError
+
     R_z = z_ld(data)
     w_z = data.summary_stats.B.shape[0]
-    
     if ld == 'sample':
         return R_sample
     elif ld == 'meanz':
