@@ -105,22 +105,13 @@ rule run_sim_n_causal:
     input:
         expand('{path}', path=log_files)
 
-
-sim_spec = pd.read_csv('output/sim/large_n_stud/sim_spec.txt', sep='\t', index_col=0)
-log_files = sim_spec.log_path.values
-log_files = [x[len('/work-zfs/abattle4/karl/cosie_analysis/'):] for x in log_files]
-rule run_sim_large_n_study:
-    input:
-        expand('{path}', path=log_files)
-
-
 sim_spec = pd.read_csv('output/sim/z_score_correction/sim_spec.txt', sep='\t', index_col=0)
 log_files = sim_spec.log_path.values
 log_files = [x[len('/work-zfs/abattle4/karl/cosie_analysis/'):] for x in log_files]
 rule run_sim_z_score_correction:
     input:
         expand('{path}', path=log_files)
-        
+
 rule score_sim:
     input:
         'output/sim/{sim}/sim_spec.txt',
