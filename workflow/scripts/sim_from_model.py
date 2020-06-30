@@ -83,7 +83,6 @@ ld_functions = {
     'z3': z3_ld
 }
 
-
 def average_ld(data, ld1, ld2, alpha=None):
     if alpha is None:
         alpha = data.data.X1kG.shape[0] / (data.data.X1kG.shape[0] + data.summary_stats.B.shape[0])
@@ -134,31 +133,6 @@ def data2ld(data, population='GTEx', ld='sample', **kwargs):
     elif ld == 'meanz':
         return average_ld(R_sample, R_z, w_sample, w_z)
     elif ld == 'fisherz':
-        return fisher_average_ld(R_sample, R_z, w_sample, w_z)
-    else:
-        raise NotImplementedError    """
-    take a model spec and get ld matrix
-    """
-    superpop2samples = pickle.load(open(
-        '/work-zfs/abattle4/karl/cosie_analysis/output/superpop2samples_1kG', 'rb'))
-
-    if spec.population == 'GTEx':
-        X = data.data.X
-    elif spec.population != '1kG':
-        X = data.data.genotype_1kG.loc[superpop2samples[spec.population]].values
-    else:
-        X = data.data.genotype_1kG.values
-    R_sample = np.corrcoef(X.T)
-    w_sample = X.shape[0]
-    
-    R_z = z_ld(data)
-    w_z = data.summary_stats.B.shape[0]
-    
-    if spec.ld == 'sample':
-        return R_sample
-    elif spec.ld == 'meanz':
-        return average_ld(R_sample, R_z, w_sample, w_z)
-    elif spec.ld == 'fisherz':
         return fisher_average_ld(R_sample, R_z, w_sample, w_z)
     else:
         raise NotImplementedError
@@ -253,8 +227,8 @@ def fit_css(data, model_spec):
 def init_css2(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, **kwargs):
     # TODO epsilon--- smooth expression?
     init_args = {
-        'LD': ld_functions[ld](sim),
-        'B': data2ld(sim **kwargs),
+        'LD': data2ld(sim, **kwargs),
+        'B': sim.summary_stats.B.values,
         'S': sim.summary_stats.S.values,
         'K': K,
         'snp_ids': sim.summary_stats.B.columns.values,
@@ -276,7 +250,7 @@ def init_css2(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, **kwargs):
     css.name = name
     return css, fit_args
 
-def fit_css2(data, model_spec):
+def fit_css2(data, save_path, model_spec):
     css, fit_args = init_css2(data, **model_spec.to_dict())
     print('fitting model')
     css.fit(**fit_args, update_active=False)
@@ -284,6 +258,7 @@ def fit_css2(data, model_spec):
     compute_records_css(css)
     print('saving model to {}'.format(save_path))
     strip_and_dump(css, save_path)
+
 
 sim_spec = pd.read_csv(snakemake.input[0], sep='\t')
 model_spec = pd.read_csv(snakemake.input[1], sep='\t')
@@ -299,11 +274,11 @@ for _, ms in model_spec.iterrows():
         if ms.model == 'gss':
             fit_gss(smoothed_data, ms.dropna())
         if ms.model == 'css':
-            fit_css2(smoothed_data, ms.dropna())
+            fit_css2(smoothed_data, save_path, ms.dropna())
     else:
         print('{} alread fit'.format(name))
 
-
+"""
 bp = '/'.join(snakemake.output[0].split('/')[:-1])
 for _, ms in model_spec.iterrows():
     name = ms.model_key
@@ -316,3 +291,5 @@ for _, ms in model_spec.iterrows():
             fit_css(smoothed_data, ms.dropna())
     else:
         print('{} alread fit'.format(name))
+"""
+
