@@ -169,7 +169,7 @@ def init_gss(sim, update_variance=False, K=10, pi0=1.0, **kwargs):
         'update_pi': True,
         'ARD_weights': True,
         'update_variance': update_variance,
-        'verbose': True,
+        'verbose': False,
         'max_iter': 50
     }
     name = kwargs['model_key']
@@ -239,7 +239,7 @@ def init_css2(sim, K=10, ld='sample', pi0=1.0, dispersion=1.0, **kwargs):
         'update_pi': True,
         'ARD_weights': True,
         'update_variance': False,
-        'verbose': True,
+        'verbose': False,
         'max_iter': 50
     }
     name = kwargs['model_key']
