@@ -18,7 +18,7 @@ def make_variant2rsid(snps):
     use GTEx variantid 2 rsid map to create a dictionary
     {variant_id: rsid}
     """
-    var2rs = pysam.TabixFile('../../output/GTEx/variantid2rsid.tsv.gz')
+    var2rs = pysam.TabixFile('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/variantid2rsid.tsv.gz')
     pos = np.array([int(snp.split('_')[1]) for snp in snps])
     chromosome = snps[0].split('_')[0]
     records = [[
