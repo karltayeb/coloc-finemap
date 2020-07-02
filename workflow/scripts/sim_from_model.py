@@ -131,6 +131,7 @@ def data2ld(data, population='GTEx', ld='sample', zweight=1.0, **kwargs):
     else:
         raise NotImplementedError
 
+
     R_z = z_ld(data)
     w_z = data.summary_stats.B.shape[0]
     if ld == 'sample':
@@ -138,7 +139,7 @@ def data2ld(data, population='GTEx', ld='sample', zweight=1.0, **kwargs):
     elif ld == 'meanz':
         return average_ld(R_sample, R_z, w_sample, zweight * w_z)
     elif ld == 'fisherz':
-        return fisher_average_ld(R_sample, R_z, w_sample, zweight* w_z)
+        return fisher_average_ld(R_sample, R_z, w_sample, zweight * w_z)
     else:
         raise NotImplementedError
 
