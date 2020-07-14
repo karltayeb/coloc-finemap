@@ -35,3 +35,8 @@ gss_1kG_paths = np.loadtxt('output/requests/1kgenes.k20.pi01.gss.txt', dtype=str
 rule gss_1kG_random_k20_pi01:
 	input:
 		expand('{path}', path=gss_1kG_paths)
+
+cad_known_coloc = np.loadtxt('output/requests/CAD_known_coloc.txt', dtype=str)
+rule cad_known_coloc:
+	input:
+		expand('{path}', path=cad_known_coloc)
