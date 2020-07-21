@@ -183,7 +183,6 @@ rsid2pos = associations.set_index('rsid').loc[:, 'pos'].to_dict()
 all_associations.loc[:, 'pos'] = all_associations.rsid.apply(lambda x: rsid2pos.get(x, np.nan))
 common_variants = np.intersect1d(
     associations.rsid.unique(), gwas.rsid.unique())
-summary_stats = association2summary(all_associations[all_associations.rsid.isin(common_variants)])
 
 summary_stats = association2summary(
     all_associations[all_associations.rsid.isin(common_variants)].drop_duplicates(['rsid', 'tissue']))
