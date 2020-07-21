@@ -17,7 +17,6 @@ import copy
 from collections import namedtuple
 import ast
 
-
 gc = pd.read_csv('../../output/GTEx/gencode.tss.bed', sep='\t', header=None)
 gc.loc[:, 'g'] = gc.iloc[:, 3].apply(lambda x: x.split('.')[0])
 
@@ -35,13 +34,13 @@ def load_cad_gwas(gene, variants=None):
     tss = gc[gc.iloc[:, 3]==gene].iloc[0][1]
     chrom = int(get_chromosome(gene)[3:])
     df = pd.DataFrame(
-        list(map(autocast, x.strip().split('\t')) for x in
+        list(map(cast, x.strip().split('\t')) for x in
              gwas.fetch(chrom, np.clip(tss-1e6, 0, None), tss+1e6)),
         columns=gwas.header[0][1:].strip().split('\t')
     )
     if variants is not None:
         df = df[df.oldID.isin(variants)]
-        
+
     df.rename(columns={
         'Allele1': 'ref',
         'Allele2': 'alt',
@@ -62,12 +61,34 @@ def load_cad_gwas(gene, variants=None):
     return df
 
 
+def get_tss(gene):
+    return gc[gc.iloc[:, 3] == gene].iloc[0][1]
+
+
+def get_var2rsid(gene):
+    var2rsid = pysam.TabixFile('../../output/GTEx/variantid2rsid.tsv.gz')
+    tss = get_tss(GENE)
+    gen = var2rsid.fetch(
+        get_chromosome(GENE), np.clip(tss-1e6, 0, None), tss+1e6)
+    df = pd.DataFrame(
+        list(map(cast, x.strip().split('\t')) for x in gen)
+    )
+    var2rsid = df.set_index(5).loc[:, 6].to_dict()
+    var2rsid.pop('.', None)
+    return var2rsid
+
+
 def load_gtex_associations(gene):
+    """
     ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
         get_chromosome(gene), gene, gene)
     v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(
         get_chromosome(gene), gene, gene)
+    """
+    #v2r = get_var2rsid(gene)
+    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chromosome(gene), gene, gene)
     v2r = json.load(open(v2rp, 'r'))
+    ap = ASSOCIATION_PATH
 
     associations = pd.read_csv(ap, index_col=0)
     associations.loc[:, 'rsid'] = associations.variant_id.apply(lambda x: v2r.get(x, '-'))
@@ -146,16 +167,17 @@ def fit_css(summary_stats, genotype, save_path=None, **kwargs):
         rehydrate_model(css)
     return css
 
-# load gwas and associations
-gene = snakemake.wildcards.gene
-save_path = snakemake.output[0]
+GENE = snakemake.wildcards.gene
+ASSOCIATION_PATH = snakemake.input.associations
+SAVE_PATH = snakemake.output[0]
 
-gwas = load_cad_gwas(gene)
-associations = load_gtex_associations(gene)
-gtex_genotype = load_gtex_genotype(gene)
+# load gwas and associations
+associations = load_gtex_associations(GENE)
+gwas = flip(associations, load_cad_gwas(GENE))
+gtex_genotype = load_gtex_genotype(GENE)
 
 common_columns = np.intersect1d(associations.columns, gwas.columns)
-all_associations= pd.concat([associations.loc[:, common_columns], gwas.loc[:, common_columns]])
+all_associations = pd.concat([associations.loc[:, common_columns], gwas.loc[:, common_columns]])
 
 rsid2pos = associations.set_index('rsid').loc[:, 'pos'].to_dict()
 all_associations.loc[:, 'pos'] = all_associations.rsid.apply(lambda x: rsid2pos.get(x, np.nan))
@@ -165,4 +187,6 @@ summary_stats = association2summary(all_associations[all_associations.rsid.isin(
 
 css = fit_css(
     summary_stats,
-    gtex_genotype.loc[:, common_variants], save_path=save_path, pi0=0.01)
+    gtex_genotype.loc[:, common_variants],
+    save_path=SAVE_PATH, pi0=0.01
+)
