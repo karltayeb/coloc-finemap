@@ -40,3 +40,8 @@ cad_known_coloc = np.loadtxt('output/requests/CAD_known_coloc.txt', dtype=str)
 rule cad_known_coloc:
 	input:
 		expand('{path}', path=cad_known_coloc)
+
+cad_n_egenes = np.loadtxt('output/requests/CAD_intersecting_egene.txt', dtype=str)
+rule cad_n_egenes:
+	input:
+		expand('{path}', path=cad_n_egenes)
