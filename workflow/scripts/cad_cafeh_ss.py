@@ -185,6 +185,9 @@ common_variants = np.intersect1d(
     associations.rsid.unique(), gwas.rsid.unique())
 summary_stats = association2summary(all_associations[all_associations.rsid.isin(common_variants)])
 
+summary_stats = association2summary(
+    all_associations[all_associations.rsid.isin(common_variants)].drop_duplicates(['rsid', 'tissue']))
+
 css = fit_css(
     summary_stats,
     gtex_genotype.loc[:, common_variants],
