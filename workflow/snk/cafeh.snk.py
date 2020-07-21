@@ -259,3 +259,11 @@ rule report_standardized_genotypek20:
     script:
         '../../workflow/scripts/report_genotype.py'
 
+rule fit_cad_gtex_cafeh:
+    input:
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        v2r = 'output/GTEx/{chr}/{gene}/{gene}.associations'
+    output:
+        'output/CAD/{chr}/{gene}/{gene}.cad_gtex.css'
+    script:
+        '../../workflow/scripts/cad_cafeh_ss.py'
