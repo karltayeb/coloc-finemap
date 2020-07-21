@@ -17,7 +17,7 @@ import copy
 from collections import namedtuple
 import ast
 
-gc = pd.read_csv('../../output/GTEx/gencode.tss.bed', sep='\t', header=None)
+gc = pd.read_csv('output/GTEx/gencode.tss.bed', sep='\t', header=None)
 gc.loc[:, 'g'] = gc.iloc[:, 3].apply(lambda x: x.split('.')[0])
 
 sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
@@ -30,7 +30,7 @@ def cast(s):
 
 
 def load_cad_gwas(gene, variants=None):
-    gwas = pysam.TabixFile('../../output/CAD/CAD_META.sorted.txt.gz')
+    gwas = pysam.TabixFile('output/CAD/CAD_META.sorted.txt.gz')
     tss = gc[gc.iloc[:, 3]==gene].iloc[0][1]
     chrom = int(get_chromosome(gene)[3:])
     df = pd.DataFrame(
@@ -66,7 +66,7 @@ def get_tss(gene):
 
 
 def get_var2rsid(gene):
-    var2rsid = pysam.TabixFile('../../output/GTEx/variantid2rsid.tsv.gz')
+    var2rsid = pysam.TabixFile('output/GTEx/variantid2rsid.tsv.gz')
     tss = get_tss(GENE)
     gen = var2rsid.fetch(
         get_chromosome(GENE), np.clip(tss-1e6, 0, None), tss+1e6)
