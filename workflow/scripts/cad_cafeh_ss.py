@@ -145,7 +145,7 @@ def init_css(summary_stats, genotype, K=10, pi0=1.0, dispersion=1.0, name='css',
         'ARD_weights': True,
         'update_variance': False,
         'verbose': True,
-        'max_iter': 50
+        'max_iter': 100
     }
     print('initializing summary stat model')
     css = CSS(**init_args)
