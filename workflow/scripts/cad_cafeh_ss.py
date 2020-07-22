@@ -175,6 +175,7 @@ SAVE_PATH = snakemake.output[0]
 associations = load_gtex_associations(GENE)
 gwas = flip(associations, load_cad_gwas(GENE))
 gtex_genotype = load_gtex_genotype(GENE)
+gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
 
 common_columns = np.intersect1d(associations.columns, gwas.columns)
 all_associations = pd.concat([associations.loc[:, common_columns], gwas.loc[:, common_columns]])
