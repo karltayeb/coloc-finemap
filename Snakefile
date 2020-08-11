@@ -3,7 +3,6 @@ import pickle
 import numpy as np
 import pandas as pd
 import glob
-from coloc.misc import repair_model
 
 configfile: "config/config.yaml"
 
@@ -21,13 +20,6 @@ rule generate_figures:
     input:
         expand(
             "output/GTEx/gene_{gene}/tissue_specific_cov/summary.zscores.png", gene=gtex_genes
-        )
-
-k20_genes = ['/'.join(x.split('/')[:-1]) for x in glob.glob('output/GTEx/chr[2-8]/*/genotype.standardized.k20.model')]
-rule repair_k20_models:
-    input:
-        expand(
-            "{path}/genotype.standardized.k20.repaired.log", path=k20_genes
         )
 
 g_to_gss = pd.read_csv('output/GTEx/g_to_gss.txt').values.flatten()
@@ -55,15 +47,6 @@ rule run_tissue_component_enrichment:
 rule run_tissue_component_enrichment2:
     input:
         expand('output/enrichment/tissue_components/{tissue}.enrichment', tissue=tissues)
-
-rule repair_k20_model:
-    input:
-        '{path}/genotype.standardized.k20.model'
-    output:
-        '{path}/genotype.standardized.k20.repaired.log'
-    run:
-        repair_model(input[0])
-        print('model repaired', file=open(output[0], 'w'))
 
 #run_genes = [x.split('/')[-2] for x in glob.glob('output/GTEx/*/*/genotype.model')]
 run_genes = np.loadtxt('output/GTEx/run_genes.txt', dtype=str)
