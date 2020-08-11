@@ -52,6 +52,7 @@ rule get_gtex_genotype:
         from utils.misc import make_plink_cmd
         import subprocess
         cmd = make_plink_cmd(wildcards.gene, output.genotype[:-4])
+        print(cmd)
         subprocess.run(cmd, shell=True)
 
 rule snpid2rsid:
