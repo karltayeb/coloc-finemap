@@ -194,32 +194,3 @@ rule fit_cad_gtex_cafeh:
         'output/CAD/{chr}/{gene}/{gene}.cad_gtex.css'
     script:
         '../../workflow/scripts/cad_cafeh_ss.py'
-
-
-rule fit_gtex_no_spike_and_slab:
-    input:
-        genotype = rule.get_gtex_genotype.output.genotype,
-        expression = rule.get_gtex_genotype.output.expression,
-        rsid_map = rule.snpid2rsid.rsid_map
-        variants = None,
-    output:
-        "output/{path}/{gene}.k20.pi01.gss"
-    params:
-        k=20,
-        pi0 = 0.01
-    script:
-        "../../workflow/scripts/fit_gss.py"
-
-rule fit_genotype_model_general:
-    input:
-        genotype = rule.get_gtex_genotype.output.genotype,
-        expression = rule.get_gtex_genotype.output.expression,
-        rsid_map = rule.snpid2rsid.rsid_map
-    output:
-        genotype_model = '',
-        gss = ''
-        "output/{path}/genotype.standardized.k40.model"
-    params:
-        k=40
-    script:
-        "../../workflow/scripts/fit_cafeh_genotype.py"
