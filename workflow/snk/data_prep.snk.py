@@ -10,6 +10,7 @@ gencode = pd.read_csv(
 
 tissues = [x.split('.')[0].split('/')[-1] for x in glob.glob(
     '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/*allpairs.txt')]
+
 rule build_indices:
     input:
         expand(
@@ -30,8 +31,7 @@ rule get_gtex_associations:
     script:
         '../../workflow/scripts/get_gtex_associations.py'
 
-
-rule get_gtex_expression2:
+rule get_gtex_expression:
     input:
         expand(
             'output/GTEx/index/{tissue}.association.index', tissue=tissues
@@ -61,10 +61,13 @@ rule snpid2rsid:
         'output/GTEx/{chrom}/{gene}/{gene}.snplist'
     output:
        rsids = 'output/GTEx/{chrom}/{gene}/{gene}.rsids',
-       rsid_map = 'output/GTEx/{chrom}/{gene}/{gene}.snp2rsid.json'
+       rsid_map = 'output/GTEx/{chrom}/{gene}/{gene}.snp2rsid'
     script:
         "../../workflow/scripts/variantid2rsid.py"
 
+
+
+# CHECK IF USING
 rule get_1kG_genotype:
     input:
         'output/GTEx/{chrom}/{gene}/{gene}.rsids',
@@ -93,47 +96,6 @@ rule get_gtex_ld2:
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}'
         '--maf 0.01  --geno 0.1 --r square'
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene} --write-snplist'
-
-# OLD
-rule get_gtex_data2:
-    input:
-        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
-        ld = 'output/GTEx/{chr}/{gene}/{gene}.ld',
-        snps = 'output/GTEx/{chr}/{gene}/{gene}.snplist'
-    output:
-        "output/GTEx/{chr}/{gene}/data"
-    wildcard_constraints:
-        gene = "(?!\/)[^\/]+(?=\/)"
-    script:
-        "../../workflow/scripts/get_gtex_data.py"
-
-# OLD
-rule get_gtex_genotype_data2:
-    input:
-        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
-        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-    output:
-        temp("output/GTEx/{chr}/{gene}/genotype.data")
-    params:
-        standardize = False
-    wildcard_constraints:
-        gene = "(?!\/)[^\/]+(?=\/)"
-    script:
-        "../../workflow/scripts/get_gtex_genotype_model_data.py"
-
-# OLD
-rule get_gtex_standardizied_genotype_data:
-    input:
-        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
-        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-    output:
-        temp("output/GTEx/{chr}/{gene}/genotype.standardized.data")
-    params:
-        standardize = True
-    wildcard_constraints:
-        gene = "(?!\/)[^\/]+(?=\/)"
-    script:
-        "../../workflow/scripts/get_gtex_genotype_model_data.py"
 
 rule build_gene_seek_index:
     output:
