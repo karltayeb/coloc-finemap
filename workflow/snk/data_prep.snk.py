@@ -49,7 +49,7 @@ rule get_gtex_genotype:
         genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw',
         log = 'output/GTEx/{chrom}/{gene}/{gene}.log'
     run:
-        from utils import make_plink_cmd
+        from utils.misc import make_plink_cmd
         import subprocess
         cmd = make_plink_cmd(wildcards.gene, output.genotype[:-4])
         subprocess.run(cmd, shell=True)
