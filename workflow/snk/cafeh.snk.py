@@ -13,7 +13,7 @@ rule fit_genotype_model:
 
         from utils.misc import load_gtex_genotype, load_gtex_expression
         genotype = load_gtex_genotype(wildcards.gene)
-        X = np.nan_to_num(genotye.values - np.nanmean(genotye.values, 0))
+        X = np.nan_to_num(genotype.values - np.nanmean(genotype.values, 0))
         expression = load_gtex_expression(gene)
         Y = expression.values
 
