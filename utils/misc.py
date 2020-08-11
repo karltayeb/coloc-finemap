@@ -41,7 +41,7 @@ def plink_get_genotype(gene, bfile, save_path):
          '--geno', '0.1',
          '--recode', 'A',
          '--keep-allele-order',
-         '--snps-only', '--write-snplist'
+         '--snps-only', '--write-snplist',
          '--out', save_path])
     return cmd
 
