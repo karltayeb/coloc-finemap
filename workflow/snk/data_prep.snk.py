@@ -3,6 +3,7 @@ import json
 import glob
 import pandas as pd
 from collections import defaultdict
+from utils import * 
 
 gencode = pd.read_csv(
     'output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t', index_col=0)
@@ -42,17 +43,16 @@ rule get_gtex_expression2:
 
 rule get_gtex_genotype:
     params:
-        chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
-        from_bp = lambda wildcards: np.maximum(0, gencode.loc[wildcards.gene].tss - 1000000),
-        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
+        chrom = lambda wildcards: get_chromosome(wildcards.gene)
     output:
         snplist = 'output/GTEx/{chrom}/{gene}/{gene}.snplist',
         genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw'
-    shell:
-        'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1'
-        ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene}'
-        ' --write-snplist --recode A --allow-no-sex --keep-allele-order'
+        log = 'output/GTEx/{chrom}/{gene}/{gene}.log'
+    python:
+        from utils import make_plink_cmd
+        import subprocess
+        cmd = make_plink_cmd(wildcards.gene, output.genotype[:-4])
+        subprocess.run(cmd, shell=True)
 
 rule snpid2rsid:
     input:
