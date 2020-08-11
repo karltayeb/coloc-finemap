@@ -1,54 +1,5 @@
-rule fit_summary_model:
-    input:
-        "output/{path}/data"
-    output:
-        "output/{path}/model_summary"
-    script:
-        "../../workflow/scripts/fit_cafeh_summary.py"
+include: 'workflow/snk/data_prep.snk.py'
 
-rule fit_cafeh2:
-    input:
-        "output/{path}/data"
-    output:
-        "output/{path}/cafeh2.model"
-    script:
-        "../../workflow/scripts/fit_cafeh2.py"
-
-rule fit_study_model:
-    input:
-        "output/{path}/data"
-    output:
-        "output/{path}/model_study"
-    script:
-        "../../workflow/scripts/fit_susie_summary.py"
-
-rule fit_genotype_model:
-    input:
-        "output/{path}/genotype_data"
-    output:
-        "output/{path}/model_genotype"
-    script:
-        "../../workflow/scripts/fit_cafeh_genotype.py"
-
-rule fit_genotype_model2:
-    input:
-        "output/{path}/genotype.data"
-    output:
-        "output/{path}/genotype.model"
-    params:
-        k=20
-    script:
-        "../../workflow/scripts/fit_cafeh_genotype.py"
-
-rule fit_genotype_model40:
-    input:
-        "output/{path}/genotype.data"
-    output:
-        "output/{path}/genotype.k40.model"
-    params:
-        k=40
-    script:
-        "../../workflow/scripts/fit_cafeh_genotype.py"
 
 rule fit_gss20:
     input:
@@ -97,7 +48,6 @@ rule fit_genotype_model20:
     script:
         "../../workflow/scripts/fit_cafeh_genotype.py"
 
-
 rule fit_standardized_genotype_model20:
     input:
         "output/{path}/genotype.standardized.data"
@@ -117,40 +67,6 @@ rule fit_standardized_genotype_model40:
         k=40
     script:
         "../../workflow/scripts/fit_cafeh_genotype.py"
-
-
-common = pd.read_csv('output/GTEx/gss_css_common.txt', header=None).values.flatten()
-rule run_gss_css_gtex:
-    input:
-        list(common[:100])
-
-rule gss_css_gtex:
-    input:
-        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
-        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-        genotype_1kG = 'output/GTEx/{chr}/{gene}/{gene}.1kG.raw',
-        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
-        snp2rsid = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid.json',
-    output:
-        gss='output/GTEx/{chr}/{gene}/{gene}.gss',
-        css_gtex='output/GTEx/{chr}/{gene}/{gene}.gtex.css',
-        css_1kG='output/GTEx/{chr}/{gene}/{gene}.1kG.css',
-        css_1kG_corrected='output/GTEx/{chr}/{gene}/{gene}.1kG.corrected.css'
-    script:
-        "../../workflow/scripts/gss_css_gtex.py"
-
-
-rule gss_fixed_var:
-    input:
-        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
-        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-        genotype_1kG = 'output/GTEx/{chr}/{gene}/{gene}.1kG.raw',
-        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
-        snp2rsid = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid.json',
-    output:
-        gss='output/GTEx/{chr}/{gene}/{gene}.fixedvar.gss',
-    script:
-        "../../workflow/scripts/gss_fixed_var.py"
 
 rule fit_pairwise_summary_model:
     input:
@@ -172,15 +88,6 @@ rule fit_pairwise_genotype_model:
         "t1_{tissue1}_t2_{tissue2}_model_genotype")
     script:
         "../../workflow/scripts/fit_cafeh_summary.py"
-
-rule make_max_min_variance_table:
-    input:
-        data = 'output/{path}/data',
-        model = 'output/{path}/model_summary'
-    output:
-        'output/{path}/max_min_variance_summary'
-    script:
-        '../../workflow/scripts/make_variance_table.py'
 
 # stat gathering rules
 rule make_tissue_pair_components_table:
@@ -215,15 +122,6 @@ rule make_pairwise_pair_components_table:
     script:
         "../../workflow/scripts/make_pairwise_pair_components_table.py"
 
-rule make_cafeh_plots:
-    input:
-        data_path = 'output/{path}/data',
-        model_path = 'output/{path}/model_summary'
-    output:
-        component_plot_path = report('output/{path}/summary.components.png'),
-        zscore_plot_path = report('output/{path}/summary.zscores.png')
-    script:
-        '../../workflow/scripts/cafeh_plots.py'
 
 rule report_genotype:
     input:
@@ -261,7 +159,7 @@ rule report_standardized_genotypek20:
 
 rule fit_cad_gtex_cafeh:
     input:
-        genotype_gted = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         genotype_1kG = 'output/GTEx/{chr}/{gene}/{gene}.1kG.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.associations'
@@ -269,3 +167,32 @@ rule fit_cad_gtex_cafeh:
         'output/CAD/{chr}/{gene}/{gene}.cad_gtex.css'
     script:
         '../../workflow/scripts/cad_cafeh_ss.py'
+
+
+rule fit_gtex_no_spike_and_slab:
+    input:
+        genotype = rule.get_gtex_genotype.output.genotype,
+        expression = rule.get_gtex_genotype.output.expression,
+        rsid_map = rule.snpid2rsid.rsid_map
+        variants = None,
+    output:
+        "output/{path}/{gene}.k20.pi01.gss"
+    params:
+        k=20,
+        pi0 = 0.01
+    script:
+        "../../workflow/scripts/fit_gss.py"
+
+rule fit_genotype_model_general:
+    input:
+        genotype = rule.get_gtex_genotype.output.genotype,
+        expression = rule.get_gtex_genotype.output.expression,
+        rsid_map = rule.snpid2rsid.rsid_map
+    output:
+        genotype_model = '',
+        gss = ''
+        "output/{path}/genotype.standardized.k40.model"
+    params:
+        k=40
+    script:
+        "../../workflow/scripts/fit_cafeh_genotype.py"
