@@ -67,6 +67,15 @@ rule snpid2rsid:
 
 
 
+
+
+
+
+
+
+
+
+
 # CHECK IF USING
 rule get_1kG_genotype:
     input:
