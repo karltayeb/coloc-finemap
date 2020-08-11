@@ -20,12 +20,12 @@ import numpy as np
 import pandas as pd
 
 def get_chr(gene):
-    gene2chr = json.load(open('data/GTEx/gene2chr', 'r'))
+    gene2chr = json.load(open('output/GTEx/gene2chr', 'r'))
     return gene2chr.get(gene, None)
 
 
 def get_tss(gene):
-    gene2chr = json.load(open('data/GTEx/gene2tss', 'r'))
+    gene2chr = json.load(open('output/GTEx/gene2tss', 'r'))
     return gene2chr.get(gene, None)
 
 
@@ -33,7 +33,7 @@ def make_plink_cmd(gene, save_path):
     tss = get_tss(gene)
     cmd = ' '.join(
         ['plink',
-         '--bfile', 'data/1k_genomes/1kg.{}'.format(get_chr(gene)),
+         '--bfile', '/work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged',
          '--chr', get_chr(gene)[3:],
          '--from-bp', str(np.maximum(tss-1e6, 0)),
          '--to-bp', str(tss+1e6),
