@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import glob
 
-#configfile: "config/config.yaml"
+configfile: "config/config.yaml"
 
 #include: 'workflow/snk/cafeh.snk.py'
 #include: 'workflow/snk/caviar.snk.py'
