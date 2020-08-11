@@ -14,4 +14,4 @@ import glob
 #include: 'workflow/snk/enrichment.snk.py'
 #include: 'workflow/snk/terminal_rules.snk.py'
 
-include: workflow/snk/data_prep.snk.py
+include: 'workflow/snk/data_prep.snk.py'
