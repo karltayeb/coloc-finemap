@@ -1,5 +1,3 @@
-include: 'workflow/snk/data_prep.snk.py'
-
 rule fit_genotype_model:
     input:
         genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw',
