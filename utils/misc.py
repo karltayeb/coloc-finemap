@@ -53,9 +53,9 @@ def load_gtex_genotype(gene, use_rsid=False):
     @param use_rsid: boolean to convert variant id to rsid
     """
     gp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.raw'.format(
-        get_chromosome(gene), gene, gene)
+        get_chr(gene), gene, gene)
     v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid'.format(
-        get_chromosome(gene), gene, gene)
+        get_chr(gene), gene, gene)
     v2r = json.load(open(v2rp, 'r'))
 
     print('loading gtex genotypes...')
