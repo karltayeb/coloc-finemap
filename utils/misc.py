@@ -29,11 +29,11 @@ def get_tss(gene):
     return gene2chr.get(gene, None)
 
 
-def make_plink_cmd(gene, save_path):
+def plink_get_genotype(gene, bfile, save_path):
     tss = get_tss(gene)
     cmd = ' '.join(
         ['plink',
-         '--bfile', '/work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged',
+         '--bfile', bfile,
          '--chr', get_chr(gene)[3:],
          '--from-bp', str(int(np.maximum(tss-1e6, 0))),
          '--to-bp', str(int(tss+1e6)),
@@ -41,7 +41,7 @@ def make_plink_cmd(gene, save_path):
          '--geno', '0.1',
          '--recode', 'A',
          '--keep-allele-order',
-         '--snps-only',
+         '--snps-only', '--write-snplist'
          '--out', save_path])
     return cmd
 
