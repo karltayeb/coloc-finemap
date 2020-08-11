@@ -3,7 +3,7 @@ import json
 import glob
 import pandas as pd
 from collections import defaultdict
-from utils import * 
+from utils.misc import * 
 
 gencode = pd.read_csv(
     'output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t', index_col=0)
@@ -43,7 +43,7 @@ rule get_gtex_expression2:
 
 rule get_gtex_genotype:
     params:
-        chrom = lambda wildcards: get_chromosome(wildcards.gene)
+        chrom = lambda wildcards: get_chr(wildcards.gene)
     output:
         snplist = 'output/GTEx/{chrom}/{gene}/{gene}.snplist',
         genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw',
