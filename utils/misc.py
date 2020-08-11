@@ -46,28 +46,43 @@ def plink_get_genotype(gene, bfile, save_path):
     return cmd
 
 
-def load_genotype(gene, subset=None):
-    if not os.path.isdir('.tmp/1k_genomes'):
-        os.makedirs('.tmp/1k_genomes')
-    genotype_path = '.tmp/1k_genomes/{}.raw'.format(gene)
-    if not os.path.isfile(genotype_path):
-        print('getting genotype')
-        subprocess.run(make_plink_cmd(gene, genotype_path[:-4]), shell=True)
-    genotype = pd.read_csv(genotype_path, sep=' ').set_index('IID').iloc[:, 5:]
-    gentoype = genotype.rename(columns={x: x.split('_')[0] for x in genotype.columns})
+def load_gtex_genotype(gene, use_rsid=False):
+    """
+    load gtex genotype for variants in 1Mb window of gene tss
+    @param gene: ensemble gene id
+    @param use_rsid: boolean to convert variant id to rsid
+    """
+    gp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.raw'.format(
+        get_chromosome(gene), gene, gene)
+    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid'.format(
+        get_chromosome(gene), gene, gene)
+    v2r = json.load(open(v2rp, 'r'))
 
-    if subset is not None:
-        snp_subset = np.random.choice(genotype.shape[1], subset, replace=False)
-        genotype = genotype.iloc[:, snp_subset]
+    print('loading gtex genotypes...')
+    genotype = pd.read_csv(gp, sep=' ')
+    genotype = genotype.set_index('IID').iloc[:, 5:]
 
-    # clean up
-    subprocess.run('rm {}*'.format(genotype_path[:-4]), shell=True)
+    # recode genotypes
+    coded_snp_ids = np.array([x.strip() for x in genotype.columns])
+    snp_ids = {x: '_'.join(x.strip().split('_')[:-1]) for x in coded_snp_ids}
+    genotype.rename(columns=snp_ids, inplace=True)
+
+    if use_rsid:
+        genotype.rename(columns=v2r, inplace=True)
     return genotype
 
-def get_chromosome(gene):
-    gc = pd.read_csv('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t')
-    gc.set_index('gene', inplace=True)
-    return gc.loc[gene].chromosome
+
+def load_gtex_expression(gene):
+    """
+    load expression, drop unexpressed individuals
+    """
+    # load expression
+    ep = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.expression'.format(get_chromosome(gene), gene, gene)
+    gene_expression = pd.read_csv(ep, sep='\t', index_col=0)
+    # drop individuals that do not have recorded expression
+    gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
+    return gene_expression
+
 
 def make_snp_format_table(gene):
     ep = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.expression'.format(get_chromosome(gene), gene, gene)
@@ -119,17 +134,6 @@ def load(path):
     model._decompress_model()
     return model
 
-def load_as_cafeh_summary(path):
-    pass
-
-def load_as_cafeh_genotype(path):
-    pass
-
-def load_as_cafeh_summary_simple(path):
-    pass
-
-def load_as_cafeh_genotype_simple(path):
-    pass
 
 def need_to_flip(variant_id):
     _, _, major, minor, _, ref = variant_id.strip().split('_')
@@ -140,32 +144,6 @@ def need_to_flip(variant_id):
 
 
 flip = lambda x: (x-1)*-1 + 1
-
-
-def load_gtex_genotype(gene):
-    gp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.raw'.format(get_chromosome(gene), gene, gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chromosome(gene), gene, gene)
-    v2r = json.load(open(v2rp, 'r'))
-    table = make_snp_format_table(gene)
-
-    # Load GTEx and 1kG genotype
-    # flip genotype encoding to be consistent with GTEx associations
-    print('loading gtex genotypes...')
-
-    genotype = pd.read_csv(gp, sep=' ')
-    genotype = genotype.set_index('IID').iloc[:, 5:]
-
-    # recode genotypes
-    coded_snp_ids = np.array([x.strip() for x in genotype.columns])
-    snp_ids = {x: '_'.join(x.strip().split('_')[:-1]) for x in coded_snp_ids}
-    genotype.rename(columns=snp_ids, inplace=True)
-
-    flip_gtex = table[table.flip_gtex].variant_id.values
-    flip_gtex = np.intersect1d(flip_gtex, genotype.columns)
-    genotype.loc[:, flip_gtex] = genotype.loc[:, flip_gtex].applymap(flip)
-    genotype.rename(columns=v2r, inplace=True)
-    return genotype
-
 
 def load_1kG_genotype(gene):
     gp1kG = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.1kG.raw'.format(get_chromosome(gene), gene, gene)
@@ -224,18 +202,6 @@ def load_genotype(genotype_path, flip=False):
         flips = np.array([need_to_flip(vid) for vid in coded_snp_ids])
         genotype.iloc[:, flips] = genotype.iloc[:, flips].applymap(flip) 
     return genotype, ref
-
-
-def load_gtex_expression(gene):
-    """
-    load expression, drop unexpressed individuals
-    """
-    # load expression
-    ep = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.expression'.format(get_chromosome(gene), gene, gene)
-    gene_expression = pd.read_csv(ep, sep='\t', index_col=0)
-    # drop individuals that do not have recorded expression
-    gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
-    return gene_expression
 
 
 def load_gtex_residual_expression(gene):

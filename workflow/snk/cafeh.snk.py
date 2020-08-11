@@ -1,5 +1,32 @@
 include: 'workflow/snk/data_prep.snk.py'
 
+rule fit_genotype_model:
+    input:
+        genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw',
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression'
+    output:
+        model = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype'
+    params:
+        K = 20,
+        p0k = 1.0
+    run:
+        from coloc.independent_model_ss import CAFEHG
+        from coloc.fitting import forward_fit_procedure
+
+        from utils.misc import load_gtex_genotype, load_gtex_expression
+        genotype = load_gtex_genotype(wildcards.gene)
+        X = np.nan_to_num(genotye.values - np.nanmean(genotye.values, 0))
+        expression = load_gtex_expression(gene)
+        Y = expression.values
+        model = CAFEHG(
+            X=X, Y=Y, K=params.K
+            study_ids=expression.index.values, snp_ids=genotype.columns.values, sample_ids=genotype.index.values)
+        model.prior_activity = np.ones(params.K) * params.p0k
+        forward_fit_procedure(model)
+        model.save(output.model)
+
+
+
 
 rule fit_gss20:
     input:
