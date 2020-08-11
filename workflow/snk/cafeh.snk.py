@@ -19,7 +19,7 @@ rule fit_genotype_model:
         expression = load_gtex_expression(gene)
         Y = expression.values
         model = CAFEHG(
-            X=X, Y=Y, K=params.K
+            X=X, Y=Y, K=params.K,
             study_ids=expression.index.values, snp_ids=genotype.columns.values, sample_ids=genotype.index.values)
         model.prior_activity = np.ones(params.K) * params.p0k
         forward_fit_procedure(model)
