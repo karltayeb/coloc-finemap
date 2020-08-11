@@ -16,7 +16,6 @@ rule fit_genotype_model:
         X = np.nan_to_num(genotype.values - np.nanmean(genotype.values, 0))
         expression = load_gtex_expression(wildcards.gene)
         Y = expression.values
-
         print(X.shape, Y.shape)
         model = CAFEHG(
             X=X, Y=Y, K=params.K,
