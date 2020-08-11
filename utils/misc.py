@@ -77,7 +77,7 @@ def load_gtex_expression(gene):
     load expression, drop unexpressed individuals
     """
     # load expression
-    ep = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.expression'.format(get_chromosome(gene), gene, gene)
+    ep = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.expression'.format(get_chr(gene), gene, gene)
     gene_expression = pd.read_csv(ep, sep='\t', index_col=0)
     # drop individuals that do not have recorded expression
     gene_expression = gene_expression.loc[:, ~np.all(np.isnan(gene_expression), 0)]
