@@ -51,7 +51,7 @@ rule get_gtex_genotype:
     run:
         from utils.misc import plink_get_genotype
         import subprocess
-        gtex_bfile = '/work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
+        gtex_bfile = '/work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
         cmd = plink_get_genotype(wildcards.gene, gtex_bfile, output.genotype[:-4])
         print(cmd)
         subprocess.run(cmd, shell=True)
