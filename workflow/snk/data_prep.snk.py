@@ -49,9 +49,9 @@ rule get_gtex_genotype:
         genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw',
         log = 'output/GTEx/{chrom}/{gene}/{gene}.log'
     run:
-        from utils.misc import make_plink_cmd
+        from utils.misc import plink_get_genotype
         import subprocess
-        cmd = make_plink_cmd(wildcards.gene, config['gtex_bfile'], output.genotype[:-4])
+        cmd = plink_get_genotype(wildcards.gene, config.gtex_bfile, output.genotype[:-4])
         print(cmd)output/GTEx/chr1/ENSG00000014914.20/ENSG00000014914.20.raw
         subprocess.run(cmd, shell=True)
 
