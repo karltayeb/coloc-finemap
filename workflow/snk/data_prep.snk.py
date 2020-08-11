@@ -29,36 +29,6 @@ rule get_gtex_associations:
     script:
         '../../workflow/scripts/get_gtex_associations.py'
 
-rule get_gtex_ld:
-    input:
-        associations = 'output/GTEx/gene_{gene}/{gene}.associations'
-    params:
-        chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
-        from_bp = lambda wildcards: gencode.loc[wildcards.gene].tss - 500000,
-        to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 500000
-    output:
-        'output/GTEx/gene_{gene}/{gene}.ld',
-        'output/GTEx/gene_{gene}/{gene}.snplist',
-        'output/GTEx/gene_{gene}/{gene}.raw'
-    shell:
-        'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01 --r square'
-        ' --out output/GTEx/gene_{wildcards.gene}/{wildcards.gene} --write-snplist --recodeA'
-
-#####
-# GATHER DATA
-#####
-rule get_gtex_associations2:
-    input:
-        expand(
-            'output/GTEx/index/{tissue}.association.index', tissue=tissues
-        )
-    output:
-        'output/GTEx/{chr}/{gene}/{gene}.zscores',
-        'output/GTEx/{chr}/{gene}/{gene}.betas',
-        'output/GTEx/{chr}/{gene}/{gene}.standard_errors'
-    script:
-        '../../workflow/scripts/get_gtex_associations.py'
 
 rule get_gtex_expression2:
     input:
@@ -70,14 +40,14 @@ rule get_gtex_expression2:
     script:
         '../../workflow/scripts/get_gtex_expression.py'
 
-rule get_gtex_genotype2:
+rule get_gtex_genotype:
     params:
         chrom = lambda wildcards: gencode.loc[wildcards.gene].chromosome,
         from_bp = lambda wildcards: np.maximum(0, gencode.loc[wildcards.gene].tss - 1000000),
         to_bp = lambda wildcards: gencode.loc[wildcards.gene].tss + 1000000
     output:
-        'output/GTEx/{chrom}/{gene}/{gene}.snplist',
-        'output/GTEx/{chrom}/{gene}/{gene}.raw'
+        snplist = 'output/GTEx/{chrom}/{gene}/{gene}.snplist',
+        genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw'
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
         ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1'
@@ -88,8 +58,8 @@ rule snpid2rsid:
     input:
         'output/GTEx/{chrom}/{gene}/{gene}.snplist'
     output:
-        'output/GTEx/{chrom}/{gene}/{gene}.rsids',
-        'output/GTEx/{chrom}/{gene}/{gene}.snp2rsid.json'
+       rsids = 'output/GTEx/{chrom}/{gene}/{gene}.rsids',
+       rsid_map = 'output/GTEx/{chrom}/{gene}/{gene}.snp2rsid.json'
     script:
         "../../workflow/scripts/variantid2rsid.py"
 
@@ -118,9 +88,11 @@ rule get_gtex_ld2:
         'output/GTEx/{chrom}/{gene}/{gene}.ld'
     shell:
         'plink --bfile /work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}  --maf 0.01  --geno 0.1 --r square'
+        ' --chr {params.chrom} --from-bp {params.from_bp} --to-bp {params.to_bp}'
+        '--maf 0.01  --geno 0.1 --r square'
         ' --out output/GTEx/{wildcards.chrom}/{wildcards.gene}/{wildcards.gene} --write-snplist'
 
+# OLD
 rule get_gtex_data2:
     input:
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
@@ -133,6 +105,7 @@ rule get_gtex_data2:
     script:
         "../../workflow/scripts/get_gtex_data.py"
 
+# OLD
 rule get_gtex_genotype_data2:
     input:
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
@@ -146,6 +119,7 @@ rule get_gtex_genotype_data2:
     script:
         "../../workflow/scripts/get_gtex_genotype_model_data.py"
 
+# OLD
 rule get_gtex_standardizied_genotype_data:
     input:
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
