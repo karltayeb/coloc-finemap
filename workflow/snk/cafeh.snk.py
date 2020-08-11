@@ -8,14 +8,16 @@ rule fit_genotype_model:
         K = 20,
         p0k = 1.0
     run:
-        from coloc.independent_model_ss import CAFEHG
-        from coloc.fitting import forward_fit_procedure
+        from cafeh.independent_model_ss import CAFEHG
+        from cafeh.fitting import forward_fit_procedure
 
         from utils.misc import load_gtex_genotype, load_gtex_expression
         genotype = load_gtex_genotype(wildcards.gene)
         X = np.nan_to_num(genotye.values - np.nanmean(genotye.values, 0))
         expression = load_gtex_expression(gene)
         Y = expression.values
+
+        print(X.shape, Y.shape)
         model = CAFEHG(
             X=X, Y=Y, K=params.K,
             study_ids=expression.index.values, snp_ids=genotype.columns.values, sample_ids=genotype.index.values)
