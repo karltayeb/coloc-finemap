@@ -51,7 +51,7 @@ rule get_gtex_genotype:
     run:
         from utils.misc import plink_get_genotype
         import subprocess
-        cmd = plink_get_genotype(wildcards.gene, config['gtex_bfile'], output.genotype[:-4])
+        cmd = plink_get_genotype(wildcards.gene, config.gtex_bfile, output.genotype[:-4])
         print(cmd)output/GTEx/chr1/ENSG00000014914.20/ENSG00000014914.20.raw
         subprocess.run(cmd, shell=True)
 
