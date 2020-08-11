@@ -41,7 +41,7 @@ def make_plink_cmd(gene, save_path):
          '--geno', '0.1',
          '--recode', 'A',
          '--keep-allele-order',
-         '--snps-only', '--snplist',
+         '--snps-only',
          '--out', save_path])
     return cmd
 
