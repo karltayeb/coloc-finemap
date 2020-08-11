@@ -1,6 +1,6 @@
 rule fit_genotype_model:
     input:
-        genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw',
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         expression = 'output/GTEx/{chr}/{gene}/{gene}.expression'
     output:
         model = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype'
