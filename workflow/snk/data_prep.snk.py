@@ -46,7 +46,7 @@ rule get_gtex_genotype:
         chrom = lambda wildcards: get_chromosome(wildcards.gene)
     output:
         snplist = 'output/GTEx/{chrom}/{gene}/{gene}.snplist',
-        genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw'
+        genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw',
         log = 'output/GTEx/{chrom}/{gene}/{gene}.log'
     run:
         from utils import make_plink_cmd
