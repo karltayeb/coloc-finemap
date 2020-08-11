@@ -1,7 +1,7 @@
 rule fit_genotype_model:
     input:
         genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression'
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
         snp2rsid = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
         model = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype'
