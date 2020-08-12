@@ -5,9 +5,11 @@ import pandas as pd
 from collections import defaultdict
 
 GTEx_genotype_model = pd.read_csv('output/requests/GTEx_cafeh_genotype.txt', header=None).iloc[:, 0].values
-rule gtex_cafeh_genotype:
-	input:
+rule fit_gtex_cafeh_genotype:
+    input:
         expand('{path}', path=GTEx_genotype_model)
+
+
 """
 BOGgenes = pd.read_csv(
     'output/GTEx/BOGgenes.txt', sep='\t', index_col=None)
