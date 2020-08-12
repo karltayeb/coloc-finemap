@@ -8,6 +8,7 @@ rule fit_genotype_model:
     params:
         K = 20,
         p0k = 1.0
+        tolerance = 1e-3
     run:
         from cafeh.independent_model_ss import CAFEHG
         from cafeh.fitting import forward_fit_procedure
@@ -24,6 +25,7 @@ rule fit_genotype_model:
             X=X, Y=Y, K=params.K, covariates=covariates,
             study_ids=expression.index.values, snp_ids=genotype.columns.values, sample_ids=genotype.index.values)
         model.prior_activity = np.ones(params.K) * params.p0k
+        model.tolerance = params.tolerance
         forward_fit_procedure(model, verbose=True, update_covariate_weights=True)
         model.save(output.model)
 
