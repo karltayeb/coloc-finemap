@@ -33,7 +33,106 @@ rule fit_genotype_model:
             study_ids=study_ids, snp_ids=snp_ids, sample_ids=sample_ids)
         model.prior_activity = np.ones(params.K) * params.p0k
         model.tolerance = params.tolerance
-        forward_fit_procedure(model, verbose=True, update_covariate_weights=True, update_active=False)
+
+        # set weight_var reasonably
+        model.fit(
+            max_iter=1,
+            verbose=True,
+            update_weights=True,
+            update_pi=True,
+            ARD_weights=False,
+            update_active=False,
+            update_covariate_weights=True,
+            update_variance=False
+        )
+
+        # set tissue_variance to reflect covariates
+        model.fit(
+            max_iter=1,
+            verbose=True,
+            update_weights=False,
+            update_pi=False,
+            ARD_weights=False,
+            update_active=False,
+            update_covariate_weights=True,
+            update_variance=True
+        )
+
+        # fit w/o ARD to get good initialization
+        model.fit(
+            max_iter=20,
+            verbose=True,
+            update_weights=True,
+            update_pi=True,
+            ARD_weights=False,
+            update_active=False,
+            update_covariate_weights=True,
+            update_variance=False
+        )
+
+        # fit model
+        model.fit(
+            max_iter=100,
+            verbose=True,
+            update_weights=True,
+            update_pi=True,
+            ARD_weights=True,
+            update_active=False,
+            update_covariate_weights=True,
+            update_variance=True
+        )
+        model.save(output.model)
+
+rule fit_cafeh_genotype_ss:
+    input:
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
+        snp2rsid = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid',
+        model = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype'
+    output:
+        model = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype_ss'
+    params:
+        p0k = 0.1,
+        tolerance = 1e-5
+    group: "g"
+    run:
+        from cafeh.independent_model_ss import CAFEHG
+        from cafeh.fitting import forward_fit_procedure
+        from utils.misc import load_gtex_genotype, load_gtex_expression
+        import pickle
+
+        genotype = load_gtex_genotype(wildcards.gene)
+        expression = load_gtex_expression(wildcards.gene)
+
+        snp_ids = genotype.columns.values
+        sample_ids = np.intersect1d(genotype.index.values, expression.columns.values)
+        study_ids = expression.index.values
+
+        X = np.nan_to_num(genotype.loc[sample_ids].values - np.nanmean(genotype.loc[sample_ids].values, 0)).T
+        Y = expression.loc[:, sample_ids].values
+
+        covariates = pd.read_csv(
+            '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/covariates.csv', sep='\t', index_col=[0, 1])
+        covariates = covariates.loc[study_ids].loc[:, sample_ids]
+
+        model = pickle.load(open(input.model, 'rb'))
+        model._decompress_model()
+        model.X = X
+        model.Y = Y
+        model.covariates = covariates
+        model.prior_activity = np.ones(model.dims['K']) * params.p0k
+        model.tolerance = params.tolerance
+
+        model.fit(
+            max_iter=100,
+            verbose=True,
+            update_weights=True,
+            update_pi=True,
+            ARD_weights=True,
+            update_active=True,
+            update_covariate_weights=True,
+            update_variance=True
+        )
         model.save(output.model)
 
 
