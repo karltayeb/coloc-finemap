@@ -92,7 +92,7 @@ rule fit_cafeh_genotype_ss:
     output:
         model = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype_ss'
     params:
-        params.K = 20,
+        K = 20,
         p0k = 0.1,
         tolerance = 1e-5
     group: "g"
