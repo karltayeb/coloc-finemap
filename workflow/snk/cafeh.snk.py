@@ -9,6 +9,7 @@ rule fit_genotype_model:
         K = 20,
         p0k = 1.0,
         tolerance = 1e-3
+    group: "g"
     run:
         from cafeh.independent_model_ss import CAFEHG
         from cafeh.fitting import forward_fit_procedure
