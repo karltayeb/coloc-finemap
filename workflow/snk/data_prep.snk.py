@@ -48,6 +48,7 @@ rule get_gtex_genotype:
         snplist = 'output/GTEx/{chrom}/{gene}/{gene}.snplist',
         genotype = 'output/GTEx/{chrom}/{gene}/{gene}.raw',
         log = 'output/GTEx/{chrom}/{gene}/{gene}.log'
+    group: "g"
     run:
         from utils.misc import plink_get_genotype
         import subprocess
@@ -62,6 +63,7 @@ rule snpid2rsid:
     output:
        rsids = 'output/GTEx/{chrom}/{gene}/{gene}.rsids',
        rsid_map = 'output/GTEx/{chrom}/{gene}/{gene}.snp2rsid'
+    group: "g"
     script:
         "../../workflow/scripts/variantid2rsid.py"
 
