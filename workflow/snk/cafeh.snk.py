@@ -118,13 +118,16 @@ rule fit_cafeh_genotype_ss:
             X=X, Y=Y, K=params.K, covariates=covariates,
             study_ids=study_ids, snp_ids=snp_ids, sample_ids=sample_ids)
 
+        # initialize model with cafeh_genotype model params
         init_model = pickle.load(open(input.model, 'rb'))
         init_model._decompress_model()
+        init_model.__dict__.pop('precompute')
         model.__dict__.update(init_model.__dict__)
 
         model.prior_activity = np.ones(model.dims['K']) * params.p0k
         model.tolerance = params.tolerance
 
+        # fit with spike and slab
         model.fit(
             max_iter=100,
             verbose=True,
