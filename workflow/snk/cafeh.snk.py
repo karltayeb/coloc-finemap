@@ -23,7 +23,7 @@ rule fit_genotype_model:
         study_ids = expression.index.values
 
         X = np.nan_to_num(genotype.loc[sample_ids].values - np.nanmean(genotype.loc[sample_ids].values, 0)).T
-        Y = expression.loc[:, sample_ids].value
+        Y = expression.loc[:, sample_ids].values
 
         covariates = pd.read_csv(
             '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/covariates.csv', sep='\t', index_col=[0, 1])
