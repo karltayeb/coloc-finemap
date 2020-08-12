@@ -9,7 +9,10 @@ rule fit_gtex_cafeh_genotype:
     input:
         expand('{path}', path=GTEx_genotype_model)
 
-
+GTEx_genotype = pd.read_csv('output/requests/GTEx_get_gtex_genotype.txt', header=None).iloc[:, 0].values
+rule get_all_gtex_genotype:
+    input:
+        expand('{path}', path=GTEx_genotype)
 """
 BOGgenes = pd.read_csv(
     'output/GTEx/BOGgenes.txt', sep='\t', index_col=None)
