@@ -7,7 +7,7 @@ rule fit_genotype_model:
         model = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype'
     params:
         K = 20,
-        p0k = 1.0
+        p0k = 1.0,
         tolerance = 1e-3
     run:
         from cafeh.independent_model_ss import CAFEHG
