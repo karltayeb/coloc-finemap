@@ -98,9 +98,8 @@ rule fit_cafeh_genotype_ss:
     run:
         from cafeh.independent_model_ss import CAFEHG
         from cafeh.fitting import forward_fit_procedure
-        from utils.misc import load_gtex_genotype, load_gtex_expression
-        import pickle
 
+        from utils.misc import load_gtex_genotype, load_gtex_expression
         genotype = load_gtex_genotype(wildcards.gene)
         expression = load_gtex_expression(wildcards.gene)
 
@@ -114,12 +113,14 @@ rule fit_cafeh_genotype_ss:
         covariates = pd.read_csv(
             '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/covariates.csv', sep='\t', index_col=[0, 1])
         covariates = covariates.loc[study_ids].loc[:, sample_ids]
+        model = CAFEHG(
+            X=X, Y=Y, K=params.K, covariates=covariates,
+            study_ids=study_ids, snp_ids=snp_ids, sample_ids=sample_ids)
 
-        model = pickle.load(open(input.model, 'rb'))
-        model._decompress_model()
-        model.X = X
-        model.Y = Y
-        model.covariates = covariates
+        init_model = pickle.load(open(input.model, 'rb'))
+        init_model._decompress_model()
+        model.__dict__.update(init_model.__dict__)
+
         model.prior_activity = np.ones(model.dims['K']) * params.p0k
         model.tolerance = params.tolerance
 
