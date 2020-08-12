@@ -19,7 +19,7 @@ rule fit_genotype_model:
         expression = load_gtex_expression(wildcards.gene)
 
         snp_ids = genotype.columns.values
-        sample_ids = np.intersect_1d(genotype.index.values, expression.columns.values)
+        sample_ids = np.intersect1d(genotype.index.values, expression.columns.values)
         study_ids = expression.index.values
 
         X = np.nan_to_num(genotype.loc[sample_ids].values - np.nanmean(genotype.loc[sample_ids].values, 0)).T
