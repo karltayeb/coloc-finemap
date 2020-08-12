@@ -93,8 +93,8 @@ rule fit_cafeh_genotype_ss:
         model = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype_ss'
     params:
         K = 20,
-        p0k = 1.0,
-        tolerance = 1e-4
+        p0k = 0.1,
+        tolerance = 1e-5
     group: "g"
     run:
         from cafeh.independent_model_ss import CAFEHG
