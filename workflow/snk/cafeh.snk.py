@@ -16,15 +16,21 @@ rule fit_genotype_model:
 
         from utils.misc import load_gtex_genotype, load_gtex_expression
         genotype = load_gtex_genotype(wildcards.gene)
-        X = np.nan_to_num(genotype.values - np.nanmean(genotype.values, 0)).T
         expression = load_gtex_expression(wildcards.gene)
-        Y = expression.values
+
+        snp_ids = genotype.columns.values
+        sample_ids = np.intersect_1d(genotype.index.values, expression.columns.values)
+        study_ids = expression.index.values
+
+        X = np.nan_to_num(genotype.loc[sample_ids].values - np.nanmean(genotype.loc[sample_ids].values, 0)).T
+        Y = expression.loc[:, sample_ids].value
+
         covariates = pd.read_csv(
             '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/covariates.csv', sep='\t', index_col=[0, 1])
-        covariates = covariates.loc[expression.index.values].loc[:, genotype.index.values]
+        covariates = covariates.loc[study_ids].loc[:, sample_ids]
         model = CAFEHG(
             X=X, Y=Y, K=params.K, covariates=covariates,
-            study_ids=expression.index.values, snp_ids=genotype.columns.values, sample_ids=genotype.index.values)
+            study_ids=study_ids, snp_ids=snp_ids, sample_ids=sample_ids)
         model.prior_activity = np.ones(params.K) * params.p0k
         model.tolerance = params.tolerance
         forward_fit_procedure(model, verbose=True, update_covariate_weights=True)
