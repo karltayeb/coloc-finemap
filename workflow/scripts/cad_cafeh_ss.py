@@ -122,23 +122,6 @@ gwas_variants = z.columns[~z.loc['CAD'].isna()].values
 fully_observed_idx = (~np.any(z.isna(), 0)).values
 fully_observed_variants = z.columns[fully_observed_idx].values
 
-# compute LD
-LD = np.corrcoef(np.nan_to_num(
-    gtex_genotype.loc[:, common_variants].values
-    - gtex_genotype.loc[:, common_variants].mean(0).values[None]), rowvar=False)
-LD_oo = LD[fully_observed_idx][:, fully_observed_idx]
-LD_uo = LD[~fully_observed_idx][:, fully_observed_idx]
-
-A = np.linalg.solve(LD_oo + np.eye(fully_observed_idx.sum()) * 0.01, LD_uo.T)
-
-# impute z-scores within cis-window
-_z_imp = pd.DataFrame(
-    z.loc[:, fully_observed_idx].values @ A,
-    index=z.index, columns=z.columns[~fully_observed_idx])
-z_imp = z.copy()
-z_imp.loc[:, _z_imp.columns] = _z_imp
-
-
 
 #############################
 # fit fully observed model  #
@@ -160,17 +143,34 @@ init_args = {
 }
 css = CSS(**init_args)
 css.prior_activity = np.ones(K) * 0.1
+print('fit model with fully observed variants')
 weight_ard_active_fit_procedure(css, verbose=True, max_iter=50)
-css.save(SAVE_PATH)
+css.save(snakemake.output[0])
 
 #######################
 #  fit imputed model  #
 #######################
 
+# compute LD
+LD = np.corrcoef(np.nan_to_num(
+    gtex_genotype.loc[:, common_variants].values
+    - gtex_genotype.loc[:, common_variants].mean(0).values[None]), rowvar=False)
+LD_oo = LD[fully_observed_idx][:, fully_observed_idx]
+LD_uo = LD[~fully_observed_idx][:, fully_observed_idx]
+
+A = np.linalg.solve(LD_oo + np.eye(fully_observed_idx.sum()) * 0.01, LD_uo.T)
+
+# impute z-scores within cis-window
+_z_imp = pd.DataFrame(
+    z.loc[:, fully_observed_idx].values @ A,
+    index=z.index, columns=z.columns[~fully_observed_idx])
+z_imp = z.copy()
+z_imp.loc[:, _z_imp.columns] = _z_imp
+
 variants = gwas_variants
-studies = z.index.values
-B = z.loc[:, variants].values
-S = zS.loc[:, variants].values
+studies = z_imp.index.values
+B = z_imp.loc[:, variants].values
+S = zS.loc[:, variants].fillna(1.0).values
 K = 20
 
 init_args = {
@@ -184,6 +184,6 @@ init_args = {
 }
 css = CSS(**init_args)
 css.prior_activity = np.ones(K) * 0.1
+print('fit model with imputed z-score')
 weight_ard_active_fit_procedure(css, verbose=True, max_iter=50)
-css.save(SAVE_PATH)
-
+css.save(snakemake.output[1])
