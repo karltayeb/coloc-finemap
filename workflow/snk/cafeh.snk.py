@@ -304,6 +304,7 @@ rule fit_cad_gtex_cafeh:
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.associations'
     output:
-        'output/CAD/{chr}/{gene}/{gene}.cad_gtex.css'
+        z_model='output/CAD/{chr}/{gene}/{gene}.cad_gtex_z.css',
+        z_imp_model='output/CAD/{chr}/{gene}/{gene}.cad_gtex_z_imputed.css'
     script:
         '../../workflow/scripts/cad_cafeh_ss.py'
