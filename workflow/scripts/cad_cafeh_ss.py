@@ -32,7 +32,7 @@ def cast(s):
 
 
 def load_cad_gwas(gene, variants=None):
-    gwas = pysam.TabixFile('../../output/CAD/CAD_META.sorted.txt.gz')
+    gwas = pysam.TabixFile('output/CAD/CAD_META.sorted.txt.gz')
     tss = gc[gc.iloc[:, 3]==gene].iloc[0][1]
     chrom = int(get_chr(gene)[3:])
     df = pd.DataFrame(
