@@ -8,7 +8,7 @@ from collections import defaultdict
 import json
 from collections import namedtuple
 import ast
-from utils.misc import *
+from ....utils.misc import *
 
 from cafeh.cafeh_ss import CAFEH as CSS
 from cafeh.fitting import weight_ard_active_fit_procedure
