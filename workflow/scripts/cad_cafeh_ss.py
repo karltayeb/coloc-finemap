@@ -8,17 +8,15 @@ from collections import defaultdict
 import json
 from collections import namedtuple
 import ast
-from coloc.misc import *
-from coloc.cafeh_ss import CAFEH as CSS
+from utils.misc import *
+
+from cafeh.cafeh_ss import CAFEH as CSS
 
 import pysam
 import copy
 
 from collections import namedtuple
 import ast
-
-gc = pd.read_csv('output/GTEx/gencode.tss.bed', sep='\t', header=None)
-gc.loc[:, 'g'] = gc.iloc[:, 3].apply(lambda x: x.split('.')[0])
 
 sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
 
@@ -31,8 +29,8 @@ def cast(s):
 
 def load_cad_gwas(gene, variants=None):
     gwas = pysam.TabixFile('output/CAD/CAD_META.sorted.txt.gz')
-    tss = gc[gc.iloc[:, 3]==gene].iloc[0][1]
-    chrom = int(get_chromosome(gene)[3:])
+    tss = get_tss(gene)
+    chrom = int(get_chr(gene)[3:])
     df = pd.DataFrame(
         list(map(cast, x.strip().split('\t')) for x in
              gwas.fetch(chrom, np.clip(tss-1e6, 0, None), tss+1e6)),
@@ -61,46 +59,6 @@ def load_cad_gwas(gene, variants=None):
     return df
 
 
-def get_tss(gene):
-    return gc[gc.iloc[:, 3] == gene].iloc[0][1]
-
-
-def get_var2rsid(gene):
-    var2rsid = pysam.TabixFile('output/GTEx/variantid2rsid.tsv.gz')
-    tss = get_tss(GENE)
-    gen = var2rsid.fetch(
-        get_chromosome(GENE), np.clip(tss-1e6, 0, None), tss+1e6)
-    df = pd.DataFrame(
-        list(map(cast, x.strip().split('\t')) for x in gen)
-    )
-    var2rsid = df.set_index(5).loc[:, 6].to_dict()
-    var2rsid.pop('.', None)
-    return var2rsid
-
-
-def load_gtex_associations(gene):
-    """
-    ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
-        get_chromosome(gene), gene, gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(
-        get_chromosome(gene), gene, gene)
-    """
-    #v2r = get_var2rsid(gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chromosome(gene), gene, gene)
-    v2r = json.load(open(v2rp, 'r'))
-    ap = ASSOCIATION_PATH
-
-    associations = pd.read_csv(ap, index_col=0)
-    associations.loc[:, 'rsid'] = associations.variant_id.apply(lambda x: v2r.get(x, '-'))
-    associations.loc[:, 'pos'] = associations.variant_id.apply(lambda x: int(x.split('_')[1]))
-    associations.loc[:, 'ref'] = associations.variant_id.apply(lambda x: x.split('_')[2])
-    associations.loc[:, 'alt'] = associations.variant_id.apply(lambda x: x.split('_')[3])
-    associations.loc[:, 'sample_size'] = (associations.ma_count / associations.maf / 2)
-    associations.loc[:, 'S'] = np.sqrt(
-        associations.slope**2/associations.sample_size + associations.slope_se**2)
-    return associations
-
-
 def flip(associations, gwas):
     """
     flip gwas asoociations to match GTEx
@@ -120,56 +78,8 @@ def flip(associations, gwas):
     gwas = gwas.reset_index()
     return gwas
 
-
-def association2summary(associations):
-    return SimpleNamespace(**{
-        'B': associations.pivot('tissue', 'rsid', 'slope'),
-        'S': associations.pivot('tissue', 'rsid', 'S')
-    })
-
-
-def init_css(summary_stats, genotype, K=10, pi0=1.0, dispersion=1.0, name='css', **kwargs):
-    # TODO epsilon--- smooth expression?
-    init_args = {
-        'LD': sample_ld(genotype),
-        'B': summary_stats.B.fillna(0).values,
-        'S': summary_stats.S.fillna(100).values,
-        'K': K,
-        'snp_ids': summary_stats.B.columns.values,
-        'tissue_ids': summary_stats.B.index.values,
-        'tolerance': 1e-8
-    }
-    fit_args = {
-        'update_weights': True,
-        'update_pi': True,
-        'ARD_weights': True,
-        'update_variance': False,
-        'verbose': True,
-        'max_iter': 100
-    }
-    print('initializing summary stat model')
-    css = CSS(**init_args)
-    css.prior_activity = np.ones(K) * pi0
-    css.tissue_precision_b = np.ones(css.dims['T']) * dispersion
-    css.name = name
-    return css, fit_args
-
-
-def fit_css(summary_stats, genotype, save_path=None, **kwargs):
-    css, fit_args = init_css(summary_stats, genotype, **kwargs)
-    print('fitting model')
-    css.fit(**fit_args, update_active=False)
-    css.fit(**fit_args, update_active=True)
-    compute_records_css(css)
-    if save_path is not None:
-        print('saving model to {}'.format(save_path))
-        strip_and_dump(css, save_path)
-        rehydrate_model(css)
-    return css
-
 GENE = snakemake.wildcards.gene
 ASSOCIATION_PATH = snakemake.input.associations
-SAVE_PATH = snakemake.output[0]
 
 # load gwas and associations
 associations = load_gtex_associations(GENE)
@@ -182,14 +92,98 @@ all_associations = pd.concat([associations.loc[:, common_columns], gwas.loc[:, c
 
 rsid2pos = associations.set_index('rsid').loc[:, 'pos'].to_dict()
 all_associations.loc[:, 'pos'] = all_associations.rsid.apply(lambda x: rsid2pos.get(x, np.nan))
+
+# filter down to common variants
 common_variants = np.intersect1d(
     associations.rsid.unique(), gwas.rsid.unique())
+common_variants = np.intersect1d(
+    common_variants, gtex_genotype.columns)
+gtex_genotype = gtex_genotype.loc[:, common_variants]
+gtex_genotype = gtex_genotype.loc[:, ~gtex_genotype.columns.duplicated()]
+all_associations = all_associations[all_associations.rsid.isin(common_variants)]
+all_associations = all_associations.drop_duplicates(['rsid', 'tissue'])
+all_associations.loc[:, 'z'] = all_associations.slope / all_associations.slope_se
+all_associations.loc[:, 'zS'] = np.sqrt((all_associations.z**2 / all_associations.sample_size) + 1)
 
-summary_stats = association2summary(
-    all_associations[all_associations.rsid.isin(common_variants)].drop_duplicates(['rsid', 'tissue']))
+# make summary stat tables
+z = all_associations[~associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'z')
+zS = all_associations[~associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'zS')
 
+gwas_variants = z.columns[~z.loc['CAD'].isna()].values
+fully_observed_idx = (~np.any(z.isna(), 0)).values
+fully_observed_variants = z.columns[fully_observed_idx].values
+
+# compute LD
+LD = np.corrcoef(np.nan_to_num(
+    gtex_genotype.loc[:, common_variants].values
+    - gtex_genotype.loc[:, common_variants].mean(0).values[None]), rowvar=False)
+LD_oo = LD[fully_observed_idx][:, fully_observed_idx]
+LD_uo = LD[~fully_observed_idx][:, fully_observed_idx]
+
+A = np.linalg.solve(LD_oo + np.eye(fully_observed_idx.sum()) * 0.01, LD_uo.T)
+
+# impute z-scores within cis-window
+_z_imp = pd.DataFrame(
+    z.loc[:, fully_observed_idx].values @ A,
+    index=z.index, columns=z.columns[~fully_observed_idx])
+z_imp = z.copy()
+z_imp.loc[:, _z_imp.columns] = _z_imp
+
+
+
+#############################
+# fit fully observed model  #
+#############################
+variants = fully_observed_variants
+studies = z.index.values
+B = z.loc[:, variants].values
+S = zS.loc[:, variants].values
+K = 20
+
+init_args = {
+    'LD': sample_ld(gtex_genotype.loc[:, variants]),
+    'B': B,
+    'S': S,
+    'K': K,
+    'snp_ids': variants,
+    'study_ids': studies,
+    'tolerance': 1e-8
+}
+css = CSS(**init_args)
+css.prior_activity = np.ones(K) * 0.1
+weight_ard_active_fit_procedure(css, verbose=False, max_iter=50)
+css.save(SAVE_PATH)
 css = fit_css(
     summary_stats,
     gtex_genotype.loc[:, common_variants],
-    save_path=SAVE_PATH, pi0=0.01
+    save_path=snakemake.output[0], pi0=0.01
+)
+
+#######################
+#  fit imputed model  #
+#######################
+
+variants = gwas_variants
+studies = z.index.values
+B = z.loc[:, variants].values
+S = zS.loc[:, variants].values
+K = 20
+
+init_args = {
+    'LD': sample_ld(gtex_genotype.loc[:, variants]),
+    'B': B,
+    'S': S,
+    'K': K,
+    'snp_ids': variants,
+    'study_ids': studies,
+    'tolerance': 1e-8
+}
+css = CSS(**init_args)
+css.prior_activity = np.ones(K) * 0.1
+weight_ard_active_fit_procedure(css, verbose=False, max_iter=50)
+css.save(SAVE_PATH)
+css = fit_css(
+    summary_stats,
+    gtex_genotype.loc[:, common_variants],
+    save_path=snakemake.output[1], pi0=0.01
 )
