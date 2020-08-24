@@ -60,6 +60,8 @@ def load_cad_gwas(gene, variants=None):
         'study': 'tissue',
         'P-value': 'pval_nominal'
     })
+
+    df.loc[:, 'sample_size'] = 200000
     return df
 
 
