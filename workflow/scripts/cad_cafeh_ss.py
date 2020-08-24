@@ -87,17 +87,22 @@ def flip(associations, gwas):
 GENE = snakemake.wildcards.gene
 ASSOCIATION_PATH = snakemake.input.associations
 
+
 # load gwas and associations
 associations = load_gtex_associations(GENE)
 gwas = flip(associations, load_cad_gwas(GENE))
-gtex_genotype = load_gtex_genotype(GENE)
-gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
+gwas.loc[:, 'sample_size'] = 200000
+
+gtex_genotype = load_gtex_genotype(GENE, use_rsid=True)
+
 
 common_columns = np.intersect1d(associations.columns, gwas.columns)
 all_associations = pd.concat([associations.loc[:, common_columns], gwas.loc[:, common_columns]])
 
 rsid2pos = associations.set_index('rsid').loc[:, 'pos'].to_dict()
 all_associations.loc[:, 'pos'] = all_associations.rsid.apply(lambda x: rsid2pos.get(x, np.nan))
+
+import pdb; pdb.set_trace()
 
 # filter down to common variants
 common_variants = np.intersect1d(
