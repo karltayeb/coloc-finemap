@@ -45,6 +45,11 @@ def plink_get_genotype(gene, bfile, save_path):
          '--out', save_path])
     return cmd
 
+def load_var2rsid(gene):
+    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid'.format(
+        get_chr(gene), gene, gene)
+    v2r = json.load(open(v2rp, 'r'))
+    return v2r
 
 def load_gtex_genotype(gene, use_rsid=False):
     """
@@ -54,9 +59,7 @@ def load_gtex_genotype(gene, use_rsid=False):
     """
     gp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.raw'.format(
         get_chr(gene), gene, gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid'.format(
-        get_chr(gene), gene, gene)
-    v2r = json.load(open(v2rp, 'r'))
+    v2r = load_var2rsid(gene)
 
     print('loading gtex genotypes...')
     genotype = pd.read_csv(gp, sep=' ')
@@ -72,6 +75,30 @@ def load_gtex_genotype(gene, use_rsid=False):
     return genotype
 
 
+def load_gtex_associations(gene):
+    """
+    ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
+        get_chr(gene), gene, gene)
+    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(
+        get_chr(gene), gene, gene)
+    """
+    #v2r = get_var2rsid(gene)
+    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chr(gene), gene, gene)
+    v2r = json.load(open(v2rp, 'r'))
+    ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
+        get_chr(gene), gene, gene)
+
+    associations = pd.read_csv(ap, index_col=0)
+    associations.loc[:, 'rsid'] = associations.variant_id.apply(lambda x: v2r.get(x, '-'))
+    associations.loc[:, 'pos'] = associations.variant_id.apply(lambda x: int(x.split('_')[1]))
+    associations.loc[:, 'ref'] = associations.variant_id.apply(lambda x: x.split('_')[2])
+    associations.loc[:, 'alt'] = associations.variant_id.apply(lambda x: x.split('_')[3])
+    associations.loc[:, 'sample_size'] = (associations.ma_count / associations.maf / 2)
+    associations.loc[:, 'S'] = np.sqrt(
+        associations.slope**2/associations.sample_size + associations.slope_se**2)
+    return associations
+
+
 def load_gtex_expression(gene):
     """
     load expression, drop unexpressed individuals
@@ -85,11 +112,11 @@ def load_gtex_expression(gene):
 
 
 def make_snp_format_table(gene):
-    ep = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.expression'.format(get_chromosome(gene), gene, gene)
-    gp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.raw'.format(get_chromosome(gene), gene, gene)
-    gp1kG = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.1kG.raw'.format(get_chromosome(gene), gene, gene)
-    ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(get_chromosome(gene), gene, gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chromosome(gene), gene, gene)
+    ep = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.expression'.format(get_chr(gene), gene, gene)
+    gp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.raw'.format(get_chr(gene), gene, gene)
+    gp1kG = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.1kG.raw'.format(get_chr(gene), gene, gene)
+    ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(get_chr(gene), gene, gene)
+    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chr(gene), gene, gene)
     v2r = json.load(open(v2rp, 'r'))
 
     with open(gp, 'r') as f:
@@ -118,6 +145,9 @@ def make_snp_format_table(gene):
     return pd.DataFrame(table)
 
 
+
+
+# DEPRECATE
 def get_common_snps(gene):
     table = make_snp_format_table(gene)
     return table[table.has_test & table.in_1kG].rsid.values
@@ -146,8 +176,8 @@ def need_to_flip(variant_id):
 flip = lambda x: (x-1)*-1 + 1
 
 def load_1kG_genotype(gene):
-    gp1kG = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.1kG.raw'.format(get_chromosome(gene), gene, gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chromosome(gene), gene, gene)
+    gp1kG = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.1kG.raw'.format(get_chr(gene), gene, gene)
+    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chr(gene), gene, gene)
     v2r = json.load(open(v2rp, 'r'))
 
     table = make_snp_format_table(gene)
@@ -167,8 +197,8 @@ def load_1kG_genotype(gene):
 
 
 def load_gtex_summary_stats(gene):
-    ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(get_chromosome(gene), gene, gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chromosome(gene), gene, gene)
+    ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(get_chr(gene), gene, gene)
+    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chr(gene), gene, gene)
     v2r = json.load(open(v2rp, 'r'))
 
     associations = pd.read_csv(ap)
