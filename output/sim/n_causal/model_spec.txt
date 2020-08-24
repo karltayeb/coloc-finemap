@@ -8,6 +8,12 @@ K	dispersion	epsilon	ld	model	model_key	pi0	update_variance
 20	1.0	0.0	sample	css	ld-sample_K-20_pi0-0.01_dispersion-1.0_epsilon-0.0_model-css	0.01	
 20	1.0	0.0	sample	css	ld-sample_K-20_pi0-0.1_dispersion-1.0_epsilon-0.0_model-css	0.1	
 20	1.0	0.0	sample	css	ld-sample_K-20_pi0-1.0_dispersion-1.0_epsilon-0.0_model-css	1.0	
+20	1.0	0.0	eur1kG	css	ld-eur1kG_K-20_pi0-0.01_dispersion-1.0_epsilon-0.0_model-css	0.01	
+20	1.0	0.0	eur1kG	css	ld-eur1kG_K-20_pi0-0.1_dispersion-1.0_epsilon-0.0_model-css	0.1	
+20	1.0	0.0	eur1kG	css	ld-eur1kG_K-20_pi0-1.0_dispersion-1.0_epsilon-0.0_model-css	1.0	
+20	1.0	0.0	afr1kG	css	ld-afr1kG_K-20_pi0-0.01_dispersion-1.0_epsilon-0.0_model-css	0.01	
+20	1.0	0.0	afr1kG	css	ld-afr1kG_K-20_pi0-0.1_dispersion-1.0_epsilon-0.0_model-css	0.1	
+20	1.0	0.0	afr1kG	css	ld-afr1kG_K-20_pi0-1.0_dispersion-1.0_epsilon-0.0_model-css	1.0	
 20	1.0	0.0	reference1kG	css	ld-reference1kG_K-20_pi0-0.01_dispersion-1.0_epsilon-0.0_model-css	0.01	
 20	1.0	0.0	reference1kG	css	ld-reference1kG_K-20_pi0-0.1_dispersion-1.0_epsilon-0.0_model-css	0.1	
 20	1.0	0.0	reference1kG	css	ld-reference1kG_K-20_pi0-1.0_dispersion-1.0_epsilon-0.0_model-css	1.0	

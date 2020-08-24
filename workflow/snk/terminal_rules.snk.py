@@ -4,7 +4,7 @@ import glob
 import pandas as pd
 from collections import defaultdict
 
-GTEx_genotype_model = pd.read_csv('output/requests/GTEx_cafeh_genotype_ss.txt', header=None).iloc[:, 0].values
+GTEx_genotype_model = pd.read_csv('output/requests/GTEx_cafeh_genotype_ss_remainder.txt', header=None).iloc[:, 0].values
 rule fit_gtex_cafeh_genotype_ss:
     input:
         expand('{path}', path=GTEx_genotype_model)
