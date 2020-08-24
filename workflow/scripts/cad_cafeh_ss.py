@@ -102,8 +102,6 @@ all_associations = pd.concat([associations.loc[:, common_columns], gwas.loc[:, c
 rsid2pos = associations.set_index('rsid').loc[:, 'pos'].to_dict()
 all_associations.loc[:, 'pos'] = all_associations.rsid.apply(lambda x: rsid2pos.get(x, np.nan))
 
-import pdb; pdb.set_trace()
-
 # filter down to common variants
 common_variants = np.intersect1d(
     associations.rsid.unique(), gwas.rsid.unique())
@@ -162,13 +160,8 @@ init_args = {
 }
 css = CSS(**init_args)
 css.prior_activity = np.ones(K) * 0.1
-weight_ard_active_fit_procedure(css, verbose=False, max_iter=50)
+weight_ard_active_fit_procedure(css, verbose=True, max_iter=50)
 css.save(SAVE_PATH)
-css = fit_css(
-    summary_stats,
-    gtex_genotype.loc[:, common_variants],
-    save_path=snakemake.output[0], pi0=0.01
-)
 
 #######################
 #  fit imputed model  #
@@ -191,10 +184,5 @@ init_args = {
 }
 css = CSS(**init_args)
 css.prior_activity = np.ones(K) * 0.1
-weight_ard_active_fit_procedure(css, verbose=False, max_iter=50)
+weight_ard_active_fit_procedure(css, verbose=True, max_iter=50)
 css.save(SAVE_PATH)
-css = fit_css(
-    summary_stats,
-    gtex_genotype.loc[:, common_variants],
-    save_path=snakemake.output[1], pi0=0.01
-)
