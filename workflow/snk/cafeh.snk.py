@@ -300,7 +300,6 @@ rule report_standardized_genotypek20:
 rule fit_cad_gtex_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-        genotype_1kG = 'output/GTEx/{chr}/{gene}/{gene}.1kG.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.associations'
     output:
