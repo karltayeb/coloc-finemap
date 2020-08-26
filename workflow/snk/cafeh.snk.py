@@ -301,7 +301,7 @@ rule fit_cad_gtex_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
-        v2r = 'output/GTEx/{chr}/{gene}/{gene}.associations'
+        v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
         z_model='output/CAD/{chr}/{gene}/{gene}.cad_gtex_z.css',
         z_imp_model='output/CAD/{chr}/{gene}/{gene}.cad_gtex_z_imputed.css'
