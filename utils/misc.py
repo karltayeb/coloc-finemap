@@ -20,12 +20,12 @@ import numpy as np
 import pandas as pd
 
 def get_chr(gene):
-    gene2chr = json.load(open('output/GTEx/gene2chr', 'r'))
+    gene2chr = json.load(open('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/gene2chr', 'r'))
     return gene2chr.get(gene, None)
 
 
 def get_tss(gene):
-    gene2chr = json.load(open('output/GTEx/gene2tss', 'r'))
+    gene2chr = json.load(open('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/gene2tss', 'r'))
     return gene2chr.get(gene, None)
 
 
