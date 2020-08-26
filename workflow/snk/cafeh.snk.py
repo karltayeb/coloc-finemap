@@ -308,3 +308,15 @@ rule fit_cad_gtex_cafeh:
     script:
         '../../workflow/scripts/cad_cafeh_ss.py'
 
+
+
+rule fit_ukbb_gtex_cafeh:
+    input:
+        genotype_gtex = 'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.raw',
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
+    output:
+        z_model='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css',
+        z_imp_model='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z_imputed.css'
+    script:
+        '../../workflow/scripts/cad_cafeh_ss.py'
