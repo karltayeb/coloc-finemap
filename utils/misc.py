@@ -82,9 +82,7 @@ def load_gtex_associations(gene):
     v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(
         get_chr(gene), gene, gene)
     """
-    #v2r = get_var2rsid(gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chr(gene), gene, gene)
-    v2r = json.load(open(v2rp, 'r'))
+    v2r = load_var2rsid(gene)
     ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
         get_chr(gene), gene, gene)
 
@@ -116,8 +114,8 @@ def make_snp_format_table(gene):
     gp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.raw'.format(get_chr(gene), gene, gene)
     gp1kG = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.1kG.raw'.format(get_chr(gene), gene, gene)
     ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(get_chr(gene), gene, gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chr(gene), gene, gene)
-    v2r = json.load(open(v2rp, 'r'))
+    v2r = load_var2rsid(gene)
+
 
     with open(gp, 'r') as f:
         snps = f.readline().strip().split()[6:]
@@ -177,9 +175,6 @@ flip = lambda x: (x-1)*-1 + 1
 
 def load_1kG_genotype(gene):
     gp1kG = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.1kG.raw'.format(get_chr(gene), gene, gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chr(gene), gene, gene)
-    v2r = json.load(open(v2rp, 'r'))
-
     table = make_snp_format_table(gene)
 
     genotype = pd.read_csv(gp1kG, sep=' ')
@@ -198,8 +193,7 @@ def load_1kG_genotype(gene):
 
 def load_gtex_summary_stats(gene):
     ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(get_chr(gene), gene, gene)
-    v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(get_chr(gene), gene, gene)
-    v2r = json.load(open(v2rp, 'r'))
+    v2r = load_var2rsid(gene)
 
     associations = pd.read_csv(ap)
     associations.loc[:, 'sample_size'] = (associations.ma_count / associations.maf / 2)
