@@ -307,3 +307,4 @@ rule fit_cad_gtex_cafeh:
         z_imp_model='output/CAD/{chr}/{gene}/{gene}.cad_gtex_z_imputed.css'
     script:
         '../../workflow/scripts/cad_cafeh_ss.py'
+

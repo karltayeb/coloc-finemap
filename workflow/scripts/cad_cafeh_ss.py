@@ -144,7 +144,9 @@ init_args = {
 css = CSS(**init_args)
 css.prior_activity = np.ones(K) * 0.1
 print('fit model with fully observed variants')
-weight_ard_active_fit_procedure(css, verbose=True, max_iter=50)
+weight_ard_active_fit_procedure(css, verbose=False, max_iter=50)
+
+print('saving model to {}'.format(snakemake.output[0]))
 css.save(snakemake.output[0])
 
 #######################
@@ -185,5 +187,6 @@ init_args = {
 css = CSS(**init_args)
 css.prior_activity = np.ones(K) * 0.1
 print('fit model with imputed z-score')
-weight_ard_active_fit_procedure(css, verbose=True, max_iter=50)
+weight_ard_active_fit_procedure(css, verbose=False, max_iter=50)
+print('saving model to {}'.format(snakemake.output[1]))
 css.save(snakemake.output[1])
