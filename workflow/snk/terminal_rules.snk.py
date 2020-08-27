@@ -18,6 +18,11 @@ GTEx_genotype = pd.read_csv('output/requests/CAD_intersecting_egene.txt', header
 rule intersect_CAD_gtex_hits:
     input:
         expand('{path}', path=GTEx_genotype)
+
+UKBB_request = pd.read_csv('output/UKBB/individual_phenotype_requests.txt', header=None).iloc[:, 0].values
+rule ukbb_gtex_individual:
+    input:
+        expand('{path}', path=UKBB_request)
 """
 BOGgenes = pd.read_csv(
     'output/GTEx/BOGgenes.txt', sep='\t', index_col=None)
