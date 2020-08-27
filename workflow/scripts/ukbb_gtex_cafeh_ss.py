@@ -44,11 +44,10 @@ def _load_ukbb_chromosome(phenotype, chromosome):
     return df
 
 def load_ukbb_gwas(gene, phenotype, variants=None):
-    gwas = pysam.TabixFile('output/UKBB/sumstats/Phecode4_{}.sumstats.txt.gz'.format(phenotype))
     tss = get_tss(gene)
     chrom = get_chr(gene)[3:]
 
-    df = _load_ukbb_chromosome(gene, chrom)
+    df = _load_ukbb_chromosome(phenotype, chrom)
     df = df[(df.POS > tss-1e6) & (df.pos < tss+1e6)]
     df.rename(columns={
         'REF': 'ref',
