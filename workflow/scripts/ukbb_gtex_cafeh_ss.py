@@ -39,7 +39,7 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
 
     df = pd.DataFrame(
         list(map(cast, x.strip().split('\t')) for x in
-             gwas.fetch(chrom, np.clip(tss-1e6, 0, None), tss+1e6)),
+             gwas.fetch(str(chrom), np.clip(tss-1e6, 0, None), tss+1e6)),
         columns=gwas.header[0][1:].strip().split('\t')
     )
     if variants is not None:
