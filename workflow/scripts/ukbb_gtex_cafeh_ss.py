@@ -167,9 +167,6 @@ print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
 # fit fully observed model  #
 #############################
 """
-print('{} variants in gwas'.format(gwas_variants.size))
-print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
-
 variants = fully_observed_variants
 studies = z.index.values
 B = z.loc[:, variants].values
@@ -198,46 +195,47 @@ css.save(snakemake.output[0])
 #############################
 
 # compute LD
+if snakemake.params.impute:
+    # A = (X.T @ X + eI)^-1
+    print('imputing missing genotype')
+    variants = gwas_variants
+    X = center_mean_impute(gtex_genotype.loc[:, variants]).values
+    X = X / (X.std(0) * np.sqrt(X.shape[0]))
+    LD = X.T @ X
+    LD_oo = LD[fully_observed_idx][:, fully_observed_idx]
+    LD_uo = LD[~fully_observed_idx][:, fully_observed_idx]
 
-# A = (X.T @ X + eI)^-1
-X = center_mean_impute(gtex_genotype.loc[:, fully_observed_variants]).values
-X = X / (X.std(0) * np.sqrt(X.shape[0]))
-m, n = X.shape
-e = 0.1
-Finv = np.eye(m) + 1/e * X @ X.T
-R = sp.linalg.solve_triangular(np.linalg.cholesky(Finv).T, np.eye(m))
-V = X.T @ R / e
-A = np.eye(n)/e - V @ V.T
+    m, n = X.shape
+    e = 0.1
+    Finv = np.eye(m) + 1/e * X @ X.T
+    R = sp.linalg.solve_triangular(np.linalg.cholesky(Finv).T, np.eye(m))
+    V = X.T @ R / e
+    A = np.eye(n)/e - V @ V.T
 
-LD = X.T @ X
-LD_oo = LD[fully_observed_idx][:, fully_observed_idx]
-LD_uo = LD[~fully_observed_idx][:, fully_observed_idx]
+    # impute z-scores within cis-window
+    _z_imp = pd.DataFrame(
+        z.loc[:, fully_observed_idx].values @ A,
+        index=z.index, columns=z.columns[~fully_observed_idx])
+    z_imp = z.copy()
+    z_imp.loc[:, _z_imp.columns] = _z_imp
 
-"""
-LD = np.corrcoef(np.nan_to_num(
-    gtex_genotype.loc[:, common_variants].values
-    - gtex_genotype.loc[:, common_variants].mean(0).values[None]), rowvar=False)
-LD_oo = LD[fully_observed_idx][:, fully_observed_idx]
-LD_uo = LD[~fully_observed_idx][:, fully_observed_idx]
+    # data for model
+    studies = z_imp.index.values
+    B = z_imp.loc[:, variants].values
+    S = zS.loc[:, variants].fillna(1.0).values
 
-A = np.linalg.solve(LD_oo + np.eye(fully_observed_idx.sum()) * 0.01, LD_uo.T)
-"""
+else:
+    variants = fully_observed_variants
+    X = center_mean_impute(gtex_genotype.loc[:, variants]).values
+    X = X / (X.std(0) * np.sqrt(X.shape[0]))
+    LD = X.T @ X
 
-# impute z-scores within cis-window
-_z_imp = pd.DataFrame(
-    z.loc[:, fully_observed_idx].values @ A,
-    index=z.index, columns=z.columns[~fully_observed_idx])
-z_imp = z.copy()
-z_imp.loc[:, _z_imp.columns] = _z_imp
+    variants = fully_observed_variants
+    studies = z.index.values
+    B = z.loc[:, variants].values
+    S = zS.loc[:, variants].values
 
-#######################
-#  fit imputed model  #
-#######################
-variants = gwas_variants
-studies = z_imp.index.values
-B = z_imp.loc[:, variants].values
-S = zS.loc[:, variants].fillna(1.0).values
-K = 20
+K = snakemake.params.K
 
 init_args = {
     'LD': sample_ld(gtex_genotype.loc[:, variants]),
