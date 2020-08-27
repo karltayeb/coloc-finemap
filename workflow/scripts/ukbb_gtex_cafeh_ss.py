@@ -127,8 +127,10 @@ ASSOCIATION_PATH = snakemake.input.associations
 associations = load_gtex_associations(GENE)
 
 if snakemake.wildcards.study == 'UKBB':
+    print('loading UKBB gwas')
     gwas = flip(associations, load_ukbb_gwas(GENE, phenotype))
 if snakemake.wildcards.study == 'GRASP':
+    print('loading GRASP gwas')
     # gwas = flip(associations, load_grasp_gwas(GENE, phenotype))
     gwas = load_grasp_gwas(phenotype)
 
