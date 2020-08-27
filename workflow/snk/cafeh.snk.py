@@ -312,7 +312,7 @@ rule fit_cad_gtex_cafeh:
 
 rule fit_ukbb_gtex_cafeh:
     input:
-        genotype_gtex = 'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.raw',
+        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
