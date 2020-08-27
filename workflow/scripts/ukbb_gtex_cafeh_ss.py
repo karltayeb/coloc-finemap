@@ -160,6 +160,9 @@ gwas_variants = z.columns[~z.loc[phenotype].isna()].values
 fully_observed_idx = (~np.any(z.isna(), 0)).values
 fully_observed_variants = z.columns[fully_observed_idx].values
 
+print('{} variants in gwas'.format(gwas_variants.size))
+print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
+
 #############################
 # fit fully observed model  #
 #############################
