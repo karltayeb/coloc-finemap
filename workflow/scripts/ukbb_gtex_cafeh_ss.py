@@ -124,7 +124,8 @@ associations = load_gtex_associations(GENE)
 if snakemake.wildcards.study == 'UKBB':
     gwas = flip(associations, load_ukbb_gwas(GENE, phenotype))
 if snakemake.wildcards.study == 'GRASP':
-    gwas = flip(associations, load_grasp_gwas(GENE, phenotype))
+    # gwas = flip(associations, load_grasp_gwas(GENE, phenotype))
+    gwas = load_grasp_gwas(phenotype)
 
 gtex_genotype = load_gtex_genotype(GENE, use_rsid=True)
 common_columns = np.intersect1d(associations.columns, gwas.columns)
