@@ -35,8 +35,6 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
     gwas = pysam.TabixFile('output/UKBB/sumstats/Phecode4_{}.sumstats.txt.gz'.format(phenotype))
     tss = get_tss(gene)
     chrom = int(get_chr(gene)[3:])
-    import pdb; pdb.set_trace()
-
     df = pd.DataFrame(
         list(map(cast, x.strip().split('\t')) for x in
              gwas.fetch(str(chrom), np.clip(tss-1e6, 0, None), tss+1e6)),
@@ -154,6 +152,8 @@ gwas_variants = z.columns[~z.loc[phenotype].isna()].values
 fully_observed_idx = (~np.any(z.isna(), 0)).values
 fully_observed_variants = z.columns[fully_observed_idx].values
 
+print('{} variants in gwas'.format(gwas_variants.size))
+print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
 
 #############################
 # fit fully observed model  #
