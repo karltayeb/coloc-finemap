@@ -30,21 +30,26 @@ def cast(s):
     except Exception:
         return s
 
+def _load_ukbb_chromosome(phenotype, chromosome):
+    ukbb_columns = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'ac', 'af', 'num_cases',
+       'num_controls', 'beta', 'sebeta', 'Tstat', 'pval',
+       'pval_SAIGE_NoSPA', 'Is_Converged', 'varT', 'varTstar']
+    path = ('/work-zfs/abattle4/marios/HF_GWAS/'
+            'summary_stats_for_genetic_correlation/Phecode4_{}.sumstats.txt'.format(phenotype))
+    chr2startidx = json.load(open('../../output/UKBB/{}/chr2startidx'.format(phenotype)))
+    start = chr2startidx.get(str(chromosome))
+    nrows = chr2startidx.get(str(chromosome + 1)) - start + 1
+    df = pd.read_csv(path, sep='\t', skiprows=start, nrows=nrows, header=None)
+    df.columns = ukbb_columns
+    return df
 
 def load_ukbb_gwas(gene, phenotype, variants=None):
     gwas = pysam.TabixFile('output/UKBB/sumstats/Phecode4_{}.sumstats.txt.gz'.format(phenotype))
     tss = get_tss(gene)
-    chrom = int(get_chr(gene)[3:])
-    import pdb; pdb.set_trace()
+    chrom = get_chr(gene)[3:]
 
-    df = pd.DataFrame(
-        list(map(cast, x.strip().split('\t')) for x in
-             gwas.fetch(str(chrom), np.clip(tss-1e6, 0, None), tss+1e6)),
-        columns=gwas.header[0][1:].strip().split('\t')
-    )
-    if variants is not None:
-        df = df[df.oldID.isin(variants)]
-
+    df = _load_ukbb_chromosome(gene, chrom)
+    df = df[(df.POS > tss-1e6) & (df.pos < tss+1e6)]
     df.rename(columns={
         'REF': 'ref',
         'ALT': 'alt',
@@ -154,6 +159,8 @@ gwas_variants = z.columns[~z.loc[phenotype].isna()].values
 fully_observed_idx = (~np.any(z.isna(), 0)).values
 fully_observed_variants = z.columns[fully_observed_idx].values
 
+print('{} variants in gwas'.format(gwas_variants.size))
+print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
 
 #############################
 # fit fully observed model  #
