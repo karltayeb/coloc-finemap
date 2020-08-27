@@ -40,6 +40,8 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
              gwas.fetch(chrom, np.clip(tss-1e6, 0, None), tss+1e6)),
         columns=gwas.header[0][1:].strip().split('\t')
     )
+    import pdb; pdb.set_trace()
+
     if variants is not None:
         df = df[df.oldID.isin(variants)]
 
@@ -55,7 +57,6 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
     df['alt'] = df['alt'].str.upper()
     df.loc[:, 'S'] = df['slope_se']  # large sample approximation
 
-    import pdb; pdb.set_trace()
     df.loc[:, 'study'] = phenotype
 
     df=df.rename(columns={
