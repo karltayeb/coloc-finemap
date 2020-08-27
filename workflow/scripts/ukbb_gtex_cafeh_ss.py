@@ -117,7 +117,7 @@ all_associations.loc[:, 'zS'] = np.sqrt((all_associations.z**2 / all_association
 z = all_associations[~associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'z')
 zS = all_associations[~associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'zS')
 
-gwas_variants = z.columns[~z.loc['CAD'].isna()].values
+gwas_variants = z.columns[~z.loc[phenotype].isna()].values
 fully_observed_idx = (~np.any(z.isna(), 0)).values
 fully_observed_variants = z.columns[fully_observed_idx].values
 
