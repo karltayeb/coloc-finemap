@@ -35,13 +35,13 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
     gwas = pysam.TabixFile('output/UKBB/sumstats/Phecode4_{}.sumstats.txt.gz'.format(phenotype))
     tss = get_tss(gene)
     chrom = int(get_chr(gene)[3:])
-    df = pd.DataFrame(
-        list(map(cast, x.strip().split('\t')) for x in
-             gwas.fetch(int(chrom[3:]), np.clip(tss-1e6, 0, None), tss+1e6)),
-        columns=gwas.header[0][1:].strip().split('\t')
-    )
     import pdb; pdb.set_trace()
 
+    df = pd.DataFrame(
+        list(map(cast, x.strip().split('\t')) for x in
+             gwas.fetch(chrom, np.clip(tss-1e6, 0, None), tss+1e6)),
+        columns=gwas.header[0][1:].strip().split('\t')
+    )
     if variants is not None:
         df = df[df.oldID.isin(variants)]
 
