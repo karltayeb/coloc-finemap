@@ -227,7 +227,7 @@ init_args = {
     'K': K,
     'snp_ids': variants,
     'study_ids': studies,
-    'tolerance': 1e-6
+    'tolerance': 1e-8
 }
 css = CSS(**init_args)
 css.prior_activity = np.ones(K) * 0.1
