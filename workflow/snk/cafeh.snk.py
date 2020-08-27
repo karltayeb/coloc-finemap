@@ -319,4 +319,4 @@ rule fit_ukbb_gtex_cafeh:
         z_model='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css',
         z_imp_model='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z_imputed.css'
     script:
-        '../../workflow/scripts/cad_cafeh_ss.py'
+        '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
