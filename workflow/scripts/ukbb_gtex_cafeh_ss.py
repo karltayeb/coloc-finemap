@@ -160,12 +160,13 @@ gwas_variants = z.columns[~z.loc[phenotype].isna()].values
 fully_observed_idx = (~np.any(z.isna(), 0)).values
 fully_observed_variants = z.columns[fully_observed_idx].values
 
-print('{} variants in gwas'.format(gwas_variants.size))
-print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
-
 #############################
 # fit fully observed model  #
 #############################
+"""
+print('{} variants in gwas'.format(gwas_variants.size))
+print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
+
 variants = fully_observed_variants
 studies = z.index.values
 B = z.loc[:, variants].values
@@ -188,10 +189,10 @@ weight_ard_active_fit_procedure(css, verbose=False, max_iter=50)
 
 print('saving model to {}'.format(snakemake.output[0]))
 css.save(snakemake.output[0])
-
-#######################
-#  fit imputed model  #
-#######################
+"""
+#############################
+#  impute zscores for gtex  #
+#############################
 
 # compute LD
 LD = np.corrcoef(np.nan_to_num(
@@ -209,6 +210,10 @@ _z_imp = pd.DataFrame(
 z_imp = z.copy()
 z_imp.loc[:, _z_imp.columns] = _z_imp
 
+#######################
+#  fit imputed model  #
+#######################
+
 variants = gwas_variants
 studies = z_imp.index.values
 B = z_imp.loc[:, variants].values
@@ -222,11 +227,19 @@ init_args = {
     'K': K,
     'snp_ids': variants,
     'study_ids': studies,
-    'tolerance': 1e-8
+    'tolerance': 1e-6
 }
 css = CSS(**init_args)
 css.prior_activity = np.ones(K) * 0.1
+
+# set large variance-- model needs to be able to pick large weights
+# otherwise it will fnd very sparse solution
+css.weight_precision_b = np.ones_like(css.weight_precision_b) * 10
+
+
 print('fit model with imputed z-score')
-weight_ard_active_fit_procedure(css, verbose=False, max_iter=50)
+weight_ard_active_fit_procedure(css, verbose=False, max_iter=10)
+css.fit(update_weight=True, update_pi=True, update_actve=True, update_ARD=True, max_iter=50)
+
 print('saving model to {}'.format(snakemake.output[1]))
 css.save(snakemake.output[1])
