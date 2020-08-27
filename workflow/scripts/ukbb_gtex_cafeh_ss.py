@@ -54,6 +54,8 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
     df['ref'] = df['ref'].str.upper()
     df['alt'] = df['alt'].str.upper()
     df.loc[:, 'S'] = df['slope_se']  # large sample approximation
+
+    import pdb; pdb.set_trace()
     df.loc[:, 'study'] = phenotype
 
     df=df.rename(columns={
