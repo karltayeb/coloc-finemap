@@ -213,7 +213,6 @@ z_imp.loc[:, _z_imp.columns] = _z_imp
 #######################
 #  fit imputed model  #
 #######################
-
 variants = gwas_variants
 studies = z_imp.index.values
 B = z_imp.loc[:, variants].values
@@ -231,14 +230,11 @@ init_args = {
 }
 css = CSS(**init_args)
 css.prior_activity = np.ones(K) * 0.1
-
-# set large variance-- model needs to be able to pick large weights
-# otherwise it will fnd very sparse solution
 css.weight_precision_b = np.ones_like(css.weight_precision_b) * 10
 
 print('fit model with imputed z-score')
-weight_ard_active_fit_procedure(css, verbose=True, max_iter=10)
-fit_all(css, verbose=True, max_iter=20)
+weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
+fit_all(css, max_iter=50, verbose=True)
 
 print('saving model to {}'.format(snakemake.output[0]))
 css.save(snakemake.output[0])
