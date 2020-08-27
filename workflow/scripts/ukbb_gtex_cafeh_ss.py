@@ -36,7 +36,7 @@ def _load_ukbb_chromosome(phenotype, chromosome):
        'pval_SAIGE_NoSPA', 'Is_Converged', 'varT', 'varTstar']
     path = ('/work-zfs/abattle4/marios/HF_GWAS/'
             'summary_stats_for_genetic_correlation/Phecode4_{}.sumstats.txt'.format(phenotype))
-    chr2startidx = json.load(open('../../output/UKBB/{}/chr2startidx'.format(phenotype)))
+    chr2startidx = json.load(open('output/UKBB/{}/chr2startidx'.format(phenotype)))
     start = chr2startidx.get(str(chromosome))
     nrows = chr2startidx.get(str(chromosome + 1)) - start + 1
     df = pd.read_csv(path, sep='\t', skiprows=start, nrows=nrows, header=None)
