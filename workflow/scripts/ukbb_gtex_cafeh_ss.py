@@ -48,7 +48,7 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
     chrom = get_chr(gene)[3:]
 
     df = _load_ukbb_chromosome(phenotype, chrom)
-    df = df[(df.POS > tss-1e6) & (df.pos < tss+1e6)]
+    df = df[(df.POS > tss-1e6) & (df.pos < tss+1e6) & (df.iloc[:, 0] == int(chrom))]
     df.rename(columns={
         'REF': 'ref',
         'ALT': 'alt',
