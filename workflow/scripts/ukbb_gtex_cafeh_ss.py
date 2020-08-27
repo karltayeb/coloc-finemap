@@ -68,6 +68,31 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
     return df
 
 
+def load_grasp_gwas(gene, phenotype):
+    df = pd.read_csv('output/GRASP/{}.txt'.format(phenotype), sep='\t')
+    df.columns = ['chr', 'pos', 'variant_id', 'rsid', 'slope', 'slope_se', 'pval_nominal', 'sample_size']
+
+    tss = get_tss(gene)
+    chrom = int(get_chr(gene)[3:])
+
+    df.loc[:, 'pos'] = df.variant_id.apply(lambda x: int(x.split('_')[1]))
+    df.loc[:, 'ref'] = df.variant_id.apply(lambda x: x.split('_')[2])
+    df.loc[:, 'alt'] = df.variant_id.apply(lambda x: x.split('_')[3])
+    df = df[(df.chr==chrom) & (df.pos > tss-1e6) & (df.pos < tss+1e6)]
+
+    df['ref'] = df['ref'].str.upper()
+    df['alt'] = df['alt'].str.upper()
+    df.loc[:, 'S'] = df['slope_se']  # large sample approximation
+
+    df.loc[:, 'study'] = phenotype
+
+    df=df.rename(columns={
+        'study': 'tissue',
+        'P-value': 'pval_nominal'
+    })
+    return df
+
+
 def flip(associations, gwas):
     """
     flip gwas asoociations to match GTEx
@@ -95,7 +120,11 @@ ASSOCIATION_PATH = snakemake.input.associations
 
 # load gwas and associations
 associations = load_gtex_associations(GENE)
-gwas = flip(associations, load_ukbb_gwas(GENE, phenotype))
+
+if wildcards.study == 'UKBB'
+    gwas = flip(associations, load_ukbb_gwas(GENE, phenotype))
+if wildcards.study == 'GRASP':
+    gwas = flip(associations, load_grasp_gwas(GENE, phenotype))
 
 gtex_genotype = load_gtex_genotype(GENE, use_rsid=True)
 common_columns = np.intersect1d(associations.columns, gwas.columns)
