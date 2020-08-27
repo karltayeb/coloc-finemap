@@ -13,7 +13,7 @@ sys.path.append('/work-zfs/abattle4/karl/cosie_analysis/utils/')
 from misc import *
 
 from cafeh.cafeh_ss import CAFEH as CSS
-from cafeh.fitting import weight_ard_active_fit_procedure
+from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
 
 
 import pysam
@@ -236,10 +236,9 @@ css.prior_activity = np.ones(K) * 0.1
 # otherwise it will fnd very sparse solution
 css.weight_precision_b = np.ones_like(css.weight_precision_b) * 10
 
-
 print('fit model with imputed z-score')
 weight_ard_active_fit_procedure(css, verbose=False, max_iter=10)
-css.fit(update_weight=True, update_pi=True, update_actve=True, update_ARD=True, max_iter=50)
+fit_all(css, verbose=False, max_iter=50)
 
-print('saving model to {}'.format(snakemake.output[1]))
-css.save(snakemake.output[1])
+print('saving model to {}'.format(snakemake.output[0]))
+css.save(snakemake.output[0])

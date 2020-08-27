@@ -316,7 +316,6 @@ rule fit_gwas_gtex_cafeh:
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
-        z_model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css',
         z_imp_model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z_imputed.css'
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
