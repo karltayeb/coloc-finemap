@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import scipy as sp
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -164,37 +165,9 @@ print('{} variants in gwas'.format(gwas_variants.size))
 print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
 
 #############################
-# fit fully observed model  #
-#############################
-"""
-variants = fully_observed_variants
-studies = z.index.values
-B = z.loc[:, variants].values
-S = zS.loc[:, variants].values
-K = 20
-
-init_args = {
-    'LD': sample_ld(gtex_genotype.loc[:, variants]),
-    'B': B,
-    'S': S,
-    'K': K,
-    'snp_ids': variants,
-    'study_ids': studies,
-    'tolerance': 1e-8
-}
-css = CSS(**init_args)
-css.prior_activity = np.ones(K) * 0.1
-print('fit model with fully observed variants')
-weight_ard_active_fit_procedure(css, verbose=False, max_iter=50)
-
-print('saving model to {}'.format(snakemake.output[0]))
-css.save(snakemake.output[0])
-"""
-#############################
 #  impute zscores for gtex  #
 #############################
 
-# compute LD
 if snakemake.params.impute:
     # A = (X.T @ X + eI)^-1
     print('imputing missing genotype')
@@ -202,20 +175,22 @@ if snakemake.params.impute:
     X = center_mean_impute(gtex_genotype.loc[:, variants]).values
     X = X / (X.std(0) * np.sqrt(X.shape[0]))
     LD = X.T @ X
-    LD_oo = LD[fully_observed_idx][:, fully_observed_idx]
-    LD_uo = LD[~fully_observed_idx][:, fully_observed_idx]
 
-    m, n = X.shape
-    e = 0.1
-    Finv = np.eye(m) + 1/e * X @ X.T
+    idx = np.isin(variants, fully_observed_variants)
+    X_o = X[:, idx]
+
+    m, n = X_o.shape
+    e = 0.01
+    Finv = np.eye(m) + 1/e * X_o @ X_o.T
     R = sp.linalg.solve_triangular(np.linalg.cholesky(Finv).T, np.eye(m))
-    V = X.T @ R / e
-    A = np.eye(n)/e - V @ V.T
+    V = X_o.T @ R / e
+    A = (np.eye(n)/e - V @ V.T) @ X_o.T @ X[:, ~idx]
 
     # impute z-scores within cis-window
     _z_imp = pd.DataFrame(
         z.loc[:, fully_observed_idx].values @ A,
-        index=z.index, columns=z.columns[~fully_observed_idx])
+        index=z.index, columns=variants[~idx])
+
     z_imp = z.copy()
     z_imp.loc[:, _z_imp.columns] = _z_imp
 
