@@ -310,12 +310,28 @@ rule fit_cad_gtex_cafeh:
 
 
 
-rule fit_gwas_gtex_cafeh:
+rule fit_gwas_gtex_z_impute_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
         z_imp_model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z_imputed.css'
+    params:
+        impute=True,
+        K=20
+    script:
+        '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
+
+rule fit_gwas_gtex_z_cafeh:
+    input:
+        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
+    output:
+        z_imp_model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
+    params:
+        impute=False,
+        K=20
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
