@@ -32,7 +32,7 @@ def cast(s):
 
 
 def load_ukbb_gwas(gene, phenotype, variants=None):
-    gwas = pysam.TabixFile('../../output/UKBB/sumstats/Phecode4_{}.sumstats.txt.gz'.format(phenotype))
+    gwas = pysam.TabixFile('output/UKBB/sumstats/Phecode4_{}.sumstats.txt.gz'.format(phenotype))
     tss = get_tss(gene)
     chrom = int(get_chr(gene)[3:])
     df = pd.DataFrame(
