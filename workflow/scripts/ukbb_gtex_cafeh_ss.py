@@ -138,14 +138,14 @@ phenotype = snakemake.wildcards.phenotype
 gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
 gtex = load_gtex_associations(gene)
 
+print(study)
 # load gwas
-if study is 'UKBB':
+if 'UKBB' in study:
     gwas = load_ukbb_gwas(gene, phenotype)
-elif study is 'CAD':
-    gwas = load_cad_gwas(gene)
-else:
+elif 'GRASP' in study:
     gwas = load_grasp_gwas(gene, phenotype)
-
+else:
+    gwas = load_cad_gwas(gene)
 # flip signs in gwas, filter down to variants with genotype, eqtl, and gwas
 gtex, gwas, flip = filter_and_flip(gtex, gwas, gtex_genotype.columns)
 
