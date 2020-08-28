@@ -139,9 +139,9 @@ gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
 gtex = load_gtex_associations(gene)
 
 # load gwas
-if study is 'UKBB':
+if study == 'UKBB':
     gwas = load_ukbb_gwas(gene, phenotype)
-elif study is 'CAD':
+elif study == 'CAD':
     gwas = load_cad_gwas(gene)
 else:
     gwas = load_grasp_gwas(gene, phenotype)
