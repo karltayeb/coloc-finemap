@@ -198,6 +198,9 @@ variants = all_associations.rsid.unique()
 fully_observed_idx = (~np.any(z.isna(), 0)).values
 fully_observed_variants = z.columns[fully_observed_idx].values
 
+if fully_observed_variants.size > 10000:
+    assert(False)
+
 print('{} variants in gwas'.format(variants.size))
 print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
 
@@ -263,7 +266,7 @@ css.weight_precision_b = np.ones_like(css.weight_precision_b) * 10
 
 print('fit model with imputed z-score')
 weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
-fit_all(css, max_iter=50, verbose=True)
+fit_all(css, max_iter=30, verbose=True)
 
 print('saving model to {}'.format(snakemake.output[0]))
 css.save(snakemake.output[0])
