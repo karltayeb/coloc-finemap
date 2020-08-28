@@ -103,7 +103,6 @@ def filter_and_flip(gtex, gwas, variants):
     filter down to common variants with unique coding
     flip gwas to match gtex
     """
-    gtex = associations
     common_variants = np.intersect1d(gwas.rsid, gtex.rsid)
     common_variants = np.intersect1d(common_variants, variants)
 
