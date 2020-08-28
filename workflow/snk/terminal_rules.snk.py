@@ -14,10 +14,10 @@ rule get_all_gtex_genotype:
     input:
         expand('{path}', path=GTEx_genotype)
 
-GTEx_genotype = pd.read_csv('output/requests/CAD_intersecting_egene.txt', header=None).iloc[:, 0].values
-rule intersect_CAD_gtex_hits:
+cad_requests = pd.read_csv('output/CAD/requests.txt', header=None).iloc[:, 0].values
+rule cad_gtex:
     input:
-        expand('{path}', path=GTEx_genotype)
+        expand('{path}', path=cad_requests)
 
 UKBB_request = pd.read_csv('output/UKBB/individual_phenotype_requests.txt', header=None).iloc[:, 0].values
 rule ukbb_gtex_individual:
