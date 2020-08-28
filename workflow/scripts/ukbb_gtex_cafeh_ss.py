@@ -31,6 +31,39 @@ def cast(s):
     except Exception:
         return s
 
+def load_cad_gwas(gene, variants=None):
+    gwas = pysam.TabixFile('output/CAD/CAD_META.sorted.txt.gz')
+    tss = get_tss(gene)
+    chrom = int(get_chr(gene)[3:])
+    df = pd.DataFrame(
+        list(map(cast, x.strip().split('\t')) for x in
+             gwas.fetch(chrom, np.clip(tss-1e6, 0, None), tss+1e6)),
+        columns=gwas.header[0][1:].strip().split('\t')
+    )
+    if variants is not None:
+        df = df[df.oldID.isin(variants)]
+
+    df.rename(columns={
+        'Allele1': 'ref',
+        'Allele2': 'alt',
+        'Effect': 'slope',
+        'StdErr': 'slope_se',
+        'P-val': 'pval_nominal',
+        'oldID': 'rsid'}, inplace=True)
+
+    df['ref'] = df['ref'].str.upper()
+    df['alt'] = df['alt'].str.upper()
+    df.loc[:, 'S'] = df['slope_se']  # large sample approximation
+    df.loc[:, 'study'] = 'CAD'
+
+    df=df.rename(columns={
+        'study': 'tissue',
+        'P-value': 'pval_nominal'
+    })
+
+    df.loc[:, 'sample_size'] = 200000
+    return df
+
 def _load_ukbb_chromosome(phenotype, chromosome):
     ukbb_columns = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'ac', 'af', 'num_cases',
        'num_controls', 'beta', 'sebeta', 'Tstat', 'pval',
