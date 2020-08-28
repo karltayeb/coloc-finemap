@@ -98,70 +98,76 @@ def load_grasp_gwas(gene, phenotype):
     return df
 
 
-def flip(associations, gwas):
+def filter_and_flip(gtex, gwas, variants):
     """
-    flip gwas asoociations to match GTEx
+    filter down to common variants with unique coding
+    flip gwas to match gtex
     """
-    A = associations.drop_duplicates('rsid').set_index('rsid').loc[:, ['alt', 'ref']]
+    gtex = associations
+    common_variants = np.intersect1d(gwas.rsid, gtex.rsid)
+    common_variants = np.intersect1d(common_variants, variants)
 
-    B = gwas.set_index('rsid').loc[:, ['alt', 'ref']]
-    B = B.loc[B.index.drop_duplicates()]
-    B = B.applymap(lambda x: np.str.upper(str(x)))
+    a = gtex.loc[gtex.rsid.isin(common_variants), ['rsid', 'ref', 'alt']]
+    a = a.drop_duplicates().drop_duplicates('rsid', keep=False).set_index('rsid')
 
-    agree = pd.DataFrame(A).merge(B, left_index=True, right_index=True)
-    agree.loc[:, 'flip'] = (agree.alt_x != agree.alt_y)
+    b = gwas.loc[gwas.rsid.isin(common_variants), ['rsid', 'ref', 'alt']]
+    b = b.drop_duplicates().drop_duplicates('rsid', keep=False).set_index('rsid')
 
-    gwas = gwas.set_index('rsid')
-    gwas.loc[agree[agree.flip == True].index, 'slope'] \
-        = gwas.loc[agree[agree.flip == True].index, 'slope']*-1
-    gwas = gwas.reset_index()
-    return gwas
+    common_variants = np.intersect1d(b.index, a.index)
 
+    a = a.loc[common_variants]
+    b = b.loc[common_variants]
+    flip = common_variants[(a.ref != b.ref)]
+    
+    gtex = gtex[gtex.rsid.isin(common_variants)]
+    gwas = gwas[gwas.rsid.isin(common_variants)]
+    
+    gwas.loc[gwas.rsid.isin(flip), 'slope'] = -1 * gwas.loc[gwas.rsid.isin(flip), 'slope']
+    
+    ref = gwas.loc[gwas.rsid.isin(flip), 'ref']
+    gwas.loc[gwas.rsid.isin(flip), 'ref'] = gwas.loc[gwas.rsid.isin(flip), 'alt']
+    gwas.loc[gwas.rsid.isin(flip), 'alt'] = ref
+    return gtex, gwas, flip
+
+
+gene = snakemake.wildcards.gene
+study = snakemake.wildcards.study
 phenotype = snakemake.wildcards.phenotype
 
-GENE = snakemake.wildcards.gene
-ASSOCIATION_PATH = snakemake.input.associations
+# load gtex and gtex genotype
+gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
+gtex = load_gtex_associations(gene)
 
+# load gwas
+if study is 'UKBB':
+    gwas = load_ukbb_gwas(gene, phenotype)
+elif study is 'CAD':
+    gwas = load_cad_gwas(gene)
+else:
+    gwas = load_grasp_gwas(gene, phenotype)
 
-# load gwas and associations
-associations = load_gtex_associations(GENE)
+# flip signs in gwas, filter down to variants with genotype, eqtl, and gwas
+gtex, gwas, flip = filter_and_flip(gtex, gwas, gtex_genotype.columns)
 
-if snakemake.wildcards.study == 'UKBB':
-    print('loading UKBB gwas')
-    gwas = flip(associations, load_ukbb_gwas(GENE, phenotype))
-if snakemake.wildcards.study == 'GRASP':
-    print('loading GRASP gwas')
-    # gwas = flip(associations, load_grasp_gwas(GENE, phenotype))
-    gwas = load_grasp_gwas(phenotype)
-
-gtex_genotype = load_gtex_genotype(GENE, use_rsid=True)
-common_columns = np.intersect1d(associations.columns, gwas.columns)
+# put all summary stats in one table
+common_columns = np.intersect1d(gtex.columns, gwas.columns)
 all_associations = pd.concat([associations.loc[:, common_columns], gwas.loc[:, common_columns]])
 
+# make position label consistent (so that plots look good)
 rsid2pos = associations.set_index('rsid').loc[:, 'pos'].to_dict()
 all_associations.loc[:, 'pos'] = all_associations.rsid.apply(lambda x: rsid2pos.get(x, np.nan))
 
-# filter down to common variants
-common_variants = np.intersect1d(
-    associations.rsid.unique(), gwas.rsid.unique())
-common_variants = np.intersect1d(
-    common_variants, gtex_genotype.columns)
-gtex_genotype = gtex_genotype.loc[:, common_variants]
-gtex_genotype = gtex_genotype.loc[:, ~gtex_genotype.columns.duplicated()]
-all_associations = all_associations[all_associations.rsid.isin(common_variants)]
-all_associations = all_associations.drop_duplicates(['rsid', 'tissue'])
+# compute z and S statistics
 all_associations.loc[:, 'z'] = all_associations.slope / all_associations.slope_se
 all_associations.loc[:, 'zS'] = np.sqrt((all_associations.z**2 / all_associations.sample_size) + 1)
+z = all_associations[~all_associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'z')
+zS = all_associations[~all_associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'zS')
 
-# make summary stat tables
-z = all_associations[~associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'z')
-zS = all_associations[~associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'zS')
-
-gwas_variants = z.columns[~z.loc[phenotype].isna()].values
+variants = all_associations.rsid.unique()
 fully_observed_idx = (~np.any(z.isna(), 0)).values
 fully_observed_variants = z.columns[fully_observed_idx].values
 
-print('{} variants in gwas'.format(gwas_variants.size))
+print('{} variants in gwas'.format(variants.size))
 print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
 
 #############################
@@ -171,7 +177,6 @@ print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
 if snakemake.params.impute:
     # A = (X.T @ X + eI)^-1
     print('imputing missing genotype')
-    variants = gwas_variants
     X = center_mean_impute(gtex_genotype.loc[:, variants]).values
     X = X / (X.std(0) * np.sqrt(X.shape[0]))
     LD = X.T @ X
