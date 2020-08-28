@@ -138,6 +138,7 @@ gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
 gtex = load_gtex_associations(gene)
 
 print(study)
+print(phenotype)
 # load gwas
 if 'UKBB' in study:
     gwas = load_ukbb_gwas(gene, phenotype)
@@ -151,7 +152,7 @@ gtex, gwas, flip = filter_and_flip(gtex, gwas, gtex_genotype.columns)
 common_columns = np.intersect1d(gtex.columns, gwas.columns)
 all_associations = pd.concat([gtex.loc[:, common_columns], gwas.loc[:, common_columns]])
 
-rsid2pos = associations.set_index('rsid').loc[:, 'pos'].to_dict()
+rsid2pos = gtex.set_index('rsid').loc[:, 'pos'].to_dict()
 all_associations.loc[:, 'pos'] = all_associations.rsid.apply(lambda x: rsid2pos.get(x, np.nan))
 
 all_associations.loc[:, 'z'] = all_associations.slope / all_associations.slope_se
