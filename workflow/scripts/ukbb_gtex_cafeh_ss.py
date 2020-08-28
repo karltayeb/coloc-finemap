@@ -198,6 +198,9 @@ variants = all_associations.rsid.unique()
 fully_observed_idx = (~np.any(z.isna(), 0)).values
 fully_observed_variants = z.columns[fully_observed_idx].values
 
+if fully_observed_variants.size > 10000:
+    assert(False)
+
 print('{} variants in gwas'.format(variants.size))
 print('{} variant fully observed in GTEx'.format(fully_observed_variants.size))
 
