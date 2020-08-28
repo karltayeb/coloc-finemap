@@ -148,17 +148,15 @@ else:
 # flip signs in gwas, filter down to variants with genotype, eqtl, and gwas
 gtex, gwas, flip = filter_and_flip(gtex, gwas, gtex_genotype.columns)
 
-# put all summary stats in one table
 common_columns = np.intersect1d(gtex.columns, gwas.columns)
-all_associations = pd.concat([associations.loc[:, common_columns], gwas.loc[:, common_columns]])
+all_associations = pd.concat([gtex.loc[:, common_columns], gwas.loc[:, common_columns]])
 
-# make position label consistent (so that plots look good)
 rsid2pos = associations.set_index('rsid').loc[:, 'pos'].to_dict()
 all_associations.loc[:, 'pos'] = all_associations.rsid.apply(lambda x: rsid2pos.get(x, np.nan))
 
-# compute z and S statistics
 all_associations.loc[:, 'z'] = all_associations.slope / all_associations.slope_se
 all_associations.loc[:, 'zS'] = np.sqrt((all_associations.z**2 / all_associations.sample_size) + 1)
+
 z = all_associations[~all_associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'z')
 zS = all_associations[~all_associations.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'zS')
 
