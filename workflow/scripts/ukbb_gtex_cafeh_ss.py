@@ -263,7 +263,7 @@ css.weight_precision_b = np.ones_like(css.weight_precision_b) * 10
 
 print('fit model with imputed z-score')
 weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
-fit_all(css, max_iter=50, verbose=True)
+fit_all(css, max_iter=30, verbose=True)
 
 print('saving model to {}'.format(snakemake.output[0]))
 css.save(snakemake.output[0])
