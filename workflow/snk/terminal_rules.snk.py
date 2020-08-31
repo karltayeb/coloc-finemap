@@ -15,7 +15,7 @@ rule get_all_gtex_genotype:
         expand('{path}', path=GTEx_genotype)
 
 GTEx_genotype_variant_report = pd.read_csv('output/requests/GTEx_cafeh_genotype_ss_variant_reports.txt', header=None).iloc[:, 0].values
-rule fit_gtex_cafeh_genotype_ss:
+rule gtex_cafeh_genotype_variant_reports:
     input:
         expand('{path}', path=GTEx_genotype_variant_report)
 
