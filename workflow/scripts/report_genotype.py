@@ -26,6 +26,7 @@ def get_minalpha(model):
     )
 
 # load a model
+gene = snakemake.wildcards.gene
 model = pickle.load(open(snakemake.input.model, 'rb'))
 model._decompress_model()
 
