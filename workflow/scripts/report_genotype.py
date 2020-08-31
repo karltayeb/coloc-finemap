@@ -3,7 +3,10 @@ import numpy as np
 import pandas as pd
 from cafeh.cafeh_ss import CAFEH
 from cafeh.misc import plot_components
-from utils.misc import *
+
+import sys
+sys.path.append('/work-zfs/abattle4/karl/cosie_analysis/utils/')
+from misc import *
 
 def _get_minalpha(pi):
     """
