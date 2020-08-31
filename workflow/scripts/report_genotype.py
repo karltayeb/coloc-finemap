@@ -65,4 +65,5 @@ table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'gene', 'pip
 
 table = table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'pip', 'top_component', 'p_active', 'pi', 'alpha', 'rank']]
 small_table = table[table.p_active > 0.5].sort_values(by=['chr', 'start'])
-small_table.to_csv(snakemake.output.report, sep='\t', index=None
+small_table.to_csv(snakemake.output.report, sep='\t', index=None)
+
