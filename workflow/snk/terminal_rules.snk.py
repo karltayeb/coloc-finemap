@@ -14,6 +14,11 @@ rule get_all_gtex_genotype:
     input:
         expand('{path}', path=GTEx_genotype)
 
+GTEx_genotype_variant_report = pd.read_csv('output/requests/GTEx_cafeh_genotype_ss_variant_reports.txt', header=None).iloc[:, 0].values
+rule fit_gtex_cafeh_genotype_ss:
+    input:
+        expand('{path}', path=GTEx_genotype_variant_report)
+
 cad_requests = pd.read_csv('output/CAD/requests.txt', header=None).iloc[:, 0].values
 rule cad_gtex:
     input:
@@ -23,6 +28,8 @@ UKBB_request = pd.read_csv('output/UKBB/individual_phenotype_requests.txt', head
 rule ukbb_gtex_individual:
     input:
         expand('{path}', path=UKBB_request)
+
+
 """
 BOGgenes = pd.read_csv(
     'output/GTEx/BOGgenes.txt', sep='\t', index_col=None)
