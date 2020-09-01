@@ -33,6 +33,17 @@ rule ukbb_gtex_individual:
     input:
         expand('{path}', path=UKBB_request)
 
+def get_paths(request):
+    """
+    get list of tile from request file
+    """
+    paths = open(request, 'r').read().split('\n')
+    paths = [x for x in paths if not isfile(x)]
+    return paths
+
+rule terminal_rule:
+    output:
+        expand('{path}', path=get_paths(config['request']))
 
 """
 BOGgenes = pd.read_csv(
