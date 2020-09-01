@@ -36,7 +36,7 @@ def get_paths(request):
     """
     get list of tile from request file
     """
-    paths = open(request, 'r').read().split('\n')
+    paths = open(request, 'r').read().strip().split('\n')
     paths = [x for x in paths if not isfile(x)]
     return paths
 
