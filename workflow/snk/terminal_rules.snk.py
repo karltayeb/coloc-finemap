@@ -41,7 +41,7 @@ def get_paths(request):
     return paths
 
 rule terminal_rule:
-    output:
+    input:
         expand('{path}', path=get_paths(config['request']))
 
 """
