@@ -36,7 +36,7 @@ rule gtex_get_variant_sets:
 
         background = []
         for b, count in tqdm(list(bins.items())):
-            bin_path = '../../output/GTEx/maf_dtss_binned/{}.bed'.format(b)
+            bin_path = 'output/GTEx/maf_dtss_binned/{}.bed'.format(b)
             bin_df = pd.read_csv(bin_path, sep='\t', header=None)
             background.append(bin_df.iloc[np.random.choice(bin_df.shape[0], count*5, replace=True)])
 
