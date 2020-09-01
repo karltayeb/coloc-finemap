@@ -84,7 +84,7 @@ rule gtex_get_variant_sets:
     input:
         'output/GTEx/variant_reports/{tissue}.all_genes.variant_report'
     output:
-        test_set = 'output/GTEx/enrichment/{tissue}.test.bed'
+        test_set = 'output/GTEx/enrichment/{tissue}.test.bed',
         bacgkround_set = 'output/GTEx/enrichment/{tissue}.background.bed'
     run:
         import numpy as np
