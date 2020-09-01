@@ -39,6 +39,7 @@ def get_paths(request):
     """
     paths = open(request, 'r').read().split('\n')
     paths = [x for x in paths if not isfile(x)]
+    print(paths)
     return paths
 
 rule terminal_rule:
