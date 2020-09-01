@@ -17,11 +17,11 @@ rule get_all_gtex_genotype:
 
 #GTEx_genotype_variant_report = pd.read_csv('output/requests/GTEx_cafeh_genotype_ss_variant_reports.txt', header=None).iloc[:, 0].values
 paths = open('output/requests/GTEx_cafeh_genotype_ss_variant_reports.txt', 'r').read().split('\n')
-paths = [x for x in paths if not isfile(x)]
-print(len(paths))
+GTEx_genotype_variant_report = [x for x in paths if not isfile(x)]
+print(len(GTEx_genotype_variant_report))
 rule gtex_cafeh_genotype_variant_reports:
     input:
-        expand('{path}', path=paths)
+        expand('{path}', path=GTEx_genotype_variant_report)
 
 cad_requests = pd.read_csv('output/CAD/requests.txt', header=None).iloc[:, 0].values
 rule cad_gtex:
