@@ -2,8 +2,8 @@ rule gtex_get_variant_sets:
     input:
         'output/GTEx/variant_reports/{tissue}.all_genes.variant_report'
     output:
-        test_set = 'output/GTEx/enrichment/{tissue}.test.bed',
-        bacgkround_set = 'output/GTEx/enrichment/{tissue}.background.bed'
+        test = 'output/GTEx/enrichment/{tissue}.test.bed',
+        background = 'output/GTEx/enrichment/{tissue}.background.bed'
     run:
         tissue = wildcards.tissue
 
@@ -43,7 +43,7 @@ rule gtex_get_variant_sets:
         background_df = pd.concat(background)
 
         df.sort_values(by=['chr', 'start']).drop_duplicates(['chr', 'start'])\
-            .to_csv(output.test_set, sep='\t', header=False, index=False)
+            .to_csv(output.test, sep='\t', header=False, index=False)
 
         background_df.sort_values(by=[0, 1]).drop_duplicates([0, 1])\
-            .to_csv(output.background_set, sep='\t', header=False, index=False)
+            .to_csv(output.background, sep='\t', header=False, index=False)
