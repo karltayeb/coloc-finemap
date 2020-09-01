@@ -3,6 +3,7 @@ import json
 import glob
 import pandas as pd
 from collections import defaultdict
+from os.path import isfile
 
 GTEx_genotype_model = pd.read_csv('output/requests/GTEx_cafeh_genotype_ss.txt', header=None).iloc[:, 0].values
 rule fit_gtex_cafeh_genotype_ss:
@@ -14,7 +15,9 @@ rule get_all_gtex_genotype:
     input:
         expand('{path}', path=GTEx_genotype)
 
-GTEx_genotype_variant_report = pd.read_csv('output/requests/GTEx_cafeh_genotype_ss_variant_reports.txt', header=None).iloc[:, 0].values
+#GTEx_genotype_variant_report = pd.read_csv('output/requests/GTEx_cafeh_genotype_ss_variant_reports.txt', header=None).iloc[:, 0].values
+paths = open('output/requests/GTEx_cafeh_genotype_ss_variant_reports.txt', 'r').read().split('\n')
+paths = [x for x in paths if isfile(x)]
 rule gtex_cafeh_genotype_variant_reports:
     input:
         expand('{path}', path=GTEx_genotype_variant_report)
