@@ -20,7 +20,7 @@ paths = open('output/requests/GTEx_cafeh_genotype_ss_variant_reports.txt', 'r').
 paths = [x for x in paths if isfile(x)]
 rule gtex_cafeh_genotype_variant_reports:
     input:
-        expand('{path}', path=GTEx_genotype_variant_report)
+        expand('{path}', path=paths)
 
 cad_requests = pd.read_csv('output/CAD/requests.txt', header=None).iloc[:, 0].values
 rule cad_gtex:
