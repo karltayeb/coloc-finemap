@@ -5,6 +5,8 @@ rule gtex_get_variant_sets:
         test_set = 'output/GTEx/enrichment/{tissue}.test.bed',
         bacgkround_set = 'output/GTEx/enrichment/{tissue}.background.bed'
     run:
+        tissue = wildcards.tissue
+
         import numpy as np
         import pandas as pd
         from tqdm import tqdm
@@ -17,7 +19,7 @@ rule gtex_get_variant_sets:
             maf_bin = '{:.2f}'.format(maf)
             return '{}/{}.{}'.format(dtss_bin, dtss_bin, maf_bin)
 
-        df = pd.read_csv('../../output/GTEx/variant_reports/Liver.all_genes.variant_report', sep='\t')
+        df = pd.read_csv('output/GTEx/variant_reports/{}.all_genes.variant_report'.format(tissue), sep='\t')
 
         df = df[
             (df.p_active > 0.9)
@@ -40,10 +42,8 @@ rule gtex_get_variant_sets:
 
         background_df = pd.concat(background)
 
-        outfile = 'test_set'
         df.sort_values(by=['chr', 'start']).drop_duplicates(['chr', 'start'])\
-            .to_csv(outfile, sep='\t', header=False, index=False)
+            .to_csv(output.test_set, sep='\t', header=False, index=False)
 
-        outfile = 'test_background'
         background_df.sort_values(by=[0, 1]).drop_duplicates([0, 1])\
-            .to_csv(outfile, sep='\t', header=False, index=False)
+            .to_csv(output.background_set, sep='\t', header=False, index=False)
