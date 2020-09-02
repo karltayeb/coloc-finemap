@@ -25,11 +25,13 @@ import ast
 
 sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
 
+
 def cast(s):
     try:
         return ast.literal_eval(s)
     except Exception:
         return s
+
 
 def load_cad_gwas(gene, variants=None):
     gwas = pysam.TabixFile('output/CAD/CAD_META.sorted.txt.gz')
@@ -64,6 +66,7 @@ def load_cad_gwas(gene, variants=None):
     df.loc[:, 'sample_size'] = 200000
     return df
 
+
 def _load_ukbb_chromosome(phenotype, chromosome):
     ukbb_columns = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'ac', 'af', 'num_cases',
        'num_controls', 'beta', 'sebeta', 'Tstat', 'pval',
@@ -76,6 +79,7 @@ def _load_ukbb_chromosome(phenotype, chromosome):
     df = pd.read_csv(path, sep='\t', skiprows=start, nrows=nrows, header=None)
     df.columns = ukbb_columns
     return df
+
 
 def load_ukbb_gwas(gene, phenotype, variants=None):
     tss = get_tss(gene)

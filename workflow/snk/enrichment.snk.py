@@ -50,3 +50,76 @@ rule gtex_get_variant_sets:
 
         background_df.sort_values(by=[0, 1]).drop_duplicates([0, 1])\
             .to_csv(output.background, sep='\t', header=False, index=False)
+
+rule roadmap_enrichment:
+    input:
+        test = 'output/GTEx/enrichment/{tissue}.test.bed',
+        background = 'output/GTEx/enrichment/{tissue}.background.bed', 
+    output:
+        'output/GTEx/enrichment/roadmap/{tissue}.roadmap.enrichments'
+    run:
+        import os
+        import pybedtools
+        import glob
+        import numpy as np
+        import pandas as pd
+        from tqdm import tqdm
+
+        def contingency_table(test, background, annotation):
+            """
+            test and background do not intersect
+            return [[test/annotation, tesn n annotation],
+                    [background/annotation, [test n annotation]]
+            """
+            test_in_annot = test.intersect(annotation).count()
+            background_in_annot = background.intersect(annotation).count()
+            test_size = test.count()
+            background_size = background.count()
+            return np.array([[test_in_annot, test_size - test_in_annot],
+                    [background_in_annot, background_size - background_in_annot]])
+
+
+        tissue = wildcards.tissue
+
+        # get annotation file
+        annotation_files = os.listdir('output/annotations/roadmap/')
+        annotation_files = [x for x in annotation_files if ('enhancer' in x or 'promooter' in x)]
+
+        eid2celltype = pd.read_csv('output/annotations/roadmap/EIDlegend.txt',
+                    sep='\t', index_col=0, header=None).iloc[:, 0].to_dict()
+
+        records = []
+        for annot_file in tqdm(annotation_files[:10]):
+            print(annot_file)
+            test_path = 'output/GTEx/enrichment/{}.test.bed'.format(tissue)
+            test = pybedtools.BedTool(test_path)
+
+            background_path = 'output/GTEx/enrichment/{}.background.bed'.format(tissue)
+            background = pybedtools.BedTool(background_path)
+
+            annotation_path = 'output/annotations/roadmap/{}'.format(annot_file)
+            annotation = pybedtools.BedTool(annotation_path)
+            enhancer = pybedtools.BedTool(
+                '/work-zfs/abattle4/marios/GTEx_v8/coloc/Enhancer_regions_cross_tissue_Roadmap_25state.bed'
+            )
+            promoter = pybedtools.BedTool(
+                '/work-zfs/abattle4/marios/GTEx_v8/coloc/Promoter_regions_cross_tissue_Roadmap_25state.bed'
+            )
+
+            ct = np.array(contingency_table(test, background-test, promoter))
+            ct[0, 0] / ct[0].sum(), ct[1, 0] / ct[1].sum()
+
+            from scipy.stats import fisher_exact
+
+            odds, p = fisher_exact(ct)
+            
+            record = {a: b for a, b in zip(contingency_entry_labels.flatten(), ct.flatten())}
+            record.update({
+                'p': p,
+                'odds_ratio': odds,
+                'EID': annot_file.split('.')[0],
+                'cell_type': eid2celltype.get(annot_file.split('.')[0]),
+                'annotation_type': annot_file.split('.')[1]
+            })
+            records.append(record)
+        pd.DataFrame(records).to_csv(output[0])
