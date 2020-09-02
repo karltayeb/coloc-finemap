@@ -1,4 +1,5 @@
 gtex_bfile: '/work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
+request: 'output/requests/empty.txt'
 genes:
   - ENSG00000212024.2
   - ENSG00000255558.1
