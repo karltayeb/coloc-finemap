@@ -83,7 +83,7 @@ rule roadmap_enrichment:
 
         # get annotation file
         annotation_files = os.listdir('output/annotations/roadmap/')
-        annotation_files = [x for x in annotation_files if ('enhancer' in x or 'promooter' in x)]
+        annotation_files = [x for x in annotation_files if ('enhancer' in x or 'promoter' in x)]
 
         eid2celltype = pd.read_csv('output/annotations/roadmap/EIDlegend.txt',
                     sep='\t', index_col=0, header=None).iloc[:, 0].to_dict()
