@@ -87,7 +87,8 @@ rule roadmap_enrichment:
 
         eid2celltype = pd.read_csv('output/annotations/roadmap/EIDlegend.txt',
                     sep='\t', index_col=0, header=None).iloc[:, 0].to_dict()
-
+        contingency_entry_labels = np.array([['test_in_annot', 'test_not_in_annot'],
+                    ['background_in_annot', 'background_not_in_annot']])
         records = []
         for annot_file in tqdm(annotation_files[:10]):
             print(annot_file)
