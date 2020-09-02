@@ -101,14 +101,8 @@ rule roadmap_enrichment:
 
                 annotation_path = 'output/annotations/roadmap/{}'.format(annot_file)
                 annotation = pybedtools.BedTool(annotation_path)
-                enhancer = pybedtools.BedTool(
-                    '/work-zfs/abattle4/marios/GTEx_v8/coloc/Enhancer_regions_cross_tissue_Roadmap_25state.bed'
-                )
-                promoter = pybedtools.BedTool(
-                    '/work-zfs/abattle4/marios/GTEx_v8/coloc/Promoter_regions_cross_tissue_Roadmap_25state.bed'
-                )
 
-                ct = np.array(contingency_table(test, background-test, promoter))
+                ct = np.array(contingency_table(test, background-test, annotation))
                 ct[0, 0] / ct[0].sum(), ct[1, 0] / ct[1].sum()
 
                 from scipy.stats import fisher_exact
@@ -121,10 +115,11 @@ rule roadmap_enrichment:
                     'odds_ratio': odds,
                     'EID': annot_file.split('.')[0],
                     'cell_type': eid2celltype.get(annot_file.split('.')[0]),
-                    'annotation_type': annot_file.split('.')[1]
+                    'annotation_type': annot_file.split('.')[1],
+                    'tissue': tissue
                 })
                 records.append(record)
             except Exception as e:
                 print(e)
 
-        pd.DataFrame(records).to_csv(output[0])
+        pd.DataFrame(records).to_csv(output[0], sep='\t', index=None)
