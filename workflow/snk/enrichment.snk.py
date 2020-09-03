@@ -75,9 +75,11 @@ rule gtex_filtered_variants_and_background:
             maf_bin = '{:.2f}'.format(maf)
             return '{}/{}.{}'.format(dtss_bin, dtss_bin, maf_bin)
 
+        print('using filter: {}'.format(params.filters))
         df = pd.read_csv('output/GTEx/variant_reports/{}.all_genes.variant_report'.format(tissue), sep='\t')
+        print('\t {} total records'.format(df.shape[0]))
         df = df[eval(params.filters)]
-
+        print('\t {} remaining records'.format(df.shape[0]))
         # put variant, gene pair into bins
         df.loc[:, 'dtss'] = df.start - df.tss
         df.loc[:, 'bin'] = [pair2bin(dtss, maf) for dtss, maf in zip(df.dtss, df.maf)]
