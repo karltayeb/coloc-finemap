@@ -111,28 +111,25 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
 
 
 def load_grasp_gwas(gene, phenotype):
-    df = pd.read_csv('output/GRASP/{}.txt'.format(phenotype), sep='\t')
-    df.columns = ['chr', 'pos', 'variant_id', 'rsid', 'slope', 'slope_se', 'pval_nominal', 'sample_size']
-
+    gwas = pysam.TabixFile('../../output/GRASP/clean/GRASP.{}.sorted.txt.gz'.format(phenotype))
     tss = get_tss(gene)
-    chrom = int(get_chr(gene)[3:])
+    chrom = get_chr(gene)
+    df = pd.DataFrame(
+        list(map(cast, x.strip().split('\t')) for x in
+             gwas.fetch(chrom, np.clip(tss-1e6, 0, None), tss+1e6)),
+        columns=gwas.header[0][1:].strip().split('\t')
+    )
 
-    df.loc[:, 'pos'] = df.variant_id.apply(lambda x: int(x.split('_')[1]))
-    df.loc[:, 'ref'] = df.variant_id.apply(lambda x: x.split('_')[2])
-    df.loc[:, 'alt'] = df.variant_id.apply(lambda x: x.split('_')[3])
-    df = df[(df.chr==chrom) & (df.pos > tss-1e6) & (df.pos < tss+1e6)]
-
-    df['ref'] = df['ref'].str.upper()
-    df['alt'] = df['alt'].str.upper()
-    df.loc[:, 'S'] = df['slope_se']  # large sample approximation
-
-    df.loc[:, 'study'] = phenotype
-
-    df=df.rename(columns={
-        'study': 'tissue',
-        'P-value': 'pval_nominal'
-    })
+    df.rename(columns={
+        'POS': 'pos',
+        'REF': 'ref',
+        'ALT': 'alt',
+        'beta': 'slope',
+        'beta_se': 'slope_se',
+        'p': 'pval_nominal'}, inplace=True)
+    df.loc[:, 'tissue'] = phenotype
     return df
+
 
 
 def filter_and_flip(gtex, gwas, variants):
