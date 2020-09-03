@@ -99,9 +99,11 @@ rule gtex_filtered_variants_and_background:
 
         background_df = pd.concat(background)
 
+        # save test set of unique chr pos
         df.sort_values(by=['chr', 'start']).drop_duplicates(['chr', 'start'])\
             .to_csv(output.test, sep='\t', header=False, index=False)
 
+        # save background set of unique chr pos
         background_df.sort_values(by=[0, 1]).drop_duplicates([0, 1])\
             .to_csv(output.background, sep='\t', header=False, index=False)
 
