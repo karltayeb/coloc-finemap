@@ -111,7 +111,7 @@ def load_ukbb_gwas(gene, phenotype, variants=None):
 
 
 def load_grasp_gwas(gene, phenotype):
-    gwas = pysam.TabixFile('../../output/GRASP/clean/GRASP.{}.sorted.txt.gz'.format(phenotype))
+    gwas = pysam.TabixFile('output/GRASP/clean/GRASP.{}.sorted.txt.gz'.format(phenotype))
     tss = get_tss(gene)
     chrom = get_chr(gene)
     df = pd.DataFrame(
