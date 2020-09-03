@@ -107,10 +107,10 @@ rule gtex_filtered_variants_and_background:
 
 rule roadmap_enrichment:
     input:
-        test = 'output/GTEx/enrichment/{tissue}.test.bed',
-        background = 'output/GTEx/enrichment/{tissue}.background.bed', 
+        test = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
+        background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed', 
     output:
-        'output/GTEx/enrichment/roadmap/{tissue}.roadmap.enrichments'
+        'output/GTEx/enrichment/roadmap/{analysis_id}/{tissue}.roadmap.enrichments'
     run:
         import os
         import pybedtools
