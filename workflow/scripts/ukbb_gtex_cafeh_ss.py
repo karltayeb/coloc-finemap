@@ -124,6 +124,7 @@ def load_grasp_gwas(gene, phenotype):
         'POS': 'pos',
         'REF': 'ref',
         'ALT': 'alt',
+        'ID': 'rsid',
         'beta': 'slope',
         'beta_se': 'slope_se',
         'p': 'pval_nominal'}, inplace=True)
