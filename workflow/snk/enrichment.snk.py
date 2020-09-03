@@ -149,11 +149,8 @@ rule roadmap_enrichment:
         records = []
         for annot_file in tqdm(annotation_files):
             try:
-                test_path = 'output/GTEx/enrichment/{}.test.bed'.format(tissue)
-                test = pybedtools.BedTool(test_path)
-
-                background_path = 'output/GTEx/enrichment/{}.background.bed'.format(tissue)
-                background = pybedtools.BedTool(background_path)
+                test = pybedtools.BedTool(input.test)
+                background = pybedtools.BedTool(input.background)
 
                 annotation_path = 'output/annotations/roadmap/{}'.format(annot_file)
                 annotation = pybedtools.BedTool(annotation_path)
