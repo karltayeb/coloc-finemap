@@ -87,6 +87,7 @@ rule gtex_filtered_variants_and_background:
         # count number of variants in each bin
         bins = df.bin.value_counts().to_dict()
 
+        print('constructing background set')
         background = []
         for b, count in tqdm(list(bins.items())):
             try:
