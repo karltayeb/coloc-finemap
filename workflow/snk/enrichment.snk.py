@@ -175,6 +175,7 @@ rule roadmap_enrichment:
             try:
                 eid, annotation_type, _ = annot_file.split('.')
                 record = get_record(analysis_id, tissue, eid, annotation_type)
+                records.append(record)
             except Exception as e:
                 print(e)
 
