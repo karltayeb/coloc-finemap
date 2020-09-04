@@ -158,7 +158,7 @@ rule roadmap_enrichment:
                 'EID': annot_file.split('.')[0],
                 'cell_type': eid2celltype.get(annot_file.split('.')[0]),
                 'annotation_type': annot_file.split('.')[1],
-                'tissue': spec.tissue
+                'tissue': tissue
             })
             return record
 
