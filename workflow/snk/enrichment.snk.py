@@ -169,7 +169,7 @@ rule roadmap_enrichment:
                     'tissue': tissue
                 })
                 records.append(record)
-                print(records)
+                print(record)
             except Exception as e:
                 print(e)
 
