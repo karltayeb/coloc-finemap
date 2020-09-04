@@ -136,40 +136,44 @@ rule roadmap_enrichment:
             return np.array([[test_in_annot, test_size - test_in_annot],
                     [background_in_annot, background_size - background_in_annot]])
 
+        def get_record(analysis_id, tissue, eid, annotation_type):
+            eid2celltype = pd.read_csv('output/annotations/roadmap/EIDlegend.txt',
+                    sep='\t', index_col=0, header=None).iloc[:, 0].to_dict()
+            contingency_entry_labels = np.array([['test_in_annot', 'test_not_in_annot'],
+                        ['background_in_annot', 'background_not_in_annot']])
+
+            test = pybedtools.BedTool('output/GTEx/enrichment/{}/{}.test.bed'.format(analysis_id, tissue))
+            background = pybedtools.BedTool('output/GTEx/enrichment/{}/{}.background.bed'.format(analysis_id, tissue))
+            annot_file = '{}.{}.bed'.format(eid, annotation_type)
+            annotation_path = 'output/annotations/roadmap/{}'.format(annot_file)
+            annotation = pybedtools.BedTool(annotation_path)
+
+            ct = np.array(contingency_table(test, background-test, annotation))
+            odds, p = fisher_exact(ct)
+
+            record = {a: b for a, b in zip(contingency_entry_labels.flatten(), ct.flatten())}
+            record.update({
+                'p': p,
+                'odds_ratio': odds,
+                'EID': annot_file.split('.')[0],
+                'cell_type': eid2celltype.get(annot_file.split('.')[0]),
+                'annotation_type': annot_file.split('.')[1],
+                'tissue': spec.tissue
+            })
+            return record
 
         tissue = wildcards.tissue
+        analysis_id = wildcards.analysis_id
 
         # get annotation file
         annotation_files = os.listdir('output/annotations/roadmap/')
         annotation_files = [x for x in annotation_files if ('enhancer' in x or 'promoter' in x)]
 
-        eid2celltype = pd.read_csv('output/annotations/roadmap/EIDlegend.txt',
-                    sep='\t', index_col=0, header=None).iloc[:, 0].to_dict()
-        contingency_entry_labels = np.array([['test_in_annot', 'test_not_in_annot'],
-                    ['background_in_annot', 'background_not_in_annot']])
         records = []
         for annot_file in tqdm(annotation_files):
             try:
-                test = pybedtools.BedTool(input.test)
-                background = pybedtools.BedTool(input.background)
-
-                annotation_path = 'output/annotations/roadmap/{}'.format(annot_file)
-                annotation = pybedtools.BedTool(annotation_path)
-
-                ct = np.array(contingency_table(test, background-test, annotation))
-                odds, p = fisher_exact(ct)
-                
-                record = {a: b for a, b in zip(contingency_entry_labels.flatten(), ct.flatten())}
-                record.update({
-                    'p': p,
-                    'odds_ratio': odds,
-                    'EID': annot_file.split('.')[0],
-                    'cell_type': eid2celltype.get(annot_file.split('.')[0]),
-                    'annotation_type': annot_file.split('.')[1],
-                    'tissue': tissue
-                })
-                records.append(record)
-                print(record)
+                eid, annotation_type, _ = annot_file.split('.')
+                record = get_record(analysis_id, tissue, eid, annotation_type)
             except Exception as e:
                 print(e)
 
