@@ -121,6 +121,7 @@ rule roadmap_enrichment:
         import numpy as np
         import pandas as pd
         from tqdm import tqdm
+        from scipy.stats import fisher_exact
 
         def contingency_table(test, background, annotation):
             """
@@ -156,10 +157,6 @@ rule roadmap_enrichment:
                 annotation = pybedtools.BedTool(annotation_path)
 
                 ct = np.array(contingency_table(test, background-test, annotation))
-                ct[0, 0] / ct[0].sum(), ct[1, 0] / ct[1].sum()
-
-                from scipy.stats import fisher_exact
-
                 odds, p = fisher_exact(ct)
                 
                 record = {a: b for a, b in zip(contingency_entry_labels.flatten(), ct.flatten())}
