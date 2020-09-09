@@ -42,13 +42,14 @@ rule gtex_get_variant_sets:
                 background.append(bin_df.iloc[np.random.choice(bin_df.shape[0], count*5, replace=True)])
             except Exception:
                 continue
-
         background_df = pd.concat(background)
 
-        df.sort_values(by=['chr', 'start']).drop_duplicates(['chr', 'start'])\
+        df.loc[:, 'chr_num'] = df.loc[:, 'chr'].apply(lambda x: int(x.replace('chr', '')))
+        df.sort_values(by=['chr_num', 'start']).drop_duplicates(['chr', 'start'])\
             .to_csv(output.test, sep='\t', header=False, index=False)
 
-        background_df.sort_values(by=[0, 1]).drop_duplicates([0, 1])\
+        df.loc[:, 'chr_num'] = df.loc[:, 0].apply(lambda x: int(x.replace('chr', '')))
+        background_df.sort_values(by=['chr_num', 1]).drop_duplicates([0, 1])\
             .to_csv(output.background, sep='\t', header=False, index=False)
 
 
@@ -111,7 +112,7 @@ rule gtex_filtered_variants_and_background:
 rule roadmap_enrichment:
     input:
         test = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
-        background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed', 
+        background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
     output:
         'output/GTEx/enrichment/roadmap/{analysis_id}/{tissue}.roadmap.enrichments'
     run:
