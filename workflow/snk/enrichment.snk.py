@@ -48,7 +48,7 @@ rule gtex_get_variant_sets:
         df.sort_values(by=['chr_num', 'start']).drop_duplicates(['chr', 'start'])\
             .to_csv(output.test, sep='\t', header=False, index=False)
 
-        df.loc[:, 'chr_num'] = df.loc[:, 0].apply(lambda x: int(x.replace('chr', '')))
+        background_df.loc[:, 'chr_num'] = background_df.loc[:, 0].apply(lambda x: int(x.replace('chr', '')))
         background_df.sort_values(by=['chr_num', 1]).drop_duplicates([0, 1])\
             .to_csv(output.background, sep='\t', header=False, index=False)
 
