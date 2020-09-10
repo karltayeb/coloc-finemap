@@ -129,16 +129,24 @@ rule roadmap_enrichment:
         from scipy.stats import fisher_exact
         from subprocess import check_output
 
+        intersect_template = 'bedtools intersect -a {} -b {} -sorted| wc -l'
+
+        def count_intersection(a, b):
+            cmd = intersect_template.format(a, b)
+            print(cmd)
+            return int(check_output(cmd, shell=True))
+
+        def count_lines(a):
+            cmd = 'cat {} | wc -l'.format(a)
+            print(cmd)
+            return int(check_output(cmd, shell=True))
+
         def contingency_table(test_path, background_path, annot_path):
             """
             test and background DO NOT intersect
             return [[test/annotation, tesn n annotation],
                     [background/annotation, [test n annotation]]
             """
-            intersect_template = 'bedtools intersect -a {} -b {} -sorted| wc -l'
-            count_intersection = lambda a, b: int(check_output(intersect_template.format(a, b), shell=True))
-            count_lines = lambda a: int(check_output('cat {} | wc -l'.format(a), shell=True))
-
             test_in_annot = count_intersection(test_path, annot_path)
             test_not_in_annot = count_lines(test_path) - test_in_annot
 
