@@ -173,7 +173,6 @@ rule roadmap_enrichment:
                 'tissue': tissue,
                 'analysis_id': analysis_id
             })
-            print(record)
             return record
 
         tissue = wildcards.tissue
