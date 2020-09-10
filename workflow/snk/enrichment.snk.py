@@ -139,10 +139,10 @@ rule roadmap_enrichment:
             count_intersection = lambda a, b: int(check_output(intersect_template.format(a, b), shell=True))
             count_lines = lambda a: int(check_output('cat {} | wc -l'.format(a), shell=True))
 
-            test_in_annot = count_intersection(test_path, annotation_path)
+            test_in_annot = count_intersection(test_path, annot_path)
             test_not_in_annot = count_lines(test_path) - test_in_annot
 
-            background_in_annot = count_intersection(background_path, annotation_path)
+            background_in_annot = count_intersection(background_path, annot_path)
             background_not_in_annot = count_lines(background_path) - background_in_annot
 
             return np.array([[test_in_annot, test_not_in_annot],
@@ -173,6 +173,7 @@ rule roadmap_enrichment:
                 'tissue': tissue,
                 'analysis_id': analysis_id
             })
+            print(record)
             return record
 
         tissue = wildcards.tissue
