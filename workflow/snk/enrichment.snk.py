@@ -130,16 +130,22 @@ rule roadmap_enrichment:
 
         def contingency_table(test, background, annotation):
             """
-            test and background do not intersect
+            test and background DO NOT intersect
             return [[test/annotation, tesn n annotation],
                     [background/annotation, [test n annotation]]
             """
-            test_in_annot = test.intersect(annotation).count()
-            background_in_annot = background.intersect(annotation).count()
-            test_size = test.count()
-            background_size = background.count()
-            return np.array([[test_in_annot, test_size - test_in_annot],
-                    [background_in_annot, background_size - background_in_annot]])
+            intersect_template = 'bedtools intersect -a {} -b {} -sorted| wc -l'
+            count_intersection = lambda a, b: int(check_output(intersect_template.format(a, b), shell=True))
+            count_lines = lambda a: int(check_output('wc -l {}'.format(a), shell=True))
+
+            test_in_annot = count_intersection(test_path, annotation_path)
+            test_not_in_annot = count_lines(test_path) - test_in_annot
+
+            background_in_annot = count_intersection(background_path, annotation_path)
+            background_not_in_annot = count_lines(background_path) - background_in_annot
+
+            return np.array([[test_in_annot, test_not_in_annot],
+                    [background_in_annot, background_not_in_annot]])
 
         def get_record(analysis_id, tissue, eid, annotation_type):
             eid2celltype = pd.read_csv('output/annotations/roadmap/EIDlegend.txt',
