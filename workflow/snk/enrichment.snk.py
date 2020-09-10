@@ -162,13 +162,12 @@ rule roadmap_enrichment:
             contingency_entry_labels = np.array([['test_in_annot', 'test_not_in_annot'],
                         ['background_in_annot', 'background_not_in_annot']])
 
-            test = pybedtools.BedTool('output/GTEx/enrichment/{}/{}.test.bed'.format(analysis_id, tissue))
-            background = pybedtools.BedTool('output/GTEx/enrichment/{}/{}.background.bed'.format(analysis_id, tissue))
+            test = 'output/GTEx/enrichment/{}/{}.test.bed'.format(analysis_id, tissue)
+            background = 'output/GTEx/enrichment/{}/{}.background.bed'.format(analysis_id, tissue)
             annot_file = '{}.{}.bed'.format(eid, annotation_type)
-            annotation_path = 'output/annotations/roadmap/{}'.format(annot_file)
-            annotation = pybedtools.BedTool(annotation_path)
+            annotation = 'output/annotations/roadmap/{}'.format(annot_file)
 
-            ct = np.array(contingency_table(test, background-test, annotation))
+            ct = np.array(contingency_table(test, background, annotation))
             odds, p = fisher_exact(ct)
 
             record = {a: b for a, b in zip(contingency_entry_labels.flatten(), ct.flatten())}
