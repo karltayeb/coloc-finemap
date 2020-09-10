@@ -35,7 +35,7 @@ def cast(s):
 def load_cad_gwas(gene, variants=None):
     gwas = pysam.TabixFile('output/CAD/CAD/CAD.sorted.txt.gz')
     tss = get_tss(gene)
-    chrom = int(get_chr(gene)[3:])
+    chrom = get_chr(gene)
     df = pd.DataFrame(
         list(map(cast, x.strip().split('\t')) for x in
              gwas.fetch(chrom, np.clip(tss-1e6, 0, None), tss+1e6)),
