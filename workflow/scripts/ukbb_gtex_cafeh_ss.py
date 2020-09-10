@@ -33,7 +33,7 @@ def cast(s):
 
 
 def load_cad_gwas(gene, variants=None):
-    gwas = pysam.TabixFile('output/CAD/CAD_META.sorted.txt.gz')
+    gwas = pysam.TabixFile('output/CAD/CAD/CAD.sorted.txt.gz')
     tss = get_tss(gene)
     chrom = int(get_chr(gene)[3:])
     df = pd.DataFrame(
@@ -45,12 +45,13 @@ def load_cad_gwas(gene, variants=None):
         df = df[df.oldID.isin(variants)]
 
     df.rename(columns={
-        'Allele1': 'ref',
-        'Allele2': 'alt',
-        'Effect': 'slope',
-        'StdErr': 'slope_se',
-        'P-val': 'pval_nominal',
-        'oldID': 'rsid'}, inplace=True)
+        'POS': 'pos',
+        'REF': 'ref',
+        'ALT': 'alt',
+        'ID': 'rsid',
+        'beta': 'slope',
+        'beta_se': 'slope_se',
+        'p': 'pval_nominal'}, inplace=True)
 
     df['ref'] = df['ref'].str.upper()
     df['alt'] = df['alt'].str.upper()
@@ -118,7 +119,6 @@ def load_grasp_gwas(gene, phenotype):
              gwas.fetch(chrom, np.clip(tss-1e6, 0, None), tss+1e6)),
         columns=gwas.header[0][1:].strip().split('\t')
     )
-
     df.rename(columns={
         'POS': 'pos',
         'REF': 'ref',
