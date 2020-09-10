@@ -16,7 +16,6 @@ from misc import *
 from cafeh.cafeh_ss import CAFEH as CSS
 from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
 
-
 import pysam
 import copy
 
@@ -132,12 +131,18 @@ def load_grasp_gwas(gene, phenotype):
     return df
 
 
-
 def filter_and_flip(gtex, gwas, variants):
     """
     filter down to common variants with unique coding
     flip gwas to match gtex
     """
+    # captialize ref/alt encoding so that theres no issue with comparison
+    gwas.ref = gwas.ref.str.upper()
+    gwas.alt = gwas.alt.str.upper()
+    
+    gtex.ref = gtex.ref.str.upper()
+    gtex.alt = gtex.alt.str.upper()
+
     common_variants = np.intersect1d(gwas.rsid, gtex.rsid)
     common_variants = np.intersect1d(common_variants, variants)
 
