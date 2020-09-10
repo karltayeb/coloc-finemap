@@ -127,8 +127,9 @@ rule roadmap_enrichment:
         import pandas as pd
         from tqdm import tqdm
         from scipy.stats import fisher_exact
+        from subprocess import check_output
 
-        def contingency_table(test, background, annotation):
+        def contingency_table(test_path, background_path, annot_path):
             """
             test and background DO NOT intersect
             return [[test/annotation, tesn n annotation],
@@ -136,7 +137,7 @@ rule roadmap_enrichment:
             """
             intersect_template = 'bedtools intersect -a {} -b {} -sorted| wc -l'
             count_intersection = lambda a, b: int(check_output(intersect_template.format(a, b), shell=True))
-            count_lines = lambda a: int(check_output('wc -l {}'.format(a), shell=True))
+            count_lines = lambda a: int(check_output('cat {} | wc -l'.format(a), shell=True))
 
             test_in_annot = count_intersection(test_path, annotation_path)
             test_not_in_annot = count_lines(test_path) - test_in_annot
