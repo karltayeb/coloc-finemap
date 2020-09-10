@@ -173,7 +173,6 @@ rule roadmap_enrichment:
                 'tissue': tissue,
                 'analysis_id': analysis_id
             })
-            print(record)
             return record
 
         tissue = wildcards.tissue
@@ -185,11 +184,8 @@ rule roadmap_enrichment:
 
         records = []
         for annot_file in tqdm(annotation_files):
-            try:
-                eid, annotation_type, _ = annot_file.split('.')
-                record = get_record(analysis_id, tissue, eid, annotation_type)
-                records.append(record)
-            except Exception as e:
-                print(e)
+            eid, annotation_type, _ = annot_file.split('.')
+            record = get_record(analysis_id, tissue, eid, annotation_type)
+            records.append(record)
 
         pd.DataFrame(records).to_csv(output[0], sep='\t', index=None)
