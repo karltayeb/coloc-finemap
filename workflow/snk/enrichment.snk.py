@@ -88,7 +88,7 @@ rule gtex_filtered_variants_and_background:
         if 'eqtltop' in analysis_id:
             print('fetching top eqtls in GTEx')
             tissue_significant = pd.read_csv(
-                '../../output/GTEx/nominally_significant_associations/{}.nominally_significant.txt'.format(tissue),
+                'output/GTEx/nominally_significant_associations/{}.nominally_significant.txt'.format(tissue),
                 sep='\t', index_col=None)
             gene2count = df.gene.value_counts()
 
