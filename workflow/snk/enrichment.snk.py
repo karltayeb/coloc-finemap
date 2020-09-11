@@ -77,6 +77,7 @@ rule gtex_filtered_variants_and_background:
             return '{}/{}.{}'.format(dtss_bin, dtss_bin, maf_bin)
 
         if analysis_id == 'eqtl':
+            genes = pd.read_csv('output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t').gene.values
             eqtls = pd.read_csv(
                 '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/'
                 '{}.v8.signif_variant_gene_pairs.txt'.format(tissue),
