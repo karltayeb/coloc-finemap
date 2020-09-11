@@ -100,6 +100,7 @@ rule gtex_filtered_variants_and_background:
             new_df.loc[:, 'start'] = new_df.variant_id.apply(lambda x: int(x.split('_')[1]))
             new_df.loc[:, 'end'] = new_df.loc[:, 'start'] + 1
             new_df.loc[:, 'study'] = tissue
+
             df = new_df
     
         # put variant, gene pair into bins
