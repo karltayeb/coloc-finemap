@@ -63,7 +63,7 @@ rule gtex_filtered_variants_and_background:
         filters = lambda wildcards: config['enrichment_filters'][wildcards.analysis_id]
     run:
         tissue = wildcards.tissue
-
+        analysis_id = wildcards.analysis_id
         import numpy as np
         import pandas as pd
         from tqdm import tqdm
@@ -80,10 +80,27 @@ rule gtex_filtered_variants_and_background:
         df = pd.read_csv('output/GTEx/variant_reports/{}.all_genes.variant_report'.format(tissue), sep='\t')
         print('\t {} total records'.format(df.shape[0]))
         df = df[eval(params.filters)]
+        df.loc[:, 'tss_distance'] = df.start - df.tss
+
+        if 'eqtltop' in analysis_id:
+            tissue_significant = pd.read_csv(
+                '../../output/GTEx/nominally_significant_associations/{}.nominally_significant.txt'.format(tissue),
+                sep='\t', index_col=None)
+            gene2count = df.gene.value_counts()
+
+            new_df = pd.concat([group.nsmallest(gene2count.get(gene, 0), 'pval_nominal')
+             for gene, group in tqdm.tqdm(tissue_significant.groupby('gene_id')) if gene in gene2count])
+
+            new_df.loc[:, 'chr'] = new_df.variant_id.apply(lambda x: x.split('_')[0])
+            new_df.loc[:, 'start'] = new_df.variant_id.apply(lambda x: int(x.split('_')[1]))
+            new_df.loc[:, 'end'] = new_df.loc[:, 'start'] + 1
+            new_df.loc[:, 'study'] = tissue
+            df = new_df
+    
         print('\t {} remaining records'.format(df.shape[0]))
+
         # put variant, gene pair into bins
-        df.loc[:, 'dtss'] = df.start - df.tss
-        df.loc[:, 'bin'] = [pair2bin(dtss, maf) for dtss, maf in zip(df.dtss, df.maf)]
+        df.loc[:, 'bin'] = [pair2bin(dtss, maf) for dtss, maf in zip(df.tss_distance, df.maf)]
 
         # count number of variants in each bin
         bins = df.bin.value_counts().to_dict()
