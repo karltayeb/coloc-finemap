@@ -84,7 +84,7 @@ rule gtex_filtered_variants_and_background:
                 sep='\t', index_col=None)
             eqtls = eqtls[eqtls.gene_id.isin(genes)]
             idx = eqtls.groupby('gene_id').pval_nominal.idxmin().values
-            eqtls.loc[idx]
+            eqtls = eqtls.loc[idx]
 
             eqtls.loc[:, 'chr'] = eqtls.variant_id.apply(lambda x: x.split('_')[0])
             eqtls.loc[:, 'start'] = eqtls.variant_id.apply(lambda x: int(x.split('_')[1]))
