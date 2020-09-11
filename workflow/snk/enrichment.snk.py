@@ -80,16 +80,20 @@ rule gtex_filtered_variants_and_background:
         df = pd.read_csv('output/GTEx/variant_reports/{}.all_genes.variant_report'.format(tissue), sep='\t')
         print('\t {} total records'.format(df.shape[0]))
         df = df[eval(params.filters)]
+        print('\t {} remaining records'.format(df.shape[0]))
+
+        # add tss_distance
         df.loc[:, 'tss_distance'] = df.start - df.tss
 
         if 'eqtltop' in analysis_id:
+            print('fetching top eqtls in GTEx')
             tissue_significant = pd.read_csv(
                 '../../output/GTEx/nominally_significant_associations/{}.nominally_significant.txt'.format(tissue),
                 sep='\t', index_col=None)
             gene2count = df.gene.value_counts()
 
             new_df = pd.concat([group.nsmallest(gene2count.get(gene, 0), 'pval_nominal')
-             for gene, group in tqdm.tqdm(tissue_significant.groupby('gene_id')) if gene in gene2count])
+                for gene, group in tqdm.tqdm(tissue_significant.groupby('gene_id')) if gene in gene2count])
 
             new_df.loc[:, 'chr'] = new_df.variant_id.apply(lambda x: x.split('_')[0])
             new_df.loc[:, 'start'] = new_df.variant_id.apply(lambda x: int(x.split('_')[1]))
@@ -97,8 +101,6 @@ rule gtex_filtered_variants_and_background:
             new_df.loc[:, 'study'] = tissue
             df = new_df
     
-        print('\t {} remaining records'.format(df.shape[0]))
-
         # put variant, gene pair into bins
         df.loc[:, 'bin'] = [pair2bin(dtss, maf) for dtss, maf in zip(df.tss_distance, df.maf)]
 
