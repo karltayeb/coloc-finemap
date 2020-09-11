@@ -143,7 +143,7 @@ rule gtex_filtered_variants_and_background:
                 background.append(bin_df.iloc[np.random.choice(bin_df.shape[0], count*5, replace=True)])
             except Exception:
                 continue
-
+        import pdb; pdb.set_trace()
         # save background set of unique chr pos
         background_df = pd.concat(background)
         f = ~background_df.iloc[:, 4].isin(df.iloc[:, 3])
