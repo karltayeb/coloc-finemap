@@ -76,15 +76,32 @@ rule gtex_filtered_variants_and_background:
             maf_bin = '{:.2f}'.format(maf)
             return '{}/{}.{}'.format(dtss_bin, dtss_bin, maf_bin)
 
-        print('using filter: {}'.format(params.filters))
-        df = pd.read_csv('output/GTEx/variant_reports/{}.all_genes.variant_report'.format(tissue), sep='\t')
-        print('\t {} total records'.format(df.shape[0]))
-        df = df[eval(params.filters)]
-        print('\t {} remaining records'.format(df.shape[0]))
+        if analysis_id == 'eqtl':
+            eqtls = pd.read_csv(
+                '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/'
+                '{}.v8.signif_variant_gene_pairs.txt'.format(tissue),
+                sep='\t', index_col=None)
+            eqtls = eqtls[eqtls.gene_id.isin(genes)]
+            idx = eqtls.groupby('gene_id').pval_nominal.idxmin().values
+            eqtls.loc[idx]
 
-        # add tss_distance
-        df.loc[:, 'tss_distance'] = df.start - df.tss
+            eqtls.loc[:, 'chr'] = eqtls.variant_id.apply(lambda x: x.split('_')[0])
+            eqtls.loc[:, 'start'] = eqtls.variant_id.apply(lambda x: int(x.split('_')[1]))
+            eqtls.loc[:, 'end'] = eqtls.loc[:, 'start'] + 1
+            eqtls.loc[:, 'study'] = tissue
+            df = eqtls.loc[:, ['chr', 'start', 'end', 'variant_id', 'tss_distance', 'maf']]
 
+        else:
+            print('using filter: {}'.format(params.filters))
+            df = pd.read_csv('output/GTEx/variant_reports/{}.all_genes.variant_report'.format(tissue), sep='\t')
+            print('\t {} total records'.format(df.shape[0]))
+            df = df[eval(params.filters)]
+            print('\t {} remaining records'.format(df.shape[0]))
+
+            # add tss_distance
+            df.loc[:, 'tss_distance'] = df.start - df.tss
+
+        """
         if 'eqtltop' in analysis_id:
             print('fetching top eqtls in GTEx')
             tissue_significant = pd.read_csv(
@@ -101,7 +118,8 @@ rule gtex_filtered_variants_and_background:
             new_df.loc[:, 'study'] = tissue
 
             df = new_df.loc[:, ['chr', 'start', 'end', 'variant_id', 'tss_distance', 'maf']]
-    
+        """
+
         # put variant, gene pair into bins
         df.loc[:, 'bin'] = [pair2bin(dtss, maf) for dtss, maf in zip(df.tss_distance, df.maf)]
 
