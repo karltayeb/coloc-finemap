@@ -87,6 +87,7 @@ rule gtex_filtered_variants_and_background:
 
         if 'eqtltop' in analysis_id:
             print('fetching top eqtls in GTEx')
+            import pdb; pdb.set_trace()
             tissue_significant = pd.read_csv(
                 'output/GTEx/nominally_significant_associations/{}.nominally_significant.txt'.format(tissue),
                 sep='\t', index_col=None)
