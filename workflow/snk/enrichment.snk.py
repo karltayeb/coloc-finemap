@@ -100,7 +100,7 @@ rule gtex_filtered_variants_and_background:
             new_df.loc[:, 'end'] = new_df.loc[:, 'start'] + 1
             new_df.loc[:, 'study'] = tissue
 
-            df = new_df
+            df = new_df.loc[:, ['chr', 'start', 'end', 'maf', 'tss_distance']]
     
         # put variant, gene pair into bins
         df.loc[:, 'bin'] = [pair2bin(dtss, maf) for dtss, maf in zip(df.tss_distance, df.maf)]
