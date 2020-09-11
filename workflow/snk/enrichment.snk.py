@@ -94,12 +94,13 @@ rule gtex_filtered_variants_and_background:
             gene2count = df.gene.value_counts()
 
             new_df = pd.concat([group.nsmallest(gene2count.get(gene, 0), 'pval_nominal')
-                for gene, group in tqdm.tqdm(tissue_significant.groupby('gene_id')) if gene in gene2count])
+                for gene, group in tqdm(tissue_significant.groupby('gene_id')) if gene in gene2count])
 
             new_df.loc[:, 'chr'] = new_df.variant_id.apply(lambda x: x.split('_')[0])
             new_df.loc[:, 'start'] = new_df.variant_id.apply(lambda x: int(x.split('_')[1]))
             new_df.loc[:, 'end'] = new_df.loc[:, 'start'] + 1
             new_df.loc[:, 'study'] = tissue
+
             df = new_df
     
         # put variant, gene pair into bins
