@@ -120,8 +120,6 @@ rule gtex_filtered_variants_and_background:
 
             df = new_df.loc[:, ['chr', 'start', 'end', 'variant_id', 'tss_distance', 'maf']]
         """
-        import pdb; pdb.set_trace()
-
         # save test set of unique chr pos
         print('save test set')
         df.loc[:, 'chr_num'] = df.loc[:, 'chr'].apply(lambda x: int(x.replace('chr', '')))
