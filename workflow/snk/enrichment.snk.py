@@ -40,7 +40,7 @@ rule get_tissue_specific_variant_gene_pairs:
     input:
         'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
     output:
-        'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
+        'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}.variant_gene_pairs.bed'
     shell:
         "bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d | awk '{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}'  > {outpu}"
 
