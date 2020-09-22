@@ -1,3 +1,49 @@
+rule get_tissue_expressed_genes_bed:
+    output:
+        'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
+    run:
+        import pandas as pd
+        import numpy as np
+
+        tissue = wildcards.tissue
+        expression_path = '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/'\
+            'GTEx_Analysis_v8_eQTL_expression_matrices/{}.v8.normalized_expression.bed.gz'.format(tissue)
+
+        gencode_path = '/work-zfs/abattle4/lab_data/annotation/gencode.v26/gencode.v26.annotation.gene.txt'
+        gencode = pd.read_csv(gencode_path, sep='\t')
+
+        tissue_gene = pd.read_csv(expression_path, sep='\t', usecols=np.arange(4))
+        pseudo_gene_types = [x for x in gencode.gene_type.unique() if 'pseudo' in x]
+        gencode_tissue = gencode[gencode.gene_id.isin(tissue_gene.gene_id) & ~(gencode.gene_type.isin(pseudo_gene_types))]
+
+        lines = []
+        for _, row in gencode_tissue.iterrows():
+            if row.strand == '-':
+                start = row.end_pos
+            else:
+                start = row.start_pos
+            line = {
+                'chr': row.chr, 'start': start, 'end': start + 1,
+                'gene_id': row.gene_id, 'strand': 1 if (row.strand == '+') else -1
+            }
+            lines.append(line)
+            
+        tissue_gene_bed = pd.DataFrame(lines)
+        tissue_gene_bed.sort_values(['chr', 'start']).to_csv(outputs[0], sep='\t', index=None, header=False)
+
+rule get_tissue_specific_variant_gene_pairs:
+    input:
+        'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
+    output:
+        'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
+    script:
+        ml bedtools
+        bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b \
+        {input} -d |
+        awk '{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}'  >
+        {output}
+
+
 rule gtex_get_variant_sets:
     input:
         'output/GTEx/variant_reports/{tissue}.all_genes.variant_report'
