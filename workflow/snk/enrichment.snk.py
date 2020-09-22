@@ -36,13 +36,9 @@ rule get_tissue_specific_variant_gene_pairs:
         'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
     output:
         'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
-    script:
-        ml bedtools
-        bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b \
-        {input} -d |
-        awk '{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}'  >
-        {output}
-
+    shell:
+        "bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d | awk '{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}'  > {outpu}"
+    
 
 rule gtex_get_variant_sets:
     input:
