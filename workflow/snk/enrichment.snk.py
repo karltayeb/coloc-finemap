@@ -10,9 +10,12 @@ rule get_tissue_expressed_genes_bed:
             'GTEx_Analysis_v8_eQTL_expression_matrices/{}.v8.normalized_expression.bed.gz'.format(tissue)
 
         gencode_path = '/work-zfs/abattle4/lab_data/annotation/gencode.v26/gencode.v26.annotation.gene.txt'
-        gencode = pd.read_csv(gencode_path, sep='\t')
 
+        print('load data')
+        gencode = pd.read_csv(gencode_path, sep='\t')
         tissue_gene = pd.read_csv(expression_path, sep='\t', usecols=np.arange(4))
+
+        print('filtering')
         pseudo_gene_types = [x for x in gencode.gene_type.unique() if 'pseudo' in x]
         gencode_tissue = gencode[gencode.gene_id.isin(tissue_gene.gene_id) & ~(gencode.gene_type.isin(pseudo_gene_types))]
 
@@ -29,6 +32,8 @@ rule get_tissue_expressed_genes_bed:
             lines.append(line)
             
         tissue_gene_bed = pd.DataFrame(lines)
+
+        print('save')
         tissue_gene_bed.sort_values(['chr', 'start']).to_csv(outputs[0], sep='\t', index=None, header=False)
 
 rule get_tissue_specific_variant_gene_pairs:
@@ -38,7 +43,7 @@ rule get_tissue_specific_variant_gene_pairs:
         'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
     shell:
         "bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d | awk '{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}'  > {outpu}"
-    
+
 
 rule gtex_get_variant_sets:
     input:
