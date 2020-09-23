@@ -76,6 +76,7 @@ rule bin_tissue_specific_variant_gene_pairs:
             df.loc[:, bin_col] = np.digitize(df.loc[:, col], bins)
             df.loc[:, bin_range_col] = df.loc[:, bin_col].apply(lambda x: bin2range.get(x))
 
+        print('loading')
         df = pd.read_csv(input[0], sep=' ', usecols=[0, 1, 2, 3, 4, 5, 10], header=None)
         df.columns = np.array(['chr', 'start', 'end', 'variant_id', 'maf', 'ldscore', 'tss'])
         df = df[(df.tss > -1e6) & (df.tss < 1e6)]
@@ -85,8 +86,8 @@ rule bin_tissue_specific_variant_gene_pairs:
         digitize_column(df, 'ldscore', 10)
         digitize_column(df, 'tss', 40)
 
-        for maf_bin, group in digitize.groupby('maf_bin'):
-            save_path = 'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}/{tissue}.maf_bin_{maf_bin}.variant_gene_pairs.bed'.format(
+        for maf_bin, group in df.groupby('maf_bin'):
+            save_path = 'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}/{tissue}.variant_gene_pairs.maf_bin_{maf_bin}.bed'.format(
                 tissue=tissue, maf_bin=maf_bin)
             print(save_path)
             group.to_csv(save_path, sep='\t')
