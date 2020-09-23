@@ -41,9 +41,13 @@ rule get_tissue_specific_variant_gene_pairs:
         'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
     output:
         'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}.variant_gene_pairs.bed'
-    shell:
+    run:
+
+        cmd = "bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d "\
+            "| awk \'{{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}}\' > {output}"
+        cmd = cmd.format(input=input[0], output=output[0])
         """
-        bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d | awk "{{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}}"  > {output}
+        bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d | awk "{{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}}"  > {{output}}
         """
 
 
