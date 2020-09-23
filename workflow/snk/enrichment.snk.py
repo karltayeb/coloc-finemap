@@ -34,7 +34,7 @@ rule get_tissue_expressed_genes_bed:
         tissue_gene_bed = pd.DataFrame(lines)
 
         print('save')
-        tissue_gene_bed.sort_values(['chr', 'start']).to_csv(outputs[0], sep='\t', index=None, header=False)
+        tissue_gene_bed.sort_values(['chr', 'start']).to_csv(output[0], sep='\t', index=None, header=False)
 
 rule get_tissue_specific_variant_gene_pairs:
     input:
