@@ -42,13 +42,12 @@ rule get_tissue_specific_variant_gene_pairs:
     output:
         'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}.variant_gene_pairs.bed'
     run:
-
+        import subprocess
         cmd = "bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d "\
             "| awk \'{{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}}\' > {output}"
         cmd = cmd.format(input=input[0], output=output[0])
-        """
-        bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d | awk "{{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}}"  > {{output}}
-        """
+        print(cmd)
+        subprocess.run(cmd, shell=True)
 
 
 rule gtex_get_variant_sets:
