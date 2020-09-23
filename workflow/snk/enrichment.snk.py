@@ -50,6 +50,47 @@ rule get_tissue_specific_variant_gene_pairs:
         subprocess.run(cmd, shell=True)
 
 
+rule bin_tissue_specific_variant_gene_pairs:
+    input:
+        'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}.variant_gene_pairs.bed'
+    output:
+        expand('output/GTEx/tissue_specific_variant_gene_pairs/{tissue}/{tissue}.maf_bin_{maf_bin}.variant_gene_pairs.bed',
+            tissue='\{tissue\}', maf_bin=np.arange(1, 26))
+    run:
+        import pandas as pd
+        import numpy as np
+
+        def digitize_column(df, col, n_bins):
+            """
+            add {col}_bin and {col}_bin_range to df
+            discritize numeric valued col in n_bins quantile bins
+            """
+            bins = np.quantile(df.loc[:, col], np.linspace(0, 1, n_bins+1))
+            bins[-1] = bins[-1] + 1 # so that we dont have a singleton bin
+            print(bins)
+            
+            bin_col = '{}_bin'.format(col)
+            bin_range_col = '{}_bin_range'.format(col)
+            bin2range = {x: '[{}, {})'.format(bins[x-1], bins[x]) for x in range(1, n_bins + 1)}
+            
+            df.loc[:, bin_col] = np.digitize(df.loc[:, col], bins)
+            df.loc[:, bin_range_col] = df.loc[:, bin_col].apply(lambda x: bin2range.get(x))
+
+        df = pd.read_csv(input[0], sep=' ', usecols=[0, 1, 2, 3, 4, 5, 10], header=None)
+        df.columns = np.array(['chr', 'start', 'end', 'variant_id', 'maf', 'ldscore', 'tss'])
+        df = df[(df.tss > -1e6) & (df.tss < 1e6)]
+
+        print('binning')
+        digitize_column(df, 'maf', 25)
+        digitize_column(df, 'ldscore', 10)
+        digitize_column(df, 'tss', 40)
+
+        for maf_bin, group in digitize.groupby('maf_bin'):
+            save_path = 'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}/{tissue}.maf_bin_{maf_bin}.variant_gene_pairs.bed'.format(
+                tissue=tissue, maf_bin=maf_bin)
+            print(save_path)
+            group.to_csv(save_path, sep='\t')
+
 rule gtex_get_variant_sets:
     input:
         'output/GTEx/variant_reports/{tissue}.all_genes.variant_report'
