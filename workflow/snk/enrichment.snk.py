@@ -55,7 +55,7 @@ rule bin_tissue_specific_variant_gene_pairs:
         'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}.variant_gene_pairs.bed'
     output:
         expand('output/GTEx/tissue_specific_variant_gene_pairs/{tissue}/{tissue}.maf_bin_{maf_bin}.variant_gene_pairs.bed',
-            tissue='\{tissue\}', maf_bin=np.arange(1, 26))
+            maf_bin=np.arange(1, 26), allow_missing=True)
     run:
         import pandas as pd
         import numpy as np
