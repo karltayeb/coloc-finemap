@@ -88,7 +88,7 @@ rule bin_tissue_specific_variant_gene_pairs:
 
         for maf_bin, group in df.groupby('maf_bin'):
             save_path = 'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}/{tissue}.variant_gene_pairs.maf_bin_{maf_bin}.bed'.format(
-                tissue=tissue, maf_bin=maf_bin)
+                tissue=wildcards.tissue, maf_bin=maf_bin)
             print(save_path)
             group.to_csv(save_path, sep='\t')
 
