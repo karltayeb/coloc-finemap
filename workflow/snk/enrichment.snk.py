@@ -88,9 +88,7 @@ rule gtex_make_test_set:
     run:
         tissue = wildcards.tissue
         analysis_id = wildcards.analysis_id
-        import numpy as np
         import pandas as pd
-        from tqdm import 
         import subprocess
 
         df = pd.read_csv(input[0], sep='\t')
