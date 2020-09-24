@@ -140,8 +140,8 @@ rule gtex_make_background_set:
             background.append(grp.sample(5*bin2count.get(key, 0)))
 
         background = pd.concat(background)
-        background = background.sort_values([0, 1])
-        background = background[~background.iloc[:, 3].isin(test.iloc[:, 3])]
+        background = background.sort_values(['chr', 'start'])
+        background = background[~background.variant_id.isin(test.variant_id)]
         background.to_csv(output.background)
 
 
