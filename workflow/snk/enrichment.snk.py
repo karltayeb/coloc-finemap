@@ -90,7 +90,7 @@ rule bin_tissue_specific_variant_gene_pairs:
             save_path = 'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}/{tissue}.variant_gene_pairs.maf_bin_{maf_bin}.bed'.format(
                 tissue=wildcards.tissue, maf_bin=maf_bin)
             print(save_path)
-            group.to_csv(save_path, sep='\t')
+            group.to_csv(save_path, sep='\t', index=False)
 
 rule gtex_get_variant_sets:
     input:
