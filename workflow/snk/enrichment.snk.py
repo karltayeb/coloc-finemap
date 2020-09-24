@@ -127,7 +127,7 @@ rule gtex_make_background_set:
         import pandas as pd
         import tqdm
 
-        test = pd.read_csv(input.test, sep='\t', , usecols=[0,1,2,3,14,16,18], header=None)
+        test = pd.read_csv(input.test, sep='\t', usecols=[0,1,2,3,14,16,18], header=None)
         test.columns = ['chr', 'start', 'end', 'variant_id', 'maf_bin', 'ldscore_bin', 'dtss_bin']
 
         bank = pd.read_csv(input.bank, usecols=[0,1,2,3,7,9,11],  sep='\t', header=None)
