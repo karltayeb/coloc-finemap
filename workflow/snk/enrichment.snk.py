@@ -130,6 +130,8 @@ rule gtex_make_background_set:
         test = pd.read_csv(input.test, sep='\t', header=None)
         bank = pd.read_csv(input.bank, sep='\t', header=None)
 
+        bin2count = test.groupby([14, 16, 18]).agg(['count']).iloc[:, 0].to_dict()
+
         background = []
         for key, grp in tqdm.tqdm(bank.groupby([7, 9, 11])):
             background.append(grp.sample(5*bin2count.get(key, 0)))
