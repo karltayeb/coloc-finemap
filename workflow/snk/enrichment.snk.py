@@ -44,7 +44,7 @@ rule get_tissue_specific_variant_gene_pairs:
     run:
         import subprocess
         cmd = "bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d "\
-            "| awk \'{{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}}\' > {output}"
+            "| awk \' BEGIN {{FS = \"\\t\"}}; {{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}}\' > {output}"
         cmd = cmd.format(input=input[0], output=output[0])
         print(cmd)
         subprocess.run(cmd, shell=True)
