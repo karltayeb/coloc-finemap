@@ -85,6 +85,7 @@ rule gtex_make_test_set:
         test_binned = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
     params:
         filters = lambda wildcards: config['enrichment_filters'][wildcards.analysis_id]
+    group: "tissue_analysis"
     run:
         tissue = wildcards.tissue
         analysis_id = wildcards.analysis_id
@@ -123,6 +124,7 @@ rule gtex_make_background_set:
         bank = 'output/GTEx/enrichment/bank/{tissue}.bank.bed'
     output:
         background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
+    group: "tissue_analysis"
     run:
         import pandas as pd
         import tqdm
@@ -151,6 +153,7 @@ rule roadmap_enrichment:
         background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
     output:
         'output/GTEx/enrichment/roadmap/{analysis_id}/{tissue}.roadmap.enrichments'
+    group: "tissue_analysis"
     run:
         import os
         import pybedtools
