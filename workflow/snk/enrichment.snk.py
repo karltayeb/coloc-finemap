@@ -79,10 +79,10 @@ rule get_tissue_variant_gene_bank:
 rule gtex_make_test_set:
     input:
         'output/GTEx/variant_reports/{tissue}.all_genes.variant_report',
+        bank = 'output/GTEx/enrichmnet/bank/{tissue}.bank.bed'
     output:
         test = temp('output/GTEx/enrichment/{analysis_id}/{tissue}.test_temp.bed'),
         test_binned = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
-        bank = 'output/GTEx/enrichmnet/bank/{tissue}.bank.bed'
     params:
         filters = lambda wildcards: config['enrichment_filters'][wildcards.analysis_id]
     run:
@@ -95,7 +95,7 @@ rule gtex_make_test_set:
         df = df[eval(params.filters)]
         df.iloc[:, :7].sort_values(['chr', 'start']).to_csv(output.test, sep='\t', index=False, header=False)
 
-        cmd = 'bedtools intersect -a {} -b {} -wa -wb -sorted > {}'.format(output.test, output.bank, output.test_binned)
+        cmd = 'bedtools intersect -a {} -b {} -wa -wb -sorted > {}'.format(output.test, input.bank, output.test_binned)
         print(cmd)
         subprocess.run(cmd, shell=True)
 
