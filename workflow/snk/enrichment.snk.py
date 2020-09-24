@@ -142,7 +142,7 @@ rule gtex_make_background_set:
         background = pd.concat(background)
         background = background.sort_values(['chr', 'start'])
         background = background[~background.variant_id.isin(test.variant_id)]
-        background.to_csv(output.background, sep='\t', index=False)
+        background.to_csv(output.background, sep='\t', index=False, header=False)
 
 
 rule roadmap_enrichment:
