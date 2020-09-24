@@ -40,7 +40,7 @@ rule get_tissue_variant_gene_bank:
     input:
         'output/GTEx/enrichment/{tissue}.genes.bed'
     output:
-        'output/GTEx/enrichmnet/bank/{tissue}.bank.bed'
+        'output/GTEx/enrichment/bank/{tissue}.bank.bed'
     run:
         import subprocess
         cmd = "bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d "\
@@ -79,7 +79,7 @@ rule get_tissue_variant_gene_bank:
 rule gtex_make_test_set:
     input:
         'output/GTEx/variant_reports/{tissue}.all_genes.variant_report',
-        bank = 'output/GTEx/enrichmnet/bank/{tissue}.bank.bed'
+        bank = 'output/GTEx/enrichment/bank/{tissue}.bank.bed'
     output:
         test = temp('output/GTEx/enrichment/{analysis_id}/{tissue}.test_temp.bed'),
         test_binned = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
@@ -120,7 +120,7 @@ rule gtex_make_test_set:
 rule gtex_make_background_set:
     input:
         test = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
-        bank = 'output/GTEx/enrichmnet/bank/{tissue}.bank.bed'
+        bank = 'output/GTEx/enrichment/bank/{tissue}.bank.bed'
     output:
         background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
     run:
