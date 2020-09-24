@@ -1,6 +1,6 @@
 rule get_tissue_expressed_genes_bed:
     output:
-        'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
+        temp('output/GTEx/enrichment/{tissue}.genes.bed')
     run:
         import pandas as pd
         import numpy as np
@@ -36,11 +36,11 @@ rule get_tissue_expressed_genes_bed:
         print('save')
         tissue_gene_bed.sort_values(['chr', 'start']).to_csv(output[0], sep='\t', index=None, header=False)
 
-rule get_tissue_specific_variant_gene_pairs:
+rule get_tissue_variant_gene_bank:
     input:
-        'output/GTEx/tissue_expressed_genes/{tissue}.genes.bed'
+        'output/GTEx/enrichment/{tissue}.genes.bed'
     output:
-        'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}.variant_gene_pairs.bed'
+        'output/GTEx/enrichmnet/bank/{tissue}.bank.bed'
     run:
         import subprocess
         cmd = "bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d "\
@@ -48,17 +48,6 @@ rule get_tissue_specific_variant_gene_pairs:
         cmd = cmd.format(input=input[0], output=output[0])
         print(cmd)
         subprocess.run(cmd, shell=True)
-
-
-rule bin_tissue_specific_variant_gene_pairs:
-    input:
-        'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}.variant_gene_pairs.bed'
-    output:
-        expand('output/GTEx/tissue_specific_variant_gene_pairs/{tissue}/{tissue}.variant_gene_pairs.maf_bin_{maf_bin}.bed',
-            maf_bin=np.arange(1, 26), allow_missing=True)
-    run:
-        import pandas as pd
-        import numpy as np
 
         def digitize_column(df, col, n_bins):
             """
@@ -77,7 +66,7 @@ rule bin_tissue_specific_variant_gene_pairs:
             df.loc[:, bin_range_col] = df.loc[:, bin_col].apply(lambda x: bin2range.get(x))
 
         print('loading')
-        df = pd.read_csv(input[0], sep=' ', usecols=[0, 1, 2, 3, 4, 5, 10], header=None)
+        df = pd.read_csv(output[0], sep=' ', usecols=[0, 1, 2, 3, 4, 5, 10], header=None)
         df.columns = np.array(['chr', 'start', 'end', 'variant_id', 'maf', 'ldscore', 'tss'])
         df = df[(df.tss > -1e6) & (df.tss < 1e6)]
 
@@ -85,74 +74,15 @@ rule bin_tissue_specific_variant_gene_pairs:
         digitize_column(df, 'maf', 25)
         digitize_column(df, 'ldscore', 10)
         digitize_column(df, 'tss', 40)
+        df.to_csv(output[0], sep='\t', index=False)
 
-        for maf_bin, group in df.groupby('maf_bin'):
-            save_path = 'output/GTEx/tissue_specific_variant_gene_pairs/{tissue}/{tissue}.variant_gene_pairs.maf_bin_{maf_bin}.bed'.format(
-                tissue=wildcards.tissue, maf_bin=maf_bin)
-            print(save_path)
-            group.to_csv(save_path, sep='\t', index=False)
-
-rule gtex_get_variant_sets:
+rule gtex_make_test_set:
     input:
-        'output/GTEx/variant_reports/{tissue}.all_genes.variant_report'
+        'output/GTEx/variant_reports/{tissue}.all_genes.variant_report',
     output:
-        test = 'output/GTEx/enrichment/{tissue}.test.bed',
-        background = 'output/GTEx/enrichment/{tissue}.background.bed'
-    run:
-        tissue = wildcards.tissue
-
-        import numpy as np
-        import pandas as pd
-        from tqdm import tqdm
-
-        def pair2bin(dtss, maf):
-            """
-            put (dtss, maf) pair into bin
-            """
-            dtss_bin = int((dtss + 1e6) / 20000)
-            maf_bin = '{:.2f}'.format(maf)
-            return '{}/{}.{}'.format(dtss_bin, dtss_bin, maf_bin)
-
-        df = pd.read_csv('output/GTEx/variant_reports/{}.all_genes.variant_report'.format(tissue), sep='\t')
-
-        df = df[
-            (df.p_active > 0.9)
-            & (df.pip > 0.2)
-            & (df.alpha < 0.95)
-        ]
-
-        # put variant, gene pair into bins
-        df.loc[:, 'dtss'] = df.start - df.tss
-        df.loc[:, 'bin'] = [pair2bin(dtss, maf) for dtss, maf in zip(df.dtss, df.maf)]
-
-        # count number of variants in each bin
-        bins = df.bin.value_counts().to_dict()
-
-        background = []
-        for b, count in tqdm(list(bins.items())):
-            try:
-                bin_path = 'output/GTEx/maf_dtss_binned/{}.bed'.format(b)
-                bin_df = pd.read_csv(bin_path, sep='\t', header=None)
-                background.append(bin_df.iloc[np.random.choice(bin_df.shape[0], count*5, replace=True)])
-            except Exception:
-                continue
-        background_df = pd.concat(background)
-
-        df.loc[:, 'chr_num'] = df.loc[:, 'chr'].apply(lambda x: int(x.replace('chr', '')))
-        df.sort_values(by=['chr_num', 'start']).drop_duplicates(['chr', 'start'])\
-            .to_csv(output.test, sep='\t', header=False, index=False)
-
-        background_df.loc[:, 'chr_num'] = background_df.loc[:, 0].apply(lambda x: int(x.replace('chr', '')))
-        background_df.sort_values(by=['chr_num', 1]).drop_duplicates([0, 1])\
-            .to_csv(output.background, sep='\t', header=False, index=False)
-
-
-rule gtex_filtered_variants_and_background:
-    input:
-        'output/GTEx/variant_reports/{tissue}.all_genes.variant_report'
-    output:
-        test = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
-        background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
+        test = temp('output/GTEx/enrichment/{analysis_id}/{tissue}.test_temp.bed'),
+        test_binned = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
+        bank = 'output/GTEx/enrichmnet/bank/{tissue}.bank.bed'
     params:
         filters = lambda wildcards: config['enrichment_filters'][wildcards.analysis_id]
     run:
@@ -160,16 +90,18 @@ rule gtex_filtered_variants_and_background:
         analysis_id = wildcards.analysis_id
         import numpy as np
         import pandas as pd
-        from tqdm import tqdm
+        from tqdm import 
+        import subprocess
 
-        def pair2bin(dtss, maf):
-            """
-            put (dtss, maf) pair into bin
-            """
-            dtss_bin = int((dtss + 1e6) / 20000)
-            maf_bin = '{:.2f}'.format(maf)
-            return '{}/{}.{}'.format(dtss_bin, dtss_bin, maf_bin)
+        df = pd.read_csv(input[0], sep='\t')
+        df = df[eval(params.filters)]
+        df.iloc[:, :7].sort_values(['chr', 'start']).to_csv(output.test, sep='\t', index=False, header=False)
 
+        cmd = 'bedtools intersect -a {} -b {} -wa -wb -sorted > {}'.format(output.test, output.bank, output.test_binned)
+        print(cmd)
+        subprocess.run(cmd, shell=True)
+
+        """
         if analysis_id == 'eqtl':
             genes = pd.read_csv('output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t').gene.values
             eqtls = pd.read_csv(
@@ -185,67 +117,29 @@ rule gtex_filtered_variants_and_background:
             eqtls.loc[:, 'end'] = eqtls.loc[:, 'start'] + 1
             eqtls.loc[:, 'study'] = tissue
             df = eqtls.loc[:, ['chr', 'start', 'end', 'variant_id', 'tss_distance', 'maf']]
-
-        else:
-            print('using filter: {}'.format(params.filters))
-            df = pd.read_csv('output/GTEx/variant_reports/{}.all_genes.variant_report'.format(tissue), sep='\t')
-            print('\t {} total records'.format(df.shape[0]))
-            df = df[eval(params.filters)]
-            print('\t {} remaining records'.format(df.shape[0]))
-
-            # add tss_distance
-            df.loc[:, 'tss_distance'] = df.start - df.tss
-
         """
-        if 'eqtltop' in analysis_id:
-            print('fetching top eqtls in GTEx')
-            tissue_significant = pd.read_csv(
-                'output/GTEx/nominally_significant_associations/{}.nominally_significant.txt'.format(tissue),
-                sep='\t', index_col=None)
-            gene2count = df.gene.value_counts()
 
-            new_df = pd.concat([group.nsmallest(gene2count.get(gene, 0), 'pval_nominal')
-                for gene, group in tqdm(tissue_significant.groupby('gene_id')) if gene in gene2count])
+rule gtex_make_background_set:
+    input:
+        test = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
+        bank = 'output/GTEx/enrichmnet/bank/{tissue}.bank.bed'
+    output:
+        background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
+    run:
+        import pandas as pd
+        import tqdm
 
-            new_df.loc[:, 'chr'] = new_df.variant_id.apply(lambda x: x.split('_')[0])
-            new_df.loc[:, 'start'] = new_df.variant_id.apply(lambda x: int(x.split('_')[1]))
-            new_df.loc[:, 'end'] = new_df.loc[:, 'start'] + 1
-            new_df.loc[:, 'study'] = tissue
+        test = pd.read_csv(input.test, sep='\t', header=None)
+        bank = pd.read_csv(input.bank, sep='\t', header=None)
 
-            df = new_df.loc[:, ['chr', 'start', 'end', 'variant_id', 'tss_distance', 'maf']]
-        """
-        # save test set of unique chr pos
-        print('save test set')
-        df.loc[:, 'chr_num'] = df.loc[:, 'chr'].apply(lambda x: int(x.replace('chr', '')))
-        df.sort_values(by=['chr_num', 'start']).drop_duplicates(['chr', 'start'])\
-            .to_csv(output.test, sep='\t', header=False, index=False)
-
-        # put variant, gene pair into bins
-        print('binning')
-        df.loc[:, 'bin'] = [pair2bin(dtss, maf) for dtss, maf in zip(df.tss_distance, df.maf)]
-
-        # count number of variants in each bin
-        bins = df.bin.value_counts().to_dict()
-
-        print('constructing background set')
         background = []
-        for b, count in tqdm(list(bins.items())):
-            try:
-                bin_path = 'output/GTEx/maf_dtss_binned/{}.bed'.format(b)
-                bin_df = pd.read_csv(bin_path, sep='\t', header=None)
-                background.append(bin_df.iloc[np.random.choice(bin_df.shape[0], count*5, replace=True)])
-            except Exception:
-                continue
-        # save background set of unique chr pos
-        background_df = pd.concat(background)
-        f = ~background_df.iloc[:, 4].isin(df.iloc[:, 3])
-        background_df = background_df[f]
-        print('removed {} variants from background'.format((~f).sum()))
+        for key, grp in tqdm.tqdm(bank.groupby([7, 9, 11])):
+            background.append(grp.sample(5*bin2count.get(key, 0)))
 
-        print('save background set')
-        background_df.loc[:, 'chr_num'] = background_df.loc[:, 0].apply(lambda x: int(x.replace('chr', '')))
-        background_df.sort_values(by=['chr_num', 1]).drop_duplicates([0, 1])\
-            .to_csv(output.background, sep='\t', header=False, index=False)
+        background = pd.concat(background)
+        background = background.sort_values([0, 1])
+        background = background[~background.iloc[:, 3].isin(test.iloc[:, 3])]
+        background.to_csv('output.background')
 
 
 rule roadmap_enrichment:
