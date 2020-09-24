@@ -127,13 +127,16 @@ rule gtex_make_background_set:
         import pandas as pd
         import tqdm
 
-        test = pd.read_csv(input.test, sep='\t', header=None)
-        bank = pd.read_csv(input.bank, sep='\t', header=None)
+        test = pd.read_csv(input.test, sep='\t', , usecols=[0,1,2,3,14,16,18], header=None)
+        test.columns = ['chr', 'start', 'end', 'variant_id', 'maf_bin', 'ldscore_bin', 'dtss_bin']
 
-        bin2count = test.groupby([14, 16, 18]).agg(['count']).iloc[:, 0].to_dict()
+        bank = pd.read_csv(input.bank, usecols=[0,1,2,3,7,9,11],  sep='\t', header=None)
+        bank.columns = ['chr', 'start', 'end', 'variant_id', 'maf_bin', 'ldscore_bin', 'dtss_bin']
+
+        bin2count = test.groupby(['maf_bin', 'ldscore_bin', 'dtss_bin']).agg(['count']).iloc[:, 0].to_dict()
 
         background = []
-        for key, grp in tqdm.tqdm(bank.groupby([7, 9, 11])):
+        for key, grp in tqdm.tqdm(bank.groupby(['maf_bin', 'ldscore_bin', 'dtss_bin'])):
             background.append(grp.sample(5*bin2count.get(key, 0)))
 
         background = pd.concat(background)
@@ -158,7 +161,7 @@ rule roadmap_enrichment:
         from scipy.stats import fisher_exact
         from subprocess import check_output
 
-        intersect_template = 'bedtools intersect -a {} -b {} -sorted| wc -l'
+        intersect_template = 'bedtools intersect -a {} -b {} -sorted | wc -l'
 
         def count_intersection(a, b):
             cmd = intersect_template.format(a, b)
