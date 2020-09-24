@@ -139,7 +139,7 @@ rule gtex_make_background_set:
         background = pd.concat(background)
         background = background.sort_values([0, 1])
         background = background[~background.iloc[:, 3].isin(test.iloc[:, 3])]
-        background.to_csv('output.background')
+        background.to_csv(output.background)
 
 
 rule roadmap_enrichment:
