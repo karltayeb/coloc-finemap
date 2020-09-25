@@ -85,22 +85,17 @@ rule gtex_make_test_set:
         test_binned = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
     params:
         filters = lambda wildcards: config['enrichment_filters'][wildcards.analysis_id]
+    group: "tissue_analysis"
     run:
         tissue = wildcards.tissue
         analysis_id = wildcards.analysis_id
         import pandas as pd
         import subprocess
 
-        df = pd.read_csv(input[0], sep='\t')
-        df = df[eval(params.filters)]
-        df.iloc[:, :7].sort_values(['chr', 'start']).to_csv(output.test, sep='\t', index=False, header=False)
-
-        cmd = 'bedtools intersect -a {} -b {} -wa -wb -sorted > {}'.format(output.test, input.bank, output.test_binned)
-        print(cmd)
-        subprocess.run(cmd, shell=True)
-
-        """
-        if analysis_id == 'eqtl':
+        if analysis_id != 'eqtl':
+            df = pd.read_csv(input[0], sep='\t')
+            df = df[eval(params.filters)]
+        else:
             genes = pd.read_csv('output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t').gene.values
             eqtls = pd.read_csv(
                 '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/'
@@ -114,8 +109,16 @@ rule gtex_make_test_set:
             eqtls.loc[:, 'start'] = eqtls.variant_id.apply(lambda x: int(x.split('_')[1]))
             eqtls.loc[:, 'end'] = eqtls.loc[:, 'start'] + 1
             eqtls.loc[:, 'study'] = tissue
-            df = eqtls.loc[:, ['chr', 'start', 'end', 'variant_id', 'tss_distance', 'maf']]
-        """
+            df = eqtls.loc[:, ['chr', 'start', 'end', 'variant_id', 'variant_id', 'study', 'gene_id']]
+
+        # save temp test file
+        df.iloc[:, :7].sort_values(['chr', 'start']).to_csv(output.test, sep='\t', index=False, header=False)
+        
+        # use bedtools to make test file with bin info
+        cmd = 'bedtools intersect -a {} -b {} -wa -wb -sorted > {}'.format(output.test, input.bank, output.test_binned)
+        print(cmd)
+        subprocess.run(cmd, shell=True)
+
 
 rule gtex_make_background_set:
     input:
@@ -123,6 +126,7 @@ rule gtex_make_background_set:
         bank = 'output/GTEx/enrichment/bank/{tissue}.bank.bed'
     output:
         background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
+    group: "tissue_analysis"
     run:
         import pandas as pd
         import tqdm
@@ -151,6 +155,7 @@ rule roadmap_enrichment:
         background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
     output:
         'output/GTEx/enrichment/roadmap/{analysis_id}/{tissue}.roadmap.enrichments'
+    group: "tissue_analysis"
     run:
         import os
         import pybedtools
