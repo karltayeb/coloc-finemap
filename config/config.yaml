@@ -5,3 +5,4 @@ enrichment_filters:
   primary: df.index.isin(df.groupby(['gene']).p_active.idxmax()) & (df.p_active > 0.9) & (df.pip > 0.2) & (df.alpha < 0.95)
   secondary: (~df.index.isin(df.groupby(['gene']).p_active.idxmax())) & (df.p_active > 0.9) & (df.pip > 0.2) & (df.alpha < 0.95)
   top: (df.loc[:, 'rank']==0) & (df.p_active > 0.9) & (df.pip > 0.2) & (df.alpha < 0.95)
+  top_pip: (df.groupby('gene').pip.idxmax().values)
