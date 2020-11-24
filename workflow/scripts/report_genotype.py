@@ -37,9 +37,6 @@ table = study_pip.reset_index().melt(id_vars='index').rename(columns={
     'value': 'pip' 
 })
 
-all_pip = pd.DataFrame({'pip': model.get_pip(), 'variant_id': model.snp_ids, 'study': 'all'})
-table = pd.concat([table, all_pip], sort=True)
-
 v2r = load_var2rsid(gene)
 table.loc[:, 'rsid'] = table.variant_id.apply(lambda x: v2r.get(x, '-'))
 
@@ -69,5 +66,14 @@ table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'gene', 'pip
 
 table = table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'pip', 'top_component', 'p_active', 'pi', 'alpha', 'rank']]
 small_table = table[table.p_active > 0.5].sort_values(by=['chr', 'start'])
+
+# add effect size and variance
+study2idx = {s: i for i, s in enumerate(model.study_ids)}
+var2idx = {s: i for i, s in enumerate(model.snp_ids)}
+small_table.loc[:, 'effect'] = [model.weight_means[study2idx.get(s), c, var2idx.get(v)] for s, v, c in zip(
+    small_table.study, small_table.variant_id, small_table.top_component)]
+small_table.loc[:, 'effect_var'] = [model.weight_vars[study2idx.get(s), c, var2idx.get(v)] for s, v, c in zip(
+    small_table.study, small_table.variant_id, small_table.top_component)]
+
 small_table.to_csv(snakemake.output.report, sep='\t', index=None)
 
