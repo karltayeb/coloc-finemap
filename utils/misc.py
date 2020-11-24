@@ -45,11 +45,13 @@ def plink_get_genotype(gene, bfile, save_path):
          '--out', save_path])
     return cmd
 
+
 def load_var2rsid(gene):
     v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid'.format(
         get_chr(gene), gene, gene)
     v2r = json.load(open(v2rp, 'r'))
     return v2r
+
 
 def load_gtex_genotype(gene, use_rsid=False):
     """
