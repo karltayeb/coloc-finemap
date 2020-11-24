@@ -78,13 +78,5 @@ gene = snakemake.wildcards.gene
 model = pickle.load(open(snakemake.input.model, 'rb'))
 model._decompress_model()
 table = make_table(model, gene)
-
-
-study_pip = model.get_study_pip().T
-table = study_pip.reset_index().melt(id_vars='index').rename(columns={
-    'index': 'variant_id',
-    'variable': 'study',
-    'value': 'pip' 
-})
 table.to_csv(snakemake.output.report, sep='\t', index=None)
 
