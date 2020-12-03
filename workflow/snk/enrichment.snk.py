@@ -154,7 +154,7 @@ rule roadmap_enrichment:
         test = 'output/GTEx/enrichment/{method}/{analysis_id}/{tissue}.test.bed',
         background = 'output/GTEx/enrichment/{method}/{analysis_id}/{tissue}.background.bed'
     output:
-        'output/GTEx/enrichment/roadmap/{method}/{analysis_id}/{tissue}.roadmap.enrichments'
+        'output/GTEx/enrichment/{method}/roadmap/{analysis_id}/{tissue}.roadmap.enrichments'
     group: "tissue_analysis"
     run:
         import os
