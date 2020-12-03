@@ -237,7 +237,7 @@ rule fit_susie:
             model.prior_activity = np.ones(5) * 0.1
             fit_all(model, update_active=False, ARD_weights=False, max_iter=100)
             fit_all(model, update_active=True, ARD_weights=True, max_iter=100)
-            tables.append(make_table(model, gene))
+            tables.append(make_table(model, wildcards.gene))
 
         table = pd.concat(tables)
         table = table.sort_values(['chr', 'start'])
