@@ -78,11 +78,11 @@ rule get_tissue_variant_gene_bank:
 
 rule gtex_make_test_set:
     input:
-        'output/GTEx/variant_reports/{tissue}.all_genes.variant_report',
+        'output/GTEx/variant_reports/{method}/{tissue}.all_genes.variant_report',
         bank = 'output/GTEx/enrichment/bank/{tissue}.bank.bed'
     output:
-        test = temp('output/GTEx/enrichment/{analysis_id}/{tissue}.test_temp.bed'),
-        test_binned = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
+        test = temp('output/GTEx/enrichment/{method}/{analysis_id}/{tissue}.test_temp.bed'),
+        test_binned = 'output/GTEx/enrichment/{method}/{analysis_id}/{tissue}.test.bed',
     params:
         filters = lambda wildcards: config['enrichment_filters'][wildcards.analysis_id]
     group: "tissue_analysis"
@@ -122,7 +122,7 @@ rule gtex_make_test_set:
 
 rule gtex_make_background_set:
     input:
-        test = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
+        test = 'output/GTEx/enrichment/{method}/{analysis_id}/{tissue}.test.bed',
         bank = 'output/GTEx/enrichment/bank/{tissue}.bank.bed'
     output:
         background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
@@ -151,10 +151,10 @@ rule gtex_make_background_set:
 
 rule roadmap_enrichment:
     input:
-        test = 'output/GTEx/enrichment/{analysis_id}/{tissue}.test.bed',
-        background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
+        test = 'output/GTEx/enrichment/{method}/{analysis_id}/{tissue}.test.bed',
+        background = 'output/GTEx/enrichment/{method}/{analysis_id}/{tissue}.background.bed'
     output:
-        'output/GTEx/enrichment/roadmap/{analysis_id}/{tissue}.roadmap.enrichments'
+        'output/GTEx/enrichment/roadmap/{method}/{analysis_id}/{tissue}.roadmap.enrichments'
     group: "tissue_analysis"
     run:
         import os
