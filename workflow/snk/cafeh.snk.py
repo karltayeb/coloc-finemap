@@ -156,7 +156,7 @@ rule fit_susie:
     group: "g"
     run:
         from cafeh.independent_model_ss import CAFEHG
-        from cafeh.fitting import forward_fit_procedure
+        from cafeh.fitting import fit_all
         from utils.misc import load_gtex_genotype, load_gtex_expression
 
         genotype = load_gtex_genotype(wildcards.gene)
