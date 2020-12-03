@@ -241,7 +241,7 @@ rule fit_susie:
 
         table = pd.concat(tables)
         table = table.sort_values(['chr', 'start'])
-        table.to_csv(output, sep='\t')
+        table.to_csv(output[0], sep='\t')
 
 rule generate_snp_report:
     input:
