@@ -13,8 +13,8 @@ rule fit_genotype_model:
     run:
         from cafeh.independent_model_ss import CAFEHG
         from cafeh.fitting import forward_fit_procedure
-
         from utils.misc import load_gtex_genotype, load_gtex_expression
+
         genotype = load_gtex_genotype(wildcards.gene)
         expression = load_gtex_expression(wildcards.gene)
 
@@ -142,101 +142,79 @@ rule fit_cafeh_genotype_ss:
         model.save(output.model)
 
 
+rule fit_susie:
+    input:
+        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
+        snp2rsid = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
+    output:
+        'output/GTEx/{chr}/{gene}/{gene}.susie.variant_report'
+    params:
+        K = 20,
+        p0k = 1.0,
+        tolerance = 1e-4
+    group: "g"
+    run:
+        from cafeh.independent_model_ss import CAFEHG
+        from cafeh.fitting import forward_fit_procedure
+        from utils.misc import load_gtex_genotype, load_gtex_expression
+
+        genotype = load_gtex_genotype(wildcards.gene)
+        expression = load_gtex_expression(wildcards.gene)
+
+        snp_ids = genotype.columns.values
+        sample_ids = np.intersect1d(genotype.index.values, expression.columns.values)
+        study_ids = expression.index.values
+
+        genotype = genotype.loc[sample_ids]
+        Y = expression.loc[:, sample_ids].values
+
+        covariates = pd.read_csv(
+            '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/covariates.csv',
+            sep='\t', index_col=[0, 1]
+        )
+
+        tables = []
+        for i in range(Y.shape[0]):
+            print(study_ids[i])
+            y = Y[i]
+            sample_mask = ~np.isnan(y)
+            y = y[sample_mask]
+
+            X = genotype[sample_mask].values
+            X = np.nan_to_num(X) - np.nanmean(X, 0)
+            X = X / X.std(0)
+
+            snp_mask = ~np.any(np.isnan(X), 0)
+            X = X[:, snp_mask]
+
+            cov = covariates[sample_ids[sample_mask]][
+                covariates.index.get_level_values(0) == study_ids[i]]
+            cov = cov.T.values
+            H = cov @ np.linalg.pinv(cov)
+
+            y = y - H @ y
+            X = X - H @ X
+
+            model = CAFEHG(
+                X=X.T, Y=y[None], K=5,
+                study_ids=study_ids[[[i]]],
+                snp_ids=snp_ids[snp_mask], sample_ids=sample_ids[sample_mask])
+            model.prior_activity = np.ones(5) * 0.1
+            fit_all(model, update_active=False, ARD_weights=False, max_iter=100)
+            fit_all(model, update_active=True, ARD_weights=True, max_iter=100)
+            tables.append(make_table(model, gene))
+
+        table = pd.concat(tables)
+        table = table.sort_values(['chr', 'start'])
+        table.to_csv(output, sep='\t')
+
 rule generate_snp_report:
     input:
         model = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype_ss',
         snp2rsid = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
         report = 'output/GTEx/{chr}/{gene}/{gene}.cafeh_genotype_ss.variant_report'
-    script:
-        '../../workflow/scripts/report_genotype.py'
-
-rule fit_pairwise_summary_model:
-    input:
-        "output/{path}/data"
-    output:
-        "{path}/pairwise_summary/"
-        "t1_{tissue1}_t2_{tissue2}_model_summary"
-    wildcard_constraints:
-        simulation = "(?!\/)[^\/]+(?=\/)"
-    script:
-        "../../workflow/scripts/fit_cafeh_summary.py"
-
-rule fit_pairwise_genotype_model:
-    input:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data"
-    output:
-        ("output/simulation/single_causal_variant/pve_{pve}/"
-        "ld_{linkage}/gene_{gene}/pairwise_genotype/"
-        "t1_{tissue1}_t2_{tissue2}_model_genotype")
-    script:
-        "../../workflow/scripts/fit_cafeh_summary.py"
-
-# stat gathering rules
-rule make_tissue_pair_components_table:
-    input:
-        data_path = \
-            "output/{path}/data",
-        summary_model_path = \
-            "output/simulation/{path}/model_summary"
-    output:
-        summary_output = \
-            "output/{path}/pairs_summary"
-    wildcard_constraints:
-        simulation = "(?!\/)[^\/]+(?=\/)"
-    script:
-        "../../workflow/scripts/make_tissue_pair_components_table.py"
-
-tissue_pairs = [x for x in itertools.combinations(np.arange(7), 2)]
-rule make_pairwise_pair_components_table:
-    """
-    same rule as above except for the pairwise outputs
-    """
-    input:
-        data_path = "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/data",
-        summary_model_paths = expand(
-            "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/t1_{tissue1}_t2_{tissue2}_model_summary",
-            tissue1=[x[0] for x in tissue_pairs],
-            tissue2=[x[1] for x in tissue_pairs],
-            pve='{pve}', linkage='{linkage}', gene='{gene}'
-        )
-    output:
-        "output/simulation/single_causal_variant/pve_{pve}/ld_{linkage}/gene_{gene}/pairwise_summary/pairs_table"
-    script:
-        "../../workflow/scripts/make_pairwise_pair_components_table.py"
-
-
-rule report_genotype:
-    input:
-        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
-        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-        model = 'output/GTEx/{chr}/{gene}/genotype.model'
-    output:
-        scores = "output/GTEx/{chr}/{gene}/genotype.scores",
-        csets = "output/GTEx/{chr}/{gene}/genotype.csets"
-    script:
-        '../../workflow/scripts/report_genotype.py'
-
-
-rule report_genotypek20:
-    input:
-        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
-        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-        model = 'output/GTEx/{chr}/{gene}/genotype.k20.model'
-    output:
-        scores = "output/GTEx/{chr}/{gene}/genotype.k20.scores",
-        csets = "output/GTEx/{chr}/{gene}/genotype.k20.csets"
-    script:
-        '../../workflow/scripts/report_genotype.py'
-
-rule report_standardized_genotypek20:
-    input:
-        expression = 'output/GTEx/{chr}/{gene}/{gene}.expression',
-        genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-        model = 'output/GTEx/{chr}/{gene}/genotype.standardized.k20.model'
-    output:
-        scores = "output/GTEx/{chr}/{gene}/genotype.standardized.k20.scores",
-        csets = "output/GTEx/{chr}/{gene}/genotype.standardized.k20.csets"
     script:
         '../../workflow/scripts/report_genotype.py'
 
