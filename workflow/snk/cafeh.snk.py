@@ -157,7 +157,41 @@ rule fit_susie:
     run:
         from cafeh.independent_model_ss import CAFEHG
         from cafeh.fitting import fit_all
+        from cafeh.model_queries import summary_table, get_minalpha
         from utils.misc import load_gtex_genotype, load_gtex_expression
+
+        def make_table(model, gene):
+            table = summary_table(model)
+
+            # annotate table
+            if table.shape[0] > 0:
+                v2r = load_var2rsid(gene)
+                table.loc[:, 'rsid'] = table.variant_id.apply(lambda x: v2r.get(x, '-'))
+
+                top_component = pd.Series(model.pi.argmax(0), index=model.snp_ids).to_dict()
+                table.loc[:, 'top_component'] = table.variant_id.apply(lambda x: top_component.get(x))
+
+                minalpha = get_minalpha(model).to_dict()
+                table.loc[:, 'alpha'] = [minalpha.get(k).get(v) for k, v in zip(table.top_component.values, table.variant_id.values)]
+
+                rank = pd.DataFrame({k: np.argsort(np.flip(np.argsort(model.pi[k]))) for k in range(model.dims['K'])}, index=model.snp_ids).to_dict()
+                table.loc[:, 'rank'] = [rank.get(k).get(v) for k, v in zip(table.top_component.values, table.variant_id.values)]
+
+                active = pd.DataFrame(model.active, index=model.study_ids)
+                active.loc['all'] = (model.active.max(0) > 0.5).astype(int)
+                active = active.to_dict()
+                table.loc[:, 'p_active'] = [active.get(k).get(s) for k, s in zip(table.top_component.values, table.study.values)]
+
+                pi = pd.Series(model.pi.max(0), index=model.snp_ids).to_dict()
+                table.loc[:, 'pi'] = table.variant_id.apply(lambda x: pi.get(x))
+
+                table.loc[:, 'chr'] = get_chr(gene)
+                table.loc[:, 'start'] = table.variant_id.apply(lambda x: int(x.split('_')[1]))
+                table.loc[:, 'end'] = table.start + 1
+                table.loc[:, 'gene'] = gene
+
+            table = table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'pip', 'top_component', 'p_active', 'pi', 'alpha', 'rank']]
+            return table
 
         genotype = load_gtex_genotype(wildcards.gene)
         expression = load_gtex_expression(wildcards.gene)
