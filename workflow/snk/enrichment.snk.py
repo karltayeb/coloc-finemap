@@ -125,7 +125,7 @@ rule gtex_make_background_set:
         test = 'output/GTEx/enrichment/{method}/{analysis_id}/{tissue}.test.bed',
         bank = 'output/GTEx/enrichment/bank/{tissue}.bank.bed'
     output:
-        background = 'output/GTEx/enrichment/{analysis_id}/{tissue}.background.bed'
+        background = 'output/GTEx/enrichment/{method}/{analysis_id}/{tissue}.background.bed'
     group: "tissue_analysis"
     run:
         import pandas as pd
