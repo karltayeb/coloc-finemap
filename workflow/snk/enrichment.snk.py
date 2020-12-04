@@ -89,6 +89,7 @@ rule gtex_make_test_set:
     run:
         tissue = wildcards.tissue
         analysis_id = wildcards.analysis_id
+        method = wildcards.method
         import pandas as pd
         import subprocess
 
