@@ -249,7 +249,7 @@ rule generate_snp_report:
                 table.loc[:, 'end'] = table.start + 1
                 table.loc[:, 'gene'] = gene
 
-            table = table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'pip', 'top_component', 'p_active', 'pi', 'alpha', 'rank']]
+            table = table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'pip', 'top_component', 'p_active', 'pi', 'alpha', 'rank', 'effect', 'effect_var']]
             return table
         # load a model
         gene = wildcards.gene
