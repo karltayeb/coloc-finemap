@@ -92,7 +92,7 @@ rule gtex_make_test_set:
         import pandas as pd
         import subprocess
 
-        if analysis_id != 'eqtl':
+        if method != 'eqtl':
             df = pd.read_csv(input[0], sep='\t')
             df = df[eval(params.filters)]
         else:
