@@ -236,7 +236,7 @@ rule generate_snp_report:
         from cafeh.fitting import fit_all
         from cafeh.model_queries import summary_table
         from utils.misc import load_gtex_genotype, load_gtex_expression
-
+        print('!!!!!!!!!!!')
         def make_table(model, gene):
             table = summary_table(model)
 
