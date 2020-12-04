@@ -193,14 +193,11 @@ rule roadmap_enrichment:
             return np.array([[test_in_annot, test_not_in_annot],
                     [background_in_annot, background_not_in_annot]])
 
-        def get_record(analysis_id, tissue, eid, annotation_type):
+        def get_record(test, background, tissue, eid, annotation_type):
             eid2celltype = pd.read_csv('output/annotations/roadmap/EIDlegend.txt',
                     sep='\t', index_col=0, header=None).iloc[:, 0].to_dict()
             contingency_entry_labels = np.array([['test_in_annot', 'test_not_in_annot'],
                         ['background_in_annot', 'background_not_in_annot']])
-
-            test = 'output/GTEx/enrichment/{}/{}.test.bed'.format(analysis_id, tissue)
-            background = 'output/GTEx/enrichment/{}/{}.background.bed'.format(analysis_id, tissue)
             annot_file = '{}.{}.bed'.format(eid, annotation_type)
             annotation = 'output/annotations/roadmap/{}'.format(annot_file)
 
@@ -229,7 +226,7 @@ rule roadmap_enrichment:
         records = []
         for annot_file in tqdm(annotation_files):
             eid, annotation_type, _ = annot_file.split('.')
-            record = get_record(analysis_id, tissue, eid, annotation_type)
+            record = get_record(input[0], input[1], tissue, eid, annotation_type)
             records.append(record)
 
         pd.DataFrame(records).to_csv(output[0], sep='\t', index=None)
