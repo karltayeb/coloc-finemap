@@ -213,13 +213,15 @@ rule roadmap_enrichment:
                 'cell_type': eid2celltype.get(annot_file.split('.')[0]),
                 'annotation_type': annot_file.split('.')[1],
                 'tissue': tissue,
-                'analysis_id': analysis_id
+                'analysis_id': analysis_id,
+                'method': method
             })
             return record
 
         tissue = wildcards.tissue
         analysis_id = wildcards.analysis_id
-
+        method = wildcards.method
+        
         # get annotation file
         annotation_files = os.listdir('output/annotations/roadmap/')
         annotation_files = [x for x in annotation_files if ('enhancer' in x or 'promoter' in x)]
