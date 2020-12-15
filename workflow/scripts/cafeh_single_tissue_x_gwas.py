@@ -21,6 +21,7 @@ import copy
 
 from collections import namedtuple
 import ast
+from tqdm import tqdm
 
 sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
 
@@ -232,7 +233,6 @@ for tissue in tqdm(tissues):
     css.prior_activity = np.ones(K) * 0.1
     css.weight_precision_b = np.ones_like(css.weight_precision_b) * 10
 
-    print('fit model with imputed z-score')
     weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
     fit_all(css, max_iter=30, verbose=True)
 
