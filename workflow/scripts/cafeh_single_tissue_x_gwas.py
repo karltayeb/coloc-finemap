@@ -247,7 +247,7 @@ table.loc[:, 'end'] = table.start + 1
 table.loc[:, 'gene'] = gene
 
 table = table.loc[:, [
-    'chr', 'start', 'end', 'variant_id',
+    'chr', 'start', 'end', 'gene', 'variant_id',
     'rsid', 'study', 'pip', 'top_component',
     'p_active', 'pi', 'alpha', 'rank']]
 table.to_csv(snakemake.output[0], sep='\t', index=False)
