@@ -284,6 +284,19 @@ rule fit_gwas_gtex_z_cafeh:
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
 
+rule fit_gwas_gtex_z_cafeh:
+    input:
+        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
+    output:
+        'output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.pairwise.variant_report'
+    params:
+        impute=False,
+        K=10
+    script:
+        '../../workflow/scripts/cafeh_single_tissue_x_gwas.py'
+
 rule generate_snp_report_gwas:
     input:
         model = 'output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
