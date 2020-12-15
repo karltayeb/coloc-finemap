@@ -283,3 +283,33 @@ rule fit_gwas_gtex_z_cafeh:
         K=20
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
+
+rule generate_snp_report_gwas:
+    input:
+        model = 'output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
+    output:
+        report = 'output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report'
+    run:
+        from cafeh.independent_model_ss import CAFEHG
+        from cafeh.fitting import fit_all
+        from cafeh.model_queries import summary_table
+        from utils.misc import load_gtex_genotype, load_gtex_expression
+        def make_table(model, gene):
+            table = summary_table(model)
+
+            # annotate table
+            if table.shape[0] > 0:
+                table.loc[:, 'rsid'] = table.variant_id
+                table.loc[:, 'chr'] = table.rsid.apply(lambda x: rsid2chr.get(x, None))
+                table.loc[:, 'start'] = table.rsid.apply(lambda x: rsid2pos.get(x, None))
+                table.loc[:, 'end'] = table.start + 1
+                table.loc[:, 'gene'] = gene
+
+            table = table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'pip', 'top_component', 'p_active', 'pi', 'alpha', 'rank', 'effect', 'effect_var']]
+            return table
+        # load a model
+        gene = wildcards.gene
+        model = pickle.load(open(input.model, 'rb'))
+        model._decompress_model()
+        table = make_table(model, gene)
+        table.to_csv(output.report, sep='\t', index=None)
