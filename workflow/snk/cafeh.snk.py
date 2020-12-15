@@ -284,7 +284,7 @@ rule fit_gwas_gtex_z_cafeh:
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
 
-rule fit_gwas_gtex_z_cafeh:
+rule fit_gwas_gtex_z_pairwise_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
