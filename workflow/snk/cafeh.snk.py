@@ -264,7 +264,7 @@ rule fit_gwas_gtex_z_impute_cafeh:
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
-        variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report'
+        variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
         model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z_imputed.css'
     params:
         impute=True,
@@ -278,7 +278,7 @@ rule fit_gwas_gtex_z_cafeh:
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
-        variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report'
+        variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
         model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
     params:
         impute=False,
