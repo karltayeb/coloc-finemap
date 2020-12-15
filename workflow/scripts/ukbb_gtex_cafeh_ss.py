@@ -169,6 +169,23 @@ def filter_and_flip(gtex, gwas, variants):
     return gtex, gwas, flip
 
 
+def make_table(model, gene, rsid2variant_id):
+    table = summary_table(model)
+
+    # annotate table
+    table.loc[:, 'rsid'] = table.variant_id
+    table.loc[:, 'variant_id'] = table.rsid.apply(lambda x: rsid2variant_id.get(x, 'chr0_0_A_B_n'))
+    table.loc[:, 'chr'] = table.variant_id.apply(lambda x: (x.split('_')[0]))
+    table.loc[:, 'start'] = table.variant_id.apply(lambda x: int(x.split('_')[1]))
+    table.loc[:, 'end'] = table.start + 1
+    table.loc[:, 'gene'] = gene
+
+    table = table.loc[:, ['chr', 'start', 'end', 'gene',
+                          'variant_id', 'rsid', 'study', 'pip',
+                          'top_component', 'p_active', 'pi', 'alpha',
+                          'rank', 'effect', 'effect_var']]
+    return table
+
 gene = snakemake.wildcards.gene
 study = snakemake.wildcards.study
 phenotype = snakemake.wildcards.phenotype
@@ -176,6 +193,7 @@ phenotype = snakemake.wildcards.phenotype
 # load gtex and gtex genotype
 gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
 gtex = load_gtex_associations(gene)
+rsid2variant_id = gtex.set_index('rsid').variant_id.to_dict()
 
 print(study)
 print(phenotype)
@@ -275,5 +293,10 @@ print('fit model with imputed z-score')
 weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
 fit_all(css, max_iter=30, verbose=True)
 
-print('saving model to {}'.format(snakemake.output[0]))
-css.save(snakemake.output[0])
+# save variant report
+table = make_table(css, gene, rsid2variant_id)
+table.to_csv(snakemake.output[0], sep='\t', index=False)
+
+# save model binary
+print('saving model to {}'.format(snakemake.output[1]))
+css.save(snakemake.output[1])
