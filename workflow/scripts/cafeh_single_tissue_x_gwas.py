@@ -250,4 +250,4 @@ table = table.loc[:, [
     'chr', 'start', 'end', 'variant_id',
     'rsid', 'study', 'pip', 'top_component',
     'p_active', 'pi', 'alpha', 'rank']]
-table.to_csv(snakemake.output, sep='\t', index=False)
+table.to_csv(snakemake.output[0], sep='\t', index=False)
