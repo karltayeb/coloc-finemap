@@ -15,6 +15,7 @@ from misc import *
 
 from cafeh.cafeh_ss import CAFEH as CSS
 from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
+from cafeh.model_queries import summary_table
 
 import pysam
 import copy
