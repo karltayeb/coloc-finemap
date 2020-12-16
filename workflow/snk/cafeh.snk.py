@@ -283,6 +283,7 @@ rule fit_gwas_gtex_z_cafeh:
     params:
         impute=False,
         K=20
+    group: 'report'
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
 
@@ -296,6 +297,7 @@ rule fit_gwas_gtex_z_pairwise_cafeh:
     params:
         impute=False,
         K=10
+    group: 'report'
     script:
         '../../workflow/scripts/cafeh_single_tissue_x_gwas.py'
 
