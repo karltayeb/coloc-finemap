@@ -200,7 +200,7 @@ rsid2variant_id = gtex.set_index('rsid').variant_id.to_dict()
 tables = []
 coloc_table = []
 # run CAFEH for each tissue sueperately
-for tissue in tqdm(tissues[:2]):
+for tissue in tqdm(tissues):
     gwas.loc[:, 'z'] = gwas.slope/gwas.slope_se
     gwas.loc[:, 'zS'] = np.sqrt((gwas.z**2 / gwas.sample_size) + 1)
 
