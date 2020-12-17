@@ -293,10 +293,11 @@ rule fit_gwas_gtex_z_pairwise_cafeh:
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
-        'output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.pairwise.variant_report'
+        'output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.pairwise.variant_report',
+        'output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.pairwise.coloc_report'
     params:
         impute=False,
-        K=10
+        K=5
     group: 'report'
     script:
         '../../workflow/scripts/cafeh_single_tissue_x_gwas.py'

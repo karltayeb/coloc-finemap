@@ -167,6 +167,14 @@ def filter_and_flip(gtex, gwas, variants):
     gwas.loc[gwas.rsid.isin(flip), 'alt'] = ref
     return gtex, gwas, flip
 
+def c(model, **kwargs):
+    coloc = pd.DataFrame(
+        [np.arange(css.dims['K']).astype(int), css.active[0], css.active.prod(0)],
+        index=['component', 'p_active', 'p_coloc']).T
+    for key, val in kwargs.items():
+        coloc.loc[:, key] = val
+    return coloc
+
 
 gene = snakemake.wildcards.gene
 study = snakemake.wildcards.study
@@ -190,9 +198,9 @@ tissues = gtex.tissue.unique()
 rsid2variant_id = gtex.set_index('rsid').variant_id.to_dict()
 
 tables = []
-
+coloc_table = []
 # run CAFEH for each tissue sueperately
-for tissue in tqdm(tissues):
+for tissue in tqdm(tissues[:2]):
     gwas.loc[:, 'z'] = gwas.slope/gwas.slope_se
     gwas.loc[:, 'zS'] = np.sqrt((gwas.z**2 / gwas.sample_size) + 1)
 
@@ -201,8 +209,8 @@ for tissue in tqdm(tissues):
     gtex_t.loc[:, 'z'] = gtex_t.slope/gtex_t.slope_se
     gtex_t.loc[:, 'zS'] = np.sqrt((gtex_t.z**2 / gtex_t.sample_size) + 1)
 
-    Z = pd.concat([gtex_t.z, gwas.z], keys=[tissue, 'CAD_{}'.format(tissue)], axis=1)
-    ZS = pd.concat([gtex_t.zS, gwas.zS], keys=[tissue, 'CAD_{}'.format(tissue)], axis=1)
+    Z = pd.concat([gtex_t.z, gwas.z], keys=[tissue, '{}_{}'.format(phenotype, tissue)], axis=1)
+    ZS = pd.concat([gtex_t.zS, gwas.zS], keys=[tissue, '{}_{}'.format(phenotype, tissue)], axis=1)
 
     fully_observed_idx = (~np.any(Z.isna(), 1)).values
     fully_observed_variants = Z[fully_observed_idx].index.values
@@ -233,9 +241,9 @@ for tissue in tqdm(tissues):
 
     weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
     fit_all(css, max_iter=30, verbose=True)
-
     table = summary_table(css)
     tables.append(table)
+    coloc_table.append(c(css, study=study, gene=gene, phenotye=phenotype, tissue=tissue))
 
 # format results
 table = pd.concat(tables)
@@ -245,9 +253,11 @@ table.loc[:, 'chr'] = table.variant_id.apply(lambda x: (x.split('_')[0]))
 table.loc[:, 'start'] = table.variant_id.apply(lambda x: int(x.split('_')[1]))
 table.loc[:, 'end'] = table.start + 1
 table.loc[:, 'gene'] = gene
-
 table = table.loc[:, [
     'chr', 'start', 'end', 'gene', 'variant_id',
     'rsid', 'study', 'pip', 'top_component',
     'p_active', 'pi', 'alpha', 'rank']]
 table.to_csv(snakemake.output[0], sep='\t', index=False)
+
+coloc_table = pd.concat(coloc_table)
+coloc_table.to_csv(snakemake.output[1], sep='\t', index=False)
