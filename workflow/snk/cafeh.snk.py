@@ -279,6 +279,7 @@ rule fit_gwas_gtex_z_cafeh:
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
         variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
+        coloc_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report',
         model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
     params:
         impute=False,
