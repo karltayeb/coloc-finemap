@@ -15,7 +15,7 @@ from misc import *
 
 from cafeh.cafeh_ss import CAFEH as CSS
 from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
-from cafeh.model_queries import summary_table
+from cafeh.model_queries import summary_table, coloc_table
 
 import pysam
 import copy
@@ -82,7 +82,6 @@ def _load_ukbb_chromosome(phenotype, chromosome):
     df = pd.read_csv(path, sep='\t', skiprows=start, nrows=nrows, header=None)
     df.columns = ukbb_columns
     return df
-
 
 def load_ukbb_gwas(gene, phenotype, variants=None):
     tss = get_tss(gene)
@@ -300,6 +299,10 @@ fit_all(css, max_iter=30, verbose=True)
 table = make_table(css, gene, rsid2variant_id)
 table.to_csv(snakemake.output[0], sep='\t', index=False)
 
+
+ct = coloc_table(model, 'CAD', gene=gene)
+ct.to_csv(snakemake.output[1], sep='\t', index=False)
+
 # save model binary
 print('saving model to {}'.format(snakemake.output[1]))
-css.save(snakemake.output[1])
+css.save(snakemake.output[2])
