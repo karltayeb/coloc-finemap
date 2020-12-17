@@ -74,6 +74,8 @@ def _load_ukbb_chromosome(phenotype, chromosome):
             'summary_stats_for_genetic_correlation/Phecode4_{}.sumstats.txt'.format(phenotype))
     chr2startidx = json.load(open('output/UKBB/{}/chr2startidx'.format(phenotype)))
     start = chr2startidx.get(str(chromosome))
+    if chromosome == '1':
+        start += 1
     nrows = chr2startidx.get(str(int(chromosome) + 1)) - start + 1
     df = pd.read_csv(path, sep='\t', skiprows=start, nrows=nrows, header=None)
     df.columns = ukbb_columns
@@ -219,9 +221,7 @@ for tissue in tqdm(tissues):
     ZS = ZS.loc[fully_observed_variants]
 
     variants = Z.index.values
-
     K = 5
-
     B = Z.T.values; S = ZS.T.values
     studies = Z.columns
 
