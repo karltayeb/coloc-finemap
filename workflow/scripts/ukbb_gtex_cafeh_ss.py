@@ -300,7 +300,7 @@ table = make_table(css, gene, rsid2variant_id)
 table.to_csv(snakemake.output[0], sep='\t', index=False)
 
 
-ct = coloc_table(model, 'CAD', gene=gene)
+ct = coloc_table(css, 'CAD', gene=gene)
 ct.to_csv(snakemake.output[1], sep='\t', index=False)
 
 # save model binary
