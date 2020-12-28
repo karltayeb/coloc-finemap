@@ -256,7 +256,7 @@ table.loc[:, 'gene'] = gene
 table = table.loc[:, [
     'chr', 'start', 'end', 'gene', 'variant_id',
     'rsid', 'study', 'pip', 'top_component',
-    'p_active', 'pi', 'alpha', 'rank']]
+    'p_active', 'pi', 'alpha', 'rank', 'effect', 'effect_var']]
 table.to_csv(snakemake.output[0], sep='\t', index=False)
 
 coloc_table = pd.concat(coloc_table)
