@@ -171,8 +171,8 @@ rule fit_susie:
                 table.loc[:, 'start'] = table.variant_id.apply(lambda x: int(x.split('_')[1]))
                 table.loc[:, 'end'] = table.start + 1
                 table.loc[:, 'gene'] = gene
-
-            table = table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'pip', 'top_component', 'p_active', 'pi', 'alpha', 'rank']]
+            
+            table = table.loc[:, ['chr', 'start', 'end', 'variant_id', 'rsid', 'study', 'pip', 'top_component', 'p_active', 'pi', 'alpha', 'rank', 'effect', 'effect_var']]
             return table
 
         genotype = load_gtex_genotype(wildcards.gene)
