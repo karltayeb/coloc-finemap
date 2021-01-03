@@ -268,7 +268,7 @@ rule fit_gwas_gtex_z_impute_cafeh:
         model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z_imputed.css'
     params:
         impute=True,
-        lrgmem=False,
+        lrgmem=config['lrgmem'],
         K=20
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
@@ -284,7 +284,7 @@ rule fit_gwas_gtex_z_cafeh:
         model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
     params:
         impute=False,
-        lrgmem=False,
+        lrgmem=config['lrgmem'],
         K=20
     group: 'report'
     script:
