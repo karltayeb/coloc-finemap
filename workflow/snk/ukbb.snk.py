@@ -1,6 +1,6 @@
 rule download_ukbb_pheno:
     input:
-        mainfest='output/UKBB/manifest.txt',
+        manifest='output/UKBB/manifest.txt',
         pheno2manifest='output/UKBB/pheno2manifest'
     output:
         temp_save_file=temp('output/UKBB/{phenotype}/_{phenotype}.tsv.bgz'),
