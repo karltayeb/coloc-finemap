@@ -41,5 +41,5 @@ rule ukbb_get_hits:
     output:
         hits='output/UKBB/{phenotype}/{phenotype}.hits.txt'
     run:
-        shell('zcat {input.sumstats} | awk '{if($NF < 1e-5){print}}' > {output.hits}')
+        shell("zcat {input.sumstats} | awk '{{if($NF < 1e-5){{print}}}}' > {output.hits}")
 
