@@ -1,11 +1,9 @@
-rule ukbb_download_pheno:
+rule download_ukbb_pheno:
     input:
         manifest='output/UKBB/manifest.txt',
         pheno2manifest='output/UKBB/pheno2manifest'
     output:
-        temp_save_file='output/UKBB/{phenotype}/_{phenotype}.tsv.bgz',
-        save_file='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
-        tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
+        temp_save_file='output/UKBB/{phenotype}/_{phenotype}.tsv.bgz'
     run:
         import pandas as pd
         import subprocess
@@ -21,6 +19,10 @@ rule ukbb_download_pheno:
             .values[0]\
             .split(' ')[1]
 
+        cmd = 'wget {} -O {}'.format(source_file, output.temp_save_file)
+        print(cmd)
+        subprocess.run(cmd, shell=True)
+
 rule ukbb_prep_pheno:
     input:
         'output/UKBB/variants.tsv.bgz',
@@ -29,6 +31,6 @@ rule ukbb_prep_pheno:
         save_file='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
     script:
-        paste <(zcat input[0]) <(zcat input[1]) | bgzip > output[1]
-        tabix -s 2 -b 3 -e 3 -S 1 output[1]
+        paste <(zcat input[0]) <(zcat input[1]) | bgzip > output[0]
+        tabix -s 2 -b 3 -e 3 -S 1 output[0]
 
