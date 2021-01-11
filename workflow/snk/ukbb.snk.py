@@ -187,6 +187,8 @@ rule ukbb_gtex_cafeh:
 
         # load summary stats
         gtex = load_gtex_associations(gene)
+        rsid2variant_id = gtex.set_index('rsid').variant_id.to_dict()
+
         gwas = load_ukbb_gwas(phenotype, gene)
 
         # combine summary stat
