@@ -35,7 +35,7 @@ rule ukbb_build_index:
         shell("tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}")
 
 
-fule ukbb_get_hits:
+rule ukbb_get_hits:
     input:
         sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz'
     output:
