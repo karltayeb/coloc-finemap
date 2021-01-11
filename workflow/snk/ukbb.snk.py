@@ -12,7 +12,7 @@ rule download_ukbb_pheno:
         import json
 
         manifest = pd.read_csv(input.manifest, sep='\t').set_index(['Phenotype Code', 'Sex'])
-        pheno2manifest = json.load(open('../../output/UKBB/pheno2manifest', 'r'))
+        pheno2manifest = json.load(open(input.pheno2manifest, 'r'))
 
         print('downloading summary stats')
         phenotype = wildcards.phenotype
