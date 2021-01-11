@@ -219,7 +219,7 @@ rule ukbb_gtex_cafeh:
 
         print('{} GTEx variants'.format(gtex.rsid.unique().size))
         print('{} UKBB variants'.format(gwas.rsid.unique().size))
-        print('{} intersecting, fully observed variants'.format(va.size))
+        print('{} intersecting, fully observed variants'.format(variants.size))
 
         K = 20
 
