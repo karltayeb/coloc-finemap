@@ -23,14 +23,14 @@ rule download_ukbb_pheno:
         print(cmd)
         subprocess.run(cmd, shell=True)
 
-rule ukbb_prep_pheno:
+rule ukbb_build_index:
     input:
-        'output/UKBB/variants.tsv.bgz',
-        'output/UKBB/{phenotype}/_{phenotype}.tsv.bgz'
+        var='output/UKBB/variants.tsv.bgz',
+        sumstats='output/UKBB/{phenotype}/_{phenotype}.tsv.bgz'
     output:
         save_file='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
     shell:
-        "paste <(zcat {input[0]}) <(zcat {input[1]}) | bgzip > {output[0]}"
-        "tabix -s 2 -b 3 -e 3 -S 1 {output[0]}"
+        "paste <(zcat {input.var}) <(zcat {input.sumstats}) | bgzip > {output.save_file}"
+        "tabix -s 2 -b 3 -e 3 -S 1 {output.save_file}"
 
