@@ -48,6 +48,7 @@ rule ukbb_gtex_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
         'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
@@ -98,7 +99,7 @@ rule ukbb_gtex_cafeh:
                 'AC', 'ytx', 'beta', 'se', 'tstat', 'pval'
             ]
 
-            ukbb = pysam.TabixFile('../../output/UKBB/{}/{}.tsv.bgz'.format(phenotype, phenotype))
+            ukbb = pysam.TabixFile(input.sumstats)
             tss = get_tss(gene)
             chrom = int(get_chr(gene)[3:])
             lines = ukbb.fetch(chrom, tss-5e6, tss+5e6)
