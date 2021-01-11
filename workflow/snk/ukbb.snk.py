@@ -3,7 +3,7 @@ rule download_ukbb_pheno:
         manifest='output/UKBB/manifest.txt',
         pheno2manifest='output/UKBB/pheno2manifest'
     output:
-        temp_save_file=temp('output/UKBB/{phenotype}/_{phenotype}.tsv.bgz'),
+        temp_save_file='output/UKBB/{phenotype}/_{phenotype}.tsv.bgz',
         save_file='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
     run:
