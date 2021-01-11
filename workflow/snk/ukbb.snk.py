@@ -30,7 +30,7 @@ rule ukbb_prep_pheno:
     output:
         save_file='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
-    script:
-        paste <(zcat input[0]) <(zcat input[1]) | bgzip > output[0]
-        tabix -s 2 -b 3 -e 3 -S 1 output[0]
+    shell:
+        "paste <(zcat {input[0]}) <(zcat {input[1]}) | bgzip > {output[0]}"
+        "tabix -s 2 -b 3 -e 3 -S 1 {output[0]}"
 
