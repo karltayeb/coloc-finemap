@@ -50,15 +50,15 @@ rule ukbb_gtex_cafeh:
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
-        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.pairwise.variant_report',
-        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.pairwise.coloc_report'
+        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
+        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report'
     run:
         import pysam
         import pandas as pd
         import numpy as np
         import sys
         sys.path.append('/work-zfs/abattle4/karl/cosie_analysis/utils/')
-        from misc import *
+        from misc import get_chr, get_tss, load_gtex_genotype
         from cafeh.cafeh_ss import CAFEH as CSS
         from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
 
