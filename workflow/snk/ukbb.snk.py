@@ -43,3 +43,185 @@ rule ukbb_get_hits:
     run:
         shell("zcat {input.sumstats} | awk '{{if($NF < 1e-5){{print}}}}' > {output.hits}")
 
+
+rule ukbb_gtex_cafeh:
+    input:
+        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
+    output:
+        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.pairwise.variant_report',
+        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.pairwise.coloc_report'
+    run:
+        import pysam
+        import pandas as pd
+        import numpy as np
+        import sys
+        sys.path.append('/work-zfs/abattle4/karl/cosie_analysis/utils/')
+        from misc import *
+        from cafeh.cafeh_ss import CAFEH as CSS
+        from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
+
+
+        sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
+
+        def cast(s):
+            try:
+                return ast.literal_eval(s)
+            except Exception:
+                return s
+
+        def load_ukbb_gwas(phenotype, gene):
+            header = [
+                'variant', 'chr', 'pos', 'ref', 'alt', 'rsid',
+                'varid', 'consequence', 'consequence_category',
+                'info', 'call_rate', 'AC', 'AF', 'minor_allele', 
+                'minor_AF', 'p_hwe', 'n_called', 'n_not_called',
+                'n_hom_ref', 'n_het', 'n_hom_var', 'n_non_ref',
+                
+                'r_heterozygosity', 'r_het_hom_var', 'r_expected_het_frequency',
+                'variant', 'minor_allele', 'minor_AF',
+                'low_confidence_variant', 'n_complete_samples',
+                'AC', 'ytx', 'beta', 'se', 'tstat', 'pval'
+            ]
+
+            header_cc = [
+                'variant', 'chr', 'pos', 'ref', 'alt', 'rsid',
+                'varid', 'consequence', 'consequence_category',
+                'info', 'call_rate', 'AC', 'AF', 'minor_allele', 
+                'minor_AF', 'p_hwe', 'n_called', 'n_not_called',
+                'n_hom_ref', 'n_het', 'n_hom_var', 'n_non_ref',
+                
+                'r_heterozygosity', 'r_het_hom_var', 'r_expected_het_frequency',
+                'variant', 'minor_allele', 'minor_AF', 'expected_case_minor_AC',
+                'low_confidence_variant', 'n_complete_samples',
+                'AC', 'ytx', 'beta', 'se', 'tstat', 'pval'
+            ]
+
+            ukbb = pysam.TabixFile('../../output/UKBB/{}/{}.tsv.bgz'.format(phenotype, phenotype))
+            tss = get_tss(gene)
+            chrom = int(get_chr(gene)[3:])
+            lines = ukbb.fetch(chrom, tss-5e6, tss+5e6)
+
+            df = pd.DataFrame(
+                list(map(cast, x.strip().split('\t')) for x in lines),
+            )
+
+            if df.shape[1] == len(header):
+                df.columns = header
+            else:
+                df.columns = header_cc
+
+            df = df.apply(pd.to_numeric, errors='ignore')
+            df = df.loc[:,~df.columns.duplicated()]
+
+            df.beta = pd.to_numeric(df.beta, errors='coerce')
+            df.se = pd.to_numeric(df.se, errors='coerce')
+            df.tstat = pd.to_numeric(df.tstat, errors='coerce')
+            df.pval = pd.to_numeric(df.pval, errors='coerce')
+
+            df.rename(columns={
+                'varid': 'variant_id',
+                'beta': 'slope',
+                'se': 'slope_se',
+                'pval': 'pval_nominal',
+                'tstat': 'z',
+                'n_complete_samples': 'sample_size'
+            }, inplace=True)
+            df.loc[:, 'tissue'] = phenotype
+            df.loc[:, 'gene'] = gene
+            df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
+            df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
+            df = df[(df.low_confidence_variant == 'false')]
+
+            df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'slope', 'slope_se', 'S', 'z', 'zS']]
+            return df
+
+        def load_gtex_associations(gene):
+            """
+            ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
+                get_chr(gene), gene, gene)
+            v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(
+                get_chr(gene), gene, gene)
+            """
+            v2r = load_var2rsid(gene)
+            ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
+                get_chr(gene), gene, gene)
+
+            df = pd.read_csv(ap, index_col=0)
+            df.loc[:, 'rsid'] = df.variant_id.apply(lambda x: v2r.get(x, '-'))
+            df.loc[:, 'pos'] = df.variant_id.apply(lambda x: int(x.split('_')[1]))
+            df.loc[:, 'ref'] = df.variant_id.apply(lambda x: x.split('_')[2])
+            df.loc[:, 'alt'] = df.variant_id.apply(lambda x: x.split('_')[3])
+            df.loc[:, 'sample_size'] = (df.ma_count / df.maf / 2)
+            
+            df.loc[:, 'S'] = np.sqrt(
+                df.slope**2/df.sample_size + df.slope_se**2)
+            df.loc[:, 'z'] = df.slope / df.slope_se
+            df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
+            df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
+            df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'slope', 'slope_se', 'S', 'z', 'zS']]
+            return df
+
+
+        gene = wildcards.gene
+        study = 'UKBB'
+        phenotype = wildcards.phenotype
+
+        # load summary stats
+        gtex = load_gtex_associations(gene)
+        gwas = load_ukbb_gwas(phenotype, gene)
+
+        # combine summary stat
+        shared_variants = np.intersect1d(gtex.rsid.unique(), gwas.rsid.unique())
+        df = pd.concat([gtex, gwas])
+        df = df[df.rsid.isin(shared_variants)]#load genotype
+        gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
+        gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
+
+        # load summary stats
+        gtex = load_gtex_associations(gene)
+        gwas = load_ukbb_gwas(phenotype, gene)
+
+        # combine summary stat
+        shared_variants = np.intersect1d(gtex.rsid.unique(), gwas.rsid.unique())
+        df = pd.concat([gtex, gwas])
+        df = df[df.rsid.isin(shared_variants)]
+
+
+        # reshape summary stats for CAFEH
+        z = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'z')
+        zS = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'zS')
+
+        mask = ~(np.any(np.isnan(z), 0) | np.any(np.isnan(zS), 0))
+        z = z.loc[:, mask]
+        zS = zS.loc[:, mask]
+
+        variants = z.columns.values
+        study_ids = z.index.values
+
+        K = 20
+
+        init_args = {
+            'LD': sample_ld(gtex_genotype.loc[:, variants]),
+            'B': z.values,
+            'S': zS.values,
+            'K': K,
+            'snp_ids': variants,
+            'study_ids': study_ids,
+            'tolerance': 1e-8
+        }
+        css = CSS(**init_args)
+        css.prior_activity = np.ones(K) * 0.1
+        css.weight_precision_b = np.ones_like(css.weight_precision_b) * 1
+
+
+        print('fit model with imputed z-score')
+        weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
+        fit_all(css, max_iter=30, verbose=True)
+
+        # save variant report
+        table = make_table(css, gene, rsid2variant_id)
+        ct = coloc_table(css, phenotype, gene=gene)
+        table.to_csv(output[0], sep='\t', index=False)
+        ct.to_csv(output[1], sep='\t', index=False)
