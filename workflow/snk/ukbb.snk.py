@@ -30,7 +30,7 @@ rule ukbb_build_index:
     output:
         save_file='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
-    shell:
-        "paste <(zcat {input.var}) <(zcat {input.sumstats}) | bgzip > {output.save_file}"
-        "tabix -s 2 -b 3 -e 3 -S 1 {output.save_file}"
+    run:
+        shell("paste <(zcat {input.var}) <(zcat {input.sumstats}) | bgzip > {output.save_file}")
+        shell("tabix -s 2 -b 3 -e 3 -S 1 {output.save_file}")
 
