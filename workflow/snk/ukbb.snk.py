@@ -62,7 +62,7 @@ rule ukbb_gtex_cafeh:
         from misc import get_chr, get_tss, load_gtex_genotype
         from cafeh.cafeh_ss import CAFEH as CSS
         from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
-
+        from cafeh.model_queries import summary_table, coloc_table
 
         sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
 
@@ -164,6 +164,22 @@ rule ukbb_gtex_cafeh:
             df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'slope', 'slope_se', 'S', 'z', 'zS']]
             return df
 
+        def make_table(model, gene, rsid2variant_id):
+            table = summary_table(model)
+
+            # annotate table
+            table.loc[:, 'rsid'] = table.variant_id
+            table.loc[:, 'variant_id'] = table.rsid.apply(lambda x: rsid2variant_id.get(x, 'chr0_0_A_B_n'))
+            table.loc[:, 'chr'] = table.variant_id.apply(lambda x: (x.split('_')[0]))
+            table.loc[:, 'start'] = table.variant_id.apply(lambda x: int(x.split('_')[1]))
+            table.loc[:, 'end'] = table.start + 1
+            table.loc[:, 'gene'] = gene
+
+            table = table.loc[:, ['chr', 'start', 'end', 'gene',
+                                  'variant_id', 'rsid', 'study', 'pip',
+                                  'top_component', 'p_active', 'pi', 'alpha',
+                                  'rank', 'effect', 'effect_var']]
+            return table
 
         gene = wildcards.gene
         study = 'UKBB'
@@ -200,6 +216,10 @@ rule ukbb_gtex_cafeh:
 
         variants = z.columns.values
         study_ids = z.index.values
+
+        print('{} GTEx variants'.format(gtex.rsid.unique().size))
+        print('{} UKBB variants'.format(gwas.rsid.unique().size))
+        print('{} intersecting, fully observed variants'.format(va.size))
 
         K = 20
 
