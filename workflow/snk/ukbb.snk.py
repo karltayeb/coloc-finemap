@@ -3,8 +3,9 @@ rule download_ukbb_pheno:
         mainfest='outpute/UKBB/manifest.txt',
         pheno2manifest='outpute/UKBB/pheno2manifest'
     output:
-        temp_save_file=temp('output/UKBB/{phenotype}/_{phenotype}.bgz.tbi'),
-        save_file='output/UKBB/{phenotype}/{phenotype}.bgz.tbi'
+        temp_save_file=temp('output/UKBB/{phenotype}/_{phenotype}.tsv.bgz'),
+        save_file='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
+        tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
     run:
         import pandas as pd
         import subprocess
