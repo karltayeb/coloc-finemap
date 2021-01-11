@@ -21,20 +21,20 @@ rule download_ukbb_pheno:
             .values[0]\
             .split(' ')[1]
 
-        cmd = 'wget {} -O {}'.format(source_file, input.temp_save_file)
+        cmd = 'wget {} -O {}'.format(source_file, output.temp_save_file)
         print(cmd)
         subprocess.run(cmd, shell=True)
 
         print('merge summary stats with variant file')
         cmd = 'paste ' + \
             '<(zcat output/UKBB/variants.tsv.bgz)' + \
-            ' <(zcat {})'.format(input.temp_save_file) + \
-            ' | bgzip > {}'.format(input.save_file)
+            ' <(zcat {})'.format(output.temp_save_file) + \
+            ' | bgzip > {}'.format(output.save_file)
         print(cmd)
         subprocess.run(cmd, shell=True)
 
         print('make tabix index')
-        cmd = 'tabix -s 2 -b 3 -e 3 -S 1 {}'.format(input.save_file)
+        cmd = 'tabix -s 2 -b 3 -e 3 -S 1 {}'.format(output.save_file)
         print(cmd)
         subprocess.run(cmd, shell=True)
 
