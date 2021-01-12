@@ -268,6 +268,7 @@ rule ukbb_gtex_cafeh:
 
         # flip variants with swapped ref/alt alleles
         # remove variants with mismatched ref/alt
+        print('harmonizing GWAS and GTEx')
         a = gtex[~gtex.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
         b = gwas[~gwas.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
         c = pd.concat([a, b], axis=1, join='inner')
@@ -495,6 +496,7 @@ rule ukbb_saige_gtex_cafeh:
 
         # flip variants with swapped ref/alt alleles
         # remove variants with mismatched ref/alt
+        print('harmonizing GWAS and GTEx')
         a = gtex[~gtex.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
         b = gwas[~gwas.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
         c = pd.concat([a, b], axis=1, join='inner')
