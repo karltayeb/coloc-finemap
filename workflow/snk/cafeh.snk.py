@@ -287,7 +287,7 @@ rule fit_gwas_gtex_z_cafeh:
         lrgmem=config['lrgmem'],
         K=20
     wildcard_constraints:
-        study="[^(UKBB_continuous)]"
+        study="[^(UKBB*)]"
     group: 'report'
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
