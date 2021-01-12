@@ -555,3 +555,5 @@ rule ukbb_saige_gtex_cafeh:
         ct = coloc_table(css, phenotype, gene=gene)
         table.to_csv(output[0], sep='\t', index=False)
         ct.to_csv(output[1], sep='\t', index=False)
+
+        css.save(output.model)
