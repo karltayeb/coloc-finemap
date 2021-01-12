@@ -36,13 +36,19 @@ rule ukbb_build_index:
         shell("paste <(zcat {input.var}) <(zcat {input.sumstats_raw}) | bgzip > {output.sumstats}")
         shell("tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}")
 
+study2col = {
+    'UKBB_continuous': 36,
+    'UKBB': 13
+}
 rule ukbb_get_hits:
     input:
-        sumstats='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz'
+        sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz'
     output:
-        hits='output/UKBB_continuous/{phenotype}/{phenotype}.hits.txt'
+        hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
+    params:
+        col = lambda wildcards: study2col[wildcards.study]
     run:
-        shell("zcat {input.sumstats} | awk '{{if($NF < 1e-6){{print}}}}' > {output.hits}")
+        shell("zcat {input.sumstats} | awk '{{if(${params.col} < 1e-6){{print}}}}' > {output.hits}")
 
 rule ukbb_get_request:
     input:
