@@ -318,8 +318,12 @@ rule download_ukbb_saige_sumstatss:
     params:
         phecode=lambda wildcards: ukbb_phenotypes.set_index(1).loc[wildcards.phenotype].iloc[0]
     shell:
-        """
-        wget ftp://share.sph.umich.edu/UKBB_SAIGE_HRC//PheCode_{params.phecode}_SAIGE_MACge20.txt.vcf.gz -O {output}
-        tabix -s 1 -b 2 -e 2 -S 1 {output.sumstats}
-        """
+        "wget ftp://share.sph.umich.edu/UKBB_SAIGE_HRC//PheCode_{params.phecode}_SAIGE_MACge20.txt.vcf.gz -O {output}"
 
+rule download_ukbb_saige_sumstatss:
+    input:
+        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
+    output:
+        tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
+    shell:
+        "tabix -s 1 -b 2 -e 2 -S 1 {input}"
