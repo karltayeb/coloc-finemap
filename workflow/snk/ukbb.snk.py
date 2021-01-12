@@ -73,12 +73,16 @@ rule ukbb_gtex_cafeh:
         import numpy as np
         import sys
         sys.path.append('/work-zfs/abattle4/karl/cosie_analysis/utils/')
-        from misc import get_chr, get_tss, load_gtex_genotype
+        from misc import gene2chr.get, gene2tss.get, load_gtex_genotype
         from cafeh.cafeh_ss import CAFEH as CSS
         from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
         from cafeh.model_queries import summary_table, coloc_table
 
         sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
+
+        gc = pd.read_csv('output/annotations/gencode/gencode_v29_v19.tsv', sep='\t')
+        gene2tss = gc.set_index('gene_id').start_pos19.to_dict()
+        gene2chr = gc.set_index('gene_id').chr.to_dict()
 
         def cast(s):
             try:
@@ -114,8 +118,8 @@ rule ukbb_gtex_cafeh:
             ]
 
             ukbb = pysam.TabixFile(input.sumstats)
-            tss = get_tss(gene)
-            chrom = int(get_chr(gene)[3:])
+            tss = gene2tss.get(gene)
+            chrom = int(gene2chr.get(gene)[3:])
             lines = ukbb.fetch(chrom, tss-5e6, tss+5e6)
 
             df = pd.DataFrame(
@@ -155,13 +159,13 @@ rule ukbb_gtex_cafeh:
         def load_gtex_associations(gene):
             """
             ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
-                get_chr(gene), gene, gene)
+                gene2chr.get(gene), gene, gene)
             v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(
-                get_chr(gene), gene, gene)
+                gene2chr.get(gene), gene, gene)
             """
             v2r = load_var2rsid(gene)
             ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
-                get_chr(gene), gene, gene)
+                gene2chr.get(gene), gene, gene)
 
             df = pd.read_csv(ap, index_col=0)
             df.loc[:, 'rsid'] = df.variant_id.apply(lambda x: v2r.get(x, '-'))
