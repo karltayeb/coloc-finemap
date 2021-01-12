@@ -315,6 +315,6 @@ rule download_ukbb_saige_sumstatss:
     output:
         sumstats='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz'
     params:
-        phecode=ukbb_phenotypes.set_index(1).loc[wildcards.phenotype].iloc[0]
+        phecode=lambda wildcards: ukbb_phenotypes.set_index(1).loc[wildcards.phenotype].iloc[0]
     shell:
         "wget ftp://share.sph.umich.edu/UKBB_SAIGE_HRC//PheCode_{params.phecode}_SAIGE_MACge20.txt.vcf.gz -O {output}"
