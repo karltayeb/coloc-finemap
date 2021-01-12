@@ -324,10 +324,12 @@ rule ukbb_gtex_cafeh:
 
         # save variant report
         table = make_table(css, gene, rsid2variant_id)
+        table.to_csv(output.variant_report, sep='\t', index=False)
+        
         ct = coloc_table(css, phenotype, gene=gene)
-        table.to_csv(output[0], sep='\t', index=False)
-        ct.to_csv(output[1], sep='\t', index=False)
+        ct.to_csv(output.coloc_report, sep='\t', index=False)
 
+        css.save(output.model)
 
 # UKBB SAIGE
 ukbb_phenotypes = pd.read_csv('output/UKBB/UKBB_phenotypes.txt', sep ='\t', header=None)
@@ -356,8 +358,9 @@ rule ukbb_saige_gtex_cafeh:
         sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
-        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
-        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report'
+        variant_report='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
+        coloc_report='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report',
+        model='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.model'
     run:
         import pysam
         import pandas as pd
@@ -552,8 +555,9 @@ rule ukbb_saige_gtex_cafeh:
 
         # save variant report
         table = make_table(css, gene, rsid2variant_id)
+        table.to_csv(output.variant_report, sep='\t', index=False)
+        
         ct = coloc_table(css, phenotype, gene=gene)
-        table.to_csv(output[0], sep='\t', index=False)
-        ct.to_csv(output[1], sep='\t', index=False)
+        ct.to_csv(output.coloc_report, sep='\t', index=False)
 
         css.save(output.model)
