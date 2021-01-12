@@ -190,11 +190,11 @@ rule ukbb_gtex_cafeh:
                 'beta': 'slope',
                 'se': 'slope_se',
                 'pval': 'pval_nominal',
-                'tstat': 'z',
                 'n_complete_samples': 'sample_size'
             }, inplace=True)
             df.loc[:, 'tissue'] = phenotype
             df.loc[:, 'gene'] = gene
+            df.loc[:, 'z'] = df.slope / df.slope_se
             df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
             df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
             df = df[(df.low_confidence_variant == 'false')]
@@ -246,7 +246,7 @@ rule ukbb_gtex_cafeh:
             return table
 
         gene = wildcards.gene
-        study = 'UKBB'
+        study = 'UKBB_continuous'
         phenotype = wildcards.phenotype
 
         # load summary stats
@@ -266,8 +266,22 @@ rule ukbb_gtex_cafeh:
         gtex = load_gtex_associations(gene)
         gwas = load_ukbb_gwas(phenotype, gene)
 
+        # flip variants with swapped ref/alt alleles
+        # remove variants with mismatched ref/alt
+        a = gtex[~gtex.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
+        b = gwas[~gwas.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
+        c = pd.concat([a, b], axis=1, join='inner')
+
+        correct = (c.iloc[:, 1] == c.iloc[:, 3]) & (c.iloc[:, 0] == c.iloc[:, 2])
+        flipped = (c.iloc[:, 1] == c.iloc[:, 2]) & (c.iloc[:, 0] == c.iloc[:, 3])
+        bad = ~(correct | flipped)
+
+        gwas.loc[gwas.rsid.isin(flipped[flipped].index), 'z'] \
+            = gwas.loc[gwas.rsid.isin(flipped[flipped].index)].z * -1
+
+        shared_variants = c[~bad].index.values
+
         # combine summary stat
-        shared_variants = np.intersect1d(gtex.rsid.unique(), gwas.rsid.unique())
         df = pd.concat([gtex, gwas])
         df = df[df.rsid.isin(shared_variants)]
 
@@ -400,8 +414,7 @@ rule ukbb_saige_gtex_cafeh:
                 'ALT': 'alt',
                 'ID': 'rsid',
                 'beta': 'slope',
-                'sebeta': 'slope_se',
-                'Tstat': 'z',
+                'sebeta': 'slope_se'
             }, inplace=True)
 
             # TODO: Effective Sample size?
@@ -409,6 +422,7 @@ rule ukbb_saige_gtex_cafeh:
 
             df.loc[:, 'tissue'] = phenotype
             df.loc[:, 'gene'] = gene
+            df.loc[:, 'z'] = df.slope / df.slope_se
             df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
             df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
 
@@ -479,8 +493,22 @@ rule ukbb_saige_gtex_cafeh:
         gtex = load_gtex_associations(gene)
         gwas = load_ukbb_gwas(phenotype, gene)
 
+        # flip variants with swapped ref/alt alleles
+        # remove variants with mismatched ref/alt
+        a = gtex[~gtex.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
+        b = gwas[~gwas.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
+        c = pd.concat([a, b], axis=1, join='inner')
+
+        correct = (c.iloc[:, 1] == c.iloc[:, 3]) & (c.iloc[:, 0] == c.iloc[:, 2])
+        flipped = (c.iloc[:, 1] == c.iloc[:, 2]) & (c.iloc[:, 0] == c.iloc[:, 3])
+        bad = ~(correct | flipped)
+
+        gwas.loc[gwas.rsid.isin(flipped[flipped].index), 'z'] \
+            = gwas.loc[gwas.rsid.isin(flipped[flipped].index)].z * -1
+
+        shared_variants = c[~bad].index.values
+
         # combine summary stat
-        shared_variants = np.intersect1d(gtex.rsid.unique(), gwas.rsid.unique())
         df = pd.concat([gtex, gwas])
         df = df[df.rsid.isin(shared_variants)]
 
