@@ -313,8 +313,7 @@ ukbb_phenotypes = pd.read_csv('output/UKBB/UKBB_phenotypes.txt', sep ='\t', head
 
 rule download_ukbb_saige_sumstats:
     output:
-        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
-        tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
+        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz'
     params:
         phecode=lambda wildcards: ukbb_phenotypes.set_index(1).loc[wildcards.phenotype].iloc[0]
     shell:
