@@ -56,7 +56,8 @@ rule ukbb_get_request:
 
         gc = pd.read_csv('output/annotations/gencode/gencode_v29_v19.tsv', sep='\t')
         hits = pd.read_csv(input.hits, sep='\t', header=None)
-        files = glob('/work-zfs/abattle4/marios/GTEx_v8/coloc/Phecode4_*_tested_genes_gwaSigeQTLs.txt')
+        files = glob('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/*.v8.signif_variant_gene_pairs.txt')
+
         genes = []
         for _, hit in hits.iterrows():
             chrom, pos = 'chr{}'.format(hit.iloc[1]), hit.iloc[2]
