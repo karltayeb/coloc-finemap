@@ -43,6 +43,44 @@ rule ukbb_get_hits:
     run:
         shell("zcat {input.sumstats} | awk '{{if($NF < 1e-6){{print}}}}' > {output.hits}")
 
+rule ukbb_get_request:
+    input:
+        hits='output/UKBB_continuous/{phenotype}/{phenotype}.hits.txt'
+    output:
+        request='output/UKBB_continuous/{phenotype}/{phenotype}.request.txt'
+    run:
+        import pandas as pd
+        import numpy as np
+        from tqdm import tqdm
+        from glob import glob
+
+        gc = pd.read_csv('output/annotations/gencode/gencode_v29_v19.tsv', sep='\t')
+        hits = pd.read_csv(input.hits, sep='\t', header=None)
+
+        genes = []
+        for _, hit in hits.iterrows():
+            chrom, pos = 'chr{}'.format(hit.iloc[1]), hit.iloc[2]
+            gc[(gc.chr == chrom)]
+            _genes = gc[
+                (gc.chr == chrom)
+                & (gc.start_pos19 > pos - 1e6)
+                & (gc.start_pos19 < pos + 1e6)].gene_id.values
+            genes.append(_genes)
+        genes = np.unique(np.concatenate(genes))
+        egenes = np.unique(np.concatenate(
+            [np.intersect1d(pd.read_csv(f, sep='\t').gene_id.values, genes)
+            for f in tqdm(files)]))
+        egenes = gc[gc.gene_id.isin(egenes)]
+
+
+        request_template = 'output/UKBB_continuous/{phe}/{chr}/{gene}/{gene}.{phe}.z.variant_report'
+
+        with open(output.request, 'w') as f:
+            for _, row in egenes.iterrows():
+                print(request_template.format(
+                    phe=wildcards.phenotype, chr=row.chr, gene=row.gene_id),
+                file=f)
+
 
 rule ukbb_get_genes:
     input:
