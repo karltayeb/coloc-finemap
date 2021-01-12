@@ -320,6 +320,6 @@ rule download_ukbb_saige_sumstatss:
     shell:
         """
         wget ftp://share.sph.umich.edu/UKBB_SAIGE_HRC//PheCode_{params.phecode}_SAIGE_MACge20.txt.vcf.gz -O {output}
-        tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}
+        tabix -s 1 -b 2 -e 2 -S 1 {output.sumstats}
         """
 
