@@ -73,7 +73,7 @@ rule ukbb_gtex_cafeh:
         import numpy as np
         import sys
         sys.path.append('/work-zfs/abattle4/karl/cosie_analysis/utils/')
-        from misc import gene2chr.get, gene2tss.get, load_gtex_genotype
+        from misc import load_gtex_genotype
         from cafeh.cafeh_ss import CAFEH as CSS
         from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
         from cafeh.model_queries import summary_table, coloc_table
