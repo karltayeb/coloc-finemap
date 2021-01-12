@@ -1,9 +1,9 @@
 rule download_ukbb_pheno:
     input:
-        manifest='output/UKBB/manifest.txt',
-        pheno2manifest='output/UKBB/pheno2manifest'
+        manifest='output/UKBB_continuous/manifest.txt',
+        pheno2manifest='output/UKBB_continuous/pheno2manifest'
     output:
-        temp_sumstats='output/UKBB/{phenotype}/_{phenotype}.tsv.bgz'
+        temp_sumstats='output/UKBB_continuous/{phenotype}/_{phenotype}.tsv.bgz'
     run:
         import pandas as pd
         import subprocess
@@ -25,11 +25,11 @@ rule download_ukbb_pheno:
 
 rule ukbb_build_index:
     input:
-        var='output/UKBB/variants.tsv.bgz',
-        sumstats_raw='output/UKBB/{phenotype}/_{phenotype}.tsv.bgz'
+        var='output/UKBB_continuous/variants.tsv.bgz',
+        sumstats_raw='output/UKBB_continuous/{phenotype}/_{phenotype}.tsv.bgz'
     output:
-        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
-        tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
+        sumstats='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz',
+        tabix_index='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz.tbi'
     run:
         shell("paste <(zcat {input.var}) <(zcat {input.sumstats_raw}) | bgzip > {output.sumstats}")
         shell("tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}")
@@ -37,22 +37,36 @@ rule ukbb_build_index:
 
 rule ukbb_get_hits:
     input:
-        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz'
+        sumstats='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz'
     output:
-        hits='output/UKBB/{phenotype}/{phenotype}.hits.txt'
+        hits='output/UKBB_continuous/{phenotype}/{phenotype}.hits.txt'
     run:
         shell("zcat {input.sumstats} | awk '{{if($NF < 1e-5){{print}}}}' > {output.hits}")
 
+
+rule ukbb_get_genes:
+    input:
+        hits='output/UKBB_continuous/{phenotype}/{phenotype}.hits.txt'
+    output:
+        genes='output/UKBB_continuous/{phenotype}/{phenotype}.genes.txt'
+    run:
+        """
+        for each hit, find nearby genes with an eqtl in at least one tissue
+
+        1. gene tss is within 1Mb of hit in grch19 coordinates
+        2. gene appears in signif_variant_gene_pairs source_file
+        3. annotate if the eqtl is also a hit
+        """
 
 rule ukbb_gtex_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
-        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
+        sumstats='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
-        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
-        'output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report'
+        'output/UKBB_continuous/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
+        'output/UKBB_continuous/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report'
     run:
         import pysam
         import pandas as pd
