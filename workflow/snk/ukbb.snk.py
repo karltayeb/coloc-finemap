@@ -360,7 +360,7 @@ rule ukbb_saige_gtex_cafeh:
     output:
         variant_report='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
         coloc_report='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report',
-        model='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.model'
+        model='output/UKBB/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
     run:
         import pysam
         import pandas as pd
@@ -556,7 +556,7 @@ rule ukbb_saige_gtex_cafeh:
         # save variant report
         table = make_table(css, gene, rsid2variant_id)
         table.to_csv(output.variant_report, sep='\t', index=False)
-        
+
         ct = coloc_table(css, phenotype, gene=gene)
         ct.to_csv(output.coloc_report, sep='\t', index=False)
 
