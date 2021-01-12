@@ -52,9 +52,9 @@ rule ukbb_get_hits:
 
 rule ukbb_get_request:
     input:
-        hits='output/UKBB_continuous/{phenotype}/{phenotype}.hits.txt'
+        hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
     output:
-        request='output/UKBB_continuous/{phenotype}/{phenotype}.request.txt'
+        request='output/{study}/{phenotype}/{phenotype}.request.txt'
     run:
         import pandas as pd
         import numpy as np
@@ -81,12 +81,14 @@ rule ukbb_get_request:
         egenes = gc[gc.gene_id.isin(egenes)]
 
 
-        request_template = 'output/UKBB_continuous/{phe}/{chr}/{gene}/{gene}.{phe}.z.variant_report'
+        request_template = 'output/{study}/{phe}/{chr}/{gene}/{gene}.{phe}.z.variant_report'
 
         with open(output.request, 'w') as f:
             for _, row in egenes.iterrows():
                 print(request_template.format(
-                    phe=wildcards.phenotype, chr=row.chr, gene=row.gene_id),
+                    study=wildcards.study,
+                    phe=wildcards.phenotype,
+                    chr=row.chr, gene=row.gene_id),
                 file=f)
 
 
