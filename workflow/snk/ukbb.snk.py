@@ -313,8 +313,12 @@ ukbb_phenotypes = pd.read_csv('output/UKBB/UKBB_phenotypes.txt', sep ='\t', head
 
 rule download_ukbb_saige_sumstatss:
     output:
-        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz'
+        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
+        sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
     params:
         phecode=lambda wildcards: ukbb_phenotypes.set_index(1).loc[wildcards.phenotype].iloc[0]
     shell:
-        "wget ftp://share.sph.umich.edu/UKBB_SAIGE_HRC//PheCode_{params.phecode}_SAIGE_MACge20.txt.vcf.gz -O {output}"
+        "wget ftp://share.sph.umich.edu/UKBB_SAIGE_HRC//PheCode_{params.phecode}_SAIGE_MACge20.txt.vcf.gz -O {output}",
+        "tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}"
+
+
