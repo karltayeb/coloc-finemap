@@ -41,7 +41,7 @@ rule ukbb_get_hits:
     output:
         hits='output/UKBB_continuous/{phenotype}/{phenotype}.hits.txt'
     run:
-        shell("zcat {input.sumstats} | awk '{{if($NF < 1e-5){{print}}}}' > {output.hits}")
+        shell("zcat {input.sumstats} | awk '{{if($NF < 1e-6){{print}}}}' > {output.hits}")
 
 
 rule ukbb_get_genes:
