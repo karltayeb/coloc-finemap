@@ -111,8 +111,9 @@ rule ukbb_gtex_cafeh:
         sumstats='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
-        'output/UKBB_continuous/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
-        'output/UKBB_continuous/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report'
+        variant_report='output/UKBB_continuous/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
+        coloc_report='output/UKBB_continuous/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report'
+        model='output/UKBB_continuous/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
     run:
         import pysam
         import pandas as pd
