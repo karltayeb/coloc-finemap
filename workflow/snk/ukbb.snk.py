@@ -1,3 +1,5 @@
+# UKBB_continuous
+
 rule download_ukbb_pheno:
     input:
         manifest='output/UKBB_continuous/manifest.txt',
@@ -33,7 +35,6 @@ rule ukbb_build_index:
     run:
         shell("paste <(zcat {input.var}) <(zcat {input.sumstats_raw}) | bgzip > {output.sumstats}")
         shell("tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}")
-
 
 rule ukbb_get_hits:
     input:
@@ -305,3 +306,15 @@ rule ukbb_gtex_cafeh:
         ct = coloc_table(css, phenotype, gene=gene)
         table.to_csv(output[0], sep='\t', index=False)
         ct.to_csv(output[1], sep='\t', index=False)
+
+
+# UKBB SAIGE
+ukbb_phenotypes = pd.read_csv('output/UKBB/UKBB_phenotypes.txt', sep ='\t', header=None)
+
+rule download_ukbb_saige_sumstatss:
+    output:
+        sumstats='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz'
+    params:
+        phecode=ukbb_phenotypes.set_index(1).loc[wildcards.phenotype].iloc[0]
+    shell:
+        "wget ftp://share.sph.umich.edu/UKBB_SAIGE_HRC//PheCode_{params.phecode}_SAIGE_MACge20.txt.vcf.gz -O {output}"
