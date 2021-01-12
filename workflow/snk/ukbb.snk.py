@@ -311,7 +311,7 @@ rule ukbb_gtex_cafeh:
 # UKBB SAIGE
 ukbb_phenotypes = pd.read_csv('output/UKBB/UKBB_phenotypes.txt', sep ='\t', header=None)
 
-rule download_ukbb_saige_sumstatss:
+rule download_ukbb_saige_sumstats:
     output:
         sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
@@ -320,7 +320,7 @@ rule download_ukbb_saige_sumstatss:
     shell:
         "wget ftp://share.sph.umich.edu/UKBB_SAIGE_HRC//PheCode_{params.phecode}_SAIGE_MACge20.txt.vcf.gz -O {output}"
 
-rule download_ukbb_saige_sumstatss:
+rule ukbb_saige_build_index:
     input:
         sumstats='output/UKBB/{phenotype}/{phenotype}.tsv.bgz',
     output:
