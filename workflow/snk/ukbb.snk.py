@@ -50,11 +50,17 @@ rule ukbb_get_hits:
     run:
         shell("zcat {input.sumstats} | awk '{{if(${params.col} < 1e-6){{print}}}}' > {output.hits}")
 
+study2col = {
+    'UKBB_continuous': 1,
+    'UKBB': 0
+}
 rule ukbb_get_request:
     input:
         hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
     output:
         request='output/{study}/{phenotype}/{phenotype}.request.txt'
+    params:
+        base_col = lambda wildcards: study2col[wildcards.study]
     run:
         import pandas as pd
         import numpy as np
@@ -67,7 +73,7 @@ rule ukbb_get_request:
 
         genes = []
         for _, hit in hits.iterrows():
-            chrom, pos = 'chr{}'.format(hit.iloc[1]), int(hit.iloc[2])
+            chrom, pos = 'chr{}'.format(hit.iloc[params.base_col]), int(hit.iloc[params.base_col + 1])
             gc[(gc.chr == chrom)]
             _genes = gc[
                 (gc.chr == chrom)
