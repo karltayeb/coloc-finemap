@@ -63,41 +63,35 @@ rule ukbb_get_request:
     params:
         base_col = lambda wildcards: study2col_request[wildcards.study]
     run:
-        #shell("grep -w -F -f <(cut -f3  {{input}}) /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged.bim | awk '{print $2, $1"_"$4}' | awk '!seen[$2]++' > {{output[0]}}")
         import pandas as pd
         import numpy as np
         from tqdm import tqdm
         from glob import glob
 
-        gc = pd.read_csv('output/annotations/gencode/gencode_v29_v19.tsv', sep='\t')
         hits = pd.read_csv(input.hits, sep='\t', header=None)
-        files = glob('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/*.v8.signif_variant_gene_pairs.txt')
+        hits = np.array([lambda x: '{}_{}'.format(c, p) for c, p in zip(hits.iloc[:, 0], hits.iloc[:, 4])])
 
         genes = []
-        for _, hit in hits.iterrows():
-            chrom, pos = 'chr{}'.format(hit.iloc[params.base_col]), int(hit.iloc[params.base_col + 1])
-            gc[(gc.chr == chrom)]
-            _genes = gc[
-                (gc.chr == chrom)
-                & (gc.start_pos19 > pos - 1e6)
-                & (gc.start_pos19 < pos + 1e6)].gene_id.values
-            genes.append(_genes)
-        genes = np.unique(np.concatenate(genes))
-        egenes = np.unique(np.concatenate(
-            [np.intersect1d(pd.read_csv(f, sep='\t').gene_id.values, genes)
-            for f in tqdm(files)]))
-        egenes = gc[gc.gene_id.isin(egenes)]
+        for file in tqdm(glob('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/*.v8.signif_variant_gene_pairs.txt')[:3]):
+            sig = pd.read_csv(file, sep='\t')
+            mask = sig.variant_id.apply(lambda x: '_'.join(x[3:].split('_')[:2])).isin(a.iloc[:, 1])
+            sig = sig[mask]
+            sig[~sig.gene_id.duplicated()]
+            genes.append(sig)
 
+        genes = pd.concat(genes)
+        genes = genes[~genes.gene_id.duplicated()]
 
-        request_template = 'output/{study}/{phe}/{chr}/{gene}/{gene}.{phe}.z.variant_report'
+        template = 'output/{study}/{phe}/{chr}/{gene}/{gene}.{phe}.z.variant_report'
+        requests = [template.format(study='a',
+                            phe='b',
+                            chr=row.variant_id.split('_')[0], gene=row.gene_id)
+                    for _, row in genes.iterrows()
+                   ]
 
         with open(output.request, 'w') as f:
-            for _, row in egenes.iterrows():
-                print(request_template.format(
-                    study=wildcards.study,
-                    phe=wildcards.phenotype,
-                    chr=row.chr, gene=row.gene_id),
-                file=f)
+            for r in request:
+                print(r, file=f)
 
 
 rule ukbb_get_genes:
