@@ -74,7 +74,7 @@ rule ukbb_get_request:
         genes = []
         for file in tqdm(glob('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/*.v8.signif_variant_gene_pairs.txt')[:3]):
             sig = pd.read_csv(file, sep='\t')
-            mask = sig.variant_id.apply(lambda x: '_'.join(x[3:].split('_')[:2])).isin(a.iloc[:, 1])
+            mask = sig.variant_id.apply(lambda x: '_'.join(x[3:].split('_')[:2])).isin(hits)
             sig = sig[mask]
             sig[~sig.gene_id.duplicated()]
             genes.append(sig)
