@@ -131,20 +131,6 @@ rule ukbb_get_request:
                 print(r, file=f)
 
 
-rule ukbb_get_genes:
-    input:
-        hits='output/UKBB_continuous/{phenotype}/{phenotype}.hits.txt'
-    output:
-        genes='output/UKBB_continuous/{phenotype}/{phenotype}.genes.txt'
-    run:
-        """
-        for each hit, find nearby genes with an eqtl in at least one tissue
-
-        1. gene tss is within 1Mb of hit in grch19 coordinates
-        2. gene appears in signif_variant_gene_pairs source_file
-        3. annotate if the eqtl is also a hit
-        """
-
 rule ukbb_gtex_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
