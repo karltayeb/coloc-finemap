@@ -83,8 +83,8 @@ rule ukbb_get_request:
         genes = genes[~genes.gene_id.duplicated()]
 
         template = 'output/{study}/{phe}/{chr}/{gene}/{gene}.{phe}.z.variant_report'
-        requests = [template.format(study='a',
-                            phe='b',
+        requests = [template.format(study=wildcards.study,
+                            phe=wildcards.phenotype,
                             chr=row.variant_id.split('_')[0], gene=row.gene_id)
                     for _, row in genes.iterrows()
                    ]
