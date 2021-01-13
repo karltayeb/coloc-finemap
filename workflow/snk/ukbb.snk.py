@@ -49,7 +49,7 @@ rule ukbb_get_hits:
         pcol = lambda wildcards: study2col_hits[wildcards.study][0],
         rsidcol = lambda wildcards: study2col_hits[wildcards.study][1]
     run:
-        shell("zcat {input.sumstats} | awk '{{if(${params.pcol} < 1e-6){{print ${params.rsidcol}}}}}' > {output.hits}")
+        shell("grep -w -F -f <(zcat {input.sumstats} | awk '{{if(${params.pcol} < 1e-6){{print ${params.rsidcol}}}}}') /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged.bim > {output.hits}")
 
 study2col_request = {
     'UKBB_continuous': 1,
