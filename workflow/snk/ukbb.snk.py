@@ -55,6 +55,43 @@ study2col_request = {
     'UKBB_continuous': 1,
     'UKBB': 0
 }
+
+rule ukbb_get_cis_genes:
+    input:
+        hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
+    output:
+        request='output/{study}/{phenotype}/{phenotype}.genes.txt'
+    run:
+        import pandas as pd
+        import numpy as np
+        from tqdm import tqdm
+        from glob import glob
+
+        hits = pd.read_csv('../../output/UKBB/Asthma/Asthma.hits.txt', sep='\t', header=None)
+        hits = np.array(['chr{}_{}'.format(c, p) for c, p in zip(hits.iloc[:, 0], hits.iloc[:, 3])])
+
+        genes = []
+        for file in tqdm(glob('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/*.v8.signif_variant_gene_pairs.txt')):
+            sig = pd.read_csv(file, sep='\t')
+            sig.loc[:, 'tissue'] = file.split('/')[-1].split('.')[0]
+            mask = sig.variant_id.apply(lambda x: '_'.join(x.split('_')[:2])).isin(hits)
+            sig = sig[mask]
+            sig = sig[~sig.gene_id.duplicated(keep='first')]
+            genes.append(sig)
+
+        genes = pd.concat(genes)
+        print(genes.gene_id.unique().size)
+
+        results = pd.DataFrame([{
+            'study': 'UKBB',
+            'phenotype': 'Asthma',
+            'tissue': row.tissue,
+            'chr': row.variant_id.split('_')[0],
+            'pos': row.variant_id.split('_')[1],
+            'gene_id': row.gene_id
+        } for _, row in genes.iterrows()])
+        results.to_csv(output[0], sep='\t')
+
 rule ukbb_get_request:
     input:
         hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
@@ -113,6 +150,7 @@ rule ukbb_gtex_cafeh:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
         sumstats='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz',
+        tabix_index='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz.tbi',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
         variant_report='output/UKBB_continuous/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
