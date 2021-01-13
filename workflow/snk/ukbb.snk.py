@@ -48,6 +48,7 @@ rule ukbb_get_hits:
     params:
         col = lambda wildcards: study2col[wildcards.study]
     run:
+        print("zcat {input.sumstats} | awk '{{if(${params.col} < 1e-6){{print}}}}' > {output.hits}")
         shell("zcat {input.sumstats} | awk '{{if(${params.col} < 1e-6){{print}}}}' > {output.hits}")
 
 study2col = {
