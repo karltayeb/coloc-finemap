@@ -69,10 +69,10 @@ rule ukbb_get_request:
         from glob import glob
 
         hits = pd.read_csv(input.hits, sep='\t', header=None)
-        hits = np.array([lambda x: '{}_{}'.format(c, p) for c, p in zip(hits.iloc[:, 0], hits.iloc[:, 4])])
-
+        hits = np.array(['{}_{}'.format(c, p) for c, p in zip(hits.iloc[:, 0], hits.iloc[:, 3])])
+    
         genes = []
-        for file in tqdm(glob('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/*.v8.signif_variant_gene_pairs.txt')[:3]):
+        for file in tqdm(glob('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/*.v8.signif_variant_gene_pairs.txt')):
             sig = pd.read_csv(file, sep='\t')
             mask = sig.variant_id.apply(lambda x: '_'.join(x[3:].split('_')[:2])).isin(hits)
             sig = sig[mask]
