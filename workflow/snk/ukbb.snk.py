@@ -46,8 +46,8 @@ rule ukbb_get_hits:
     output:
         hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
     params:
-        pcol = lambda wildcards: study2col_hits[wildcards.study],
-        rsidcol = lambda wildcards: study2col_hits[wildcards.study]
+        pcol = lambda wildcards: study2col_hits[wildcards.study][0],
+        rsidcol = lambda wildcards: study2col_hits[wildcards.study][1]
     run:
         shell("zcat {input.sumstats} | awk '{{if(${params.pcol} < 1e-6){{print ${params.rsidcol}}}}}' > {output.hits}")
 
