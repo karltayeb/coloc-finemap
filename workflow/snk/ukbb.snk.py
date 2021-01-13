@@ -37,8 +37,8 @@ rule ukbb_build_index:
         shell("tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}")
 
 study2col_hits = {
-    'UKBB_continuous': 36,
-    'UKBB': 13
+    'UKBB_continuous': (36, 6),
+    'UKBB': (13, 3)
 }
 rule ukbb_get_hits:
     input:
@@ -46,10 +46,10 @@ rule ukbb_get_hits:
     output:
         hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
     params:
-        col = lambda wildcards: study2col_hits[wildcards.study]
+        pcol = lambda wildcards: study2col_hits[wildcards.study]
+        rsidcol = lambda wildcards: study2col_hits[wildcards.study]
     run:
-        print("zcat {input.sumstats} | awk '{{if(${params.col} < 1e-6){{print}}}}' > {output.hits}")
-        shell("zcat {input.sumstats} | awk '{{if(${params.col} < 1e-6){{print}}}}' > {output.hits}")
+        shell("zcat {input.sumstats} | awk '{{if(${params.pcol} < 1e-6){{print ${params.rsidcol}}}}}' > {output.hits}")
 
 study2col_request = {
     'UKBB_continuous': 1,
@@ -61,8 +61,10 @@ rule ukbb_get_request:
     output:
         request='output/{study}/{phenotype}/{phenotype}.request.txt'
     params:
+        request='output/{study}/{phenotype}/{phenotype}.hits..txt'
         base_col = lambda wildcards: study2col_request[wildcards.study]
     run:
+        shell("grep -w -F -f <(cut -f3  {{input}}) /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged.bim | awk '{print $2, $1"_"$4}' | awk '!seen[$2]++' > {{output[0]}}")
         import pandas as pd
         import numpy as np
         from tqdm import tqdm
