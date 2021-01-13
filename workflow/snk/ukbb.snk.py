@@ -90,7 +90,7 @@ rule ukbb_get_request:
                    ]
 
         with open(output.request, 'w') as f:
-            for r in request:
+            for r in requests:
                 print(r, file=f)
 
 
