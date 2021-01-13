@@ -67,7 +67,7 @@ rule ukbb_get_cis_genes:
         from tqdm import tqdm
         from glob import glob
 
-        hits = pd.read_csv('../../output/UKBB/Asthma/Asthma.hits.txt', sep='\t', header=None)
+        hits = pd.read_csv(input.hits, sep='\t', header=None)
         hits = np.array(['chr{}_{}'.format(c, p) for c, p in zip(hits.iloc[:, 0], hits.iloc[:, 3])])
 
         genes = []
@@ -83,8 +83,8 @@ rule ukbb_get_cis_genes:
         print(genes.gene_id.unique().size)
 
         results = pd.DataFrame([{
-            'study': 'UKBB',
-            'phenotype': 'Asthma',
+            'study': wildcards.study,
+            'phenotype': wildcards.phenotype,
             'tissue': row.tissue,
             'chr': row.variant_id.split('_')[0],
             'pos': row.variant_id.split('_')[1],
