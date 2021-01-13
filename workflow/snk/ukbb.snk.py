@@ -61,10 +61,9 @@ rule ukbb_get_request:
     output:
         request='output/{study}/{phenotype}/{phenotype}.request.txt'
     params:
-        request='output/{study}/{phenotype}/{phenotype}.hits..txt'
         base_col = lambda wildcards: study2col_request[wildcards.study]
     run:
-        shell("grep -w -F -f <(cut -f3  {{input}}) /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged.bim | awk '{print $2, $1"_"$4}' | awk '!seen[$2]++' > {{output[0]}}")
+        #shell("grep -w -F -f <(cut -f3  {{input}}) /work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged.bim | awk '{print $2, $1"_"$4}' | awk '!seen[$2]++' > {{output[0]}}")
         import pandas as pd
         import numpy as np
         from tqdm import tqdm
