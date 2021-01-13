@@ -564,3 +564,4 @@ rule ukbb_saige_gtex_cafeh:
         ct.to_csv(output.coloc_report, sep='\t', index=False)
 
         css.save(output.model)
+
