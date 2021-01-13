@@ -67,7 +67,7 @@ rule ukbb_get_request:
 
         genes = []
         for _, hit in hits.iterrows():
-            chrom, pos = 'chr{}'.format(hit.iloc[1]), hit.iloc[2]
+            chrom, pos = 'chr{}'.format(hit.iloc[1]), int(hit.iloc[2])
             gc[(gc.chr == chrom)]
             _genes = gc[
                 (gc.chr == chrom)
