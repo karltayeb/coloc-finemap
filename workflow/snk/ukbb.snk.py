@@ -36,7 +36,7 @@ rule ukbb_build_index:
         shell("paste <(zcat {input.var}) <(zcat {input.sumstats_raw}) | bgzip > {output.sumstats}")
         shell("tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}")
 
-study2col = {
+study2col_hits = {
     'UKBB_continuous': 36,
     'UKBB': 13
 }
@@ -46,12 +46,12 @@ rule ukbb_get_hits:
     output:
         hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
     params:
-        col = lambda wildcards: study2col[wildcards.study]
+        col = lambda wildcards: study2col_hits[wildcards.study]
     run:
         print("zcat {input.sumstats} | awk '{{if(${params.col} < 1e-6){{print}}}}' > {output.hits}")
         shell("zcat {input.sumstats} | awk '{{if(${params.col} < 1e-6){{print}}}}' > {output.hits}")
 
-study2col = {
+study2col_request = {
     'UKBB_continuous': 1,
     'UKBB': 0
 }
@@ -61,7 +61,7 @@ rule ukbb_get_request:
     output:
         request='output/{study}/{phenotype}/{phenotype}.request.txt'
     params:
-        base_col = lambda wildcards: study2col[wildcards.study]
+        base_col = lambda wildcards: study2col_request[wildcards.study]
     run:
         import pandas as pd
         import numpy as np
