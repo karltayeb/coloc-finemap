@@ -23,12 +23,10 @@ gc26 = pd.read_csv(
     '/work-zfs/abattle4/lab_data/annotation/gencode.v26/gencode.v26.annotation.gene.txt', sep='\t')
 
 def get_chr(gene):
-    gene2chr = json.load(open('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/gene2chr', 'r'))
     return gc26.set_index('gene_id').chr.to_dict().get(gene, None)
 
 
 def get_tss(gene):
-    gene2chr = json.load(open('/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/gene2tss', 'r'))
     return gc26.set_index('gene_id').start_pos.to_dict().get(gene, None)
 
 
