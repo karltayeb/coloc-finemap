@@ -55,7 +55,8 @@ rule get_gtex_genotype:
         gtex_bfile = '/work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
         cmd = plink_get_genotype(wildcards.gene, gtex_bfile, output.genotype[:-4])
         print(cmd)
-        subprocess.run(cmd, shell=True)
+        #subprocess.run(cmd, shell=True)
+        shell(cmd)
         print('PLINK FINISHED RUNNING?')
 rule snpid2rsid:
     input:
