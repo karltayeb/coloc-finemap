@@ -617,11 +617,14 @@ rule ukbb_saige_gtex_cafeh_truncated:
 
         gc = pd.read_csv('output/annotations/gencode/gencode_v29_v19.tsv', sep='\t')
         gene2tss = gc.set_index('gene_id').start_pos19.to_dict()
-        gene2chr = gc.set_index('gene_id').chr.to_dict()
+
+        gc26 = pd.read_csv(
+            '/work-zfs/abattle4/lab_data/annotation/gencode.v26/gencode.v26.annotation.gene.txt', sep='\t')
+        gene2chr = gc26.set_index('gene_id').chr.to_dict()
 
 
         print('gene2chr', gene2chr.get(wildcards.gene))
-        
+
         def cast(s):
             try:
                 return ast.literal_eval(s)
