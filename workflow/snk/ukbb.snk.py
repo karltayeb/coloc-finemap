@@ -619,6 +619,9 @@ rule ukbb_saige_gtex_cafeh_truncated:
         gene2tss = gc.set_index('gene_id').start_pos19.to_dict()
         gene2chr = gc.set_index('gene_id').chr.to_dict()
 
+
+        print('gene2chr', gene2chr.get(wildcards.gene))
+        
         def cast(s):
             try:
                 return ast.literal_eval(s)
