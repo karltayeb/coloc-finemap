@@ -403,13 +403,15 @@ rule ukbb_saige_gtex_cafeh:
 
         sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
 
-        gc = pd.read_csv('output/annotations/gencode/gencode_v29_v19.tsv', sep='\t')
-        gene2tss = gc.set_index('gene_id').start_pos19.to_dict()
-        
-        gc26 = pd.read_csv(
-            '/work-zfs/abattle4/lab_data/annotation/gencode.v26/gencode.v26.annotation.gene.txt', sep='\t')
-        gene2chr = gc26.set_index('gene_id').chr.to_dict()
-        
+        gc = pd.read_csv('output/annotations/genes_hg19.bed', sep='\t')
+        gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
+        gc.loc[:, 'right'] = gc.end + 1e6
+
+        gene2chr = gc.set_index('gene_id').chrom.to_dict()
+        gene2left = gc.set_index('gene_id').left.to_dict()
+        gene2right = gc.set_index('gene_id').right.to_dict()
+
+
         def cast(s):
             try:
                 return ast.literal_eval(s)
@@ -420,7 +422,11 @@ rule ukbb_saige_gtex_cafeh:
             ukbb = pysam.TabixFile(input.sumstats)
             tss = gene2tss.get(gene)
             chrom = int(gene2chr.get(gene)[3:])
-            lines = ukbb.fetch(chrom, tss-1e6, tss+1e6)
+            left = gene2left.get(gene)
+            right = gene2right.get(gene)
+            if (right - left) > 1e7:
+                right = left + 1e7
+            lines = ukbb.fetch(chrom, left, right)
 
 
             header = [
