@@ -420,7 +420,6 @@ rule ukbb_saige_gtex_cafeh:
 
         def load_ukbb_gwas(phenotype, gene):
             ukbb = pysam.TabixFile(input.sumstats)
-            tss = gene2tss.get(gene)
             chrom = int(gene2chr.get(gene)[3:])
             left = gene2left.get(gene)
             right = gene2right.get(gene)
