@@ -56,7 +56,7 @@ rule get_gtex_genotype:
         cmd = plink_get_genotype(wildcards.gene, gtex_bfile, output.genotype[:-4])
         print(cmd)
         subprocess.run(cmd, shell=True)
-
+        print('PLINK FINISHED RUNNING?')
 rule snpid2rsid:
     input:
         'output/GTEx/{chrom}/{gene}/{gene}.snplist'
