@@ -426,6 +426,7 @@ rule ukbb_saige_gtex_cafeh:
             right = gene2right.get(gene)
             if (right - left) > 1e7:
                 right = left + 1e7
+            print(chrom, left, right)
             lines = ukbb.fetch(chrom, left, right)
 
 
