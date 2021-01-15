@@ -25,6 +25,51 @@ def cast(s):
     except Exception:
         return s
 
+def load_cad_gwas(gene):
+    gwas = pysam.TabixFile('../../output/CAD/CAD/CAD.tsv.bgz')
+    left = gene2left.get(gene)
+    right = gene2right.get(gene)
+    chrom = gene2chr.get(gene)
+    print('range: ', chrom, left, right)
+    lines = gwas.fetch(chrom, left, right)
+
+    header =[
+        '#CHR', 'POS', 'ID', 'REF', 'ALT',
+        'ref_frequency', 'beta', 'beta_se',
+        'p', 'sample_size', 'chromosome_number']
+    df = pd.DataFrame(
+        list(map(cast, x.strip().split('\t')) for x in lines),
+        columns=header
+    )
+    
+    df = df.apply(pd.to_numeric, errors='ignore')
+    df = df.loc[:,~df.columns.duplicated()]
+
+    df.beta = pd.to_numeric(df.beta, errors='coerce')
+    df.beta_se = pd.to_numeric(df.beta_se, errors='coerce')
+    df.p = pd.to_numeric(df.p, errors='coerce')
+            
+    df.rename(columns={
+        '#CHR': 'chr',
+        'POS': 'pos',
+        'REF': 'ref',
+        'ALT': 'alt',
+        'ID': 'rsid',
+        'beta': 'slope',
+        'beta_se': 'slope_se',
+        'p': 'pval_nominal'}, inplace=True)
+
+    df.loc[:, 'ref'] = df.ref.str.upper()
+    df.loc[:, 'alt'] = df.alt.str.upper()
+
+    df.loc[:, 'tissue'] = 'CAD'
+    df.loc[:, 'gene'] = gene
+    df.loc[:, 'z'] = df.slope / df.slope_se
+    df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
+    df.loc[:, 'S'] = df.slope_se # large sample approximation
+
+    df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'slope', 'slope_se', 'S', 'z', 'zS']]
+    return df
 
 def load_ukbb_gwas(phenotype, gene):
     header = [
@@ -204,6 +249,8 @@ if study == 'UKBB':
     gwas = load_phecode_gwas(phenotype, gene)
 if study == 'UKBB_continuous':
     gwas = load_ukbb_gwas(phenotype, gene)
+if study == 'CAD':
+    gwas = load_cad_gwas(gene)
 
 # load genotype
 gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
