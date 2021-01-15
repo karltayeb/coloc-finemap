@@ -283,11 +283,8 @@ rule fit_gwas_gtex_z_cafeh:
         coloc_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.coloc_report',
         model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
     params:
-        impute=False,
-        lrgmem=config['lrgmem'],
-        K=20
-    wildcard_constraints:
-        study="[^(UKBB*)]"
+        K=20,
+        zscore=True
     group: 'report'
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
