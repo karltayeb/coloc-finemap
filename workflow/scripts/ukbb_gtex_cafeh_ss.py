@@ -268,8 +268,8 @@ flipped = (c.iloc[:, 1] == c.iloc[:, 2]) & (c.iloc[:, 0] == c.iloc[:, 3])
 bad = ~(correct | flipped)
 print('Coreect: {}, Flipped: {}, Bad {}'.format(correct.sum(), flipped.sum(), bad.sum()))
 
-gwas.loc[gwas.rsid.isin(flipped[flipped].index), 'z'] \
-    = gwas.loc[gwas.rsid.isin(flipped[flipped].index)].z * -1
+gwas.loc[gwas.rsid.isin(flipped[flipped].index), 'slope'] \
+    = gwas.loc[gwas.rsid.isin(flipped[flipped].index)].slope * -1
 
 shared_variants = c[~bad].index.values
 
