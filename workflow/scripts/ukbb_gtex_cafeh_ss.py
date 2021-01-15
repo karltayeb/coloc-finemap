@@ -26,7 +26,7 @@ def cast(s):
         return s
 
 def load_cad_gwas(gene):
-    gwas = pysam.TabixFile('../../output/CAD/CAD/CAD.tsv.bgz')
+    gwas = pysam.TabixFile('output/CAD/CAD/CAD.tsv.bgz')
     left = gene2left.get(gene)
     right = gene2right.get(gene)
     chrom = gene2chr.get(gene)
