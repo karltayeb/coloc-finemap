@@ -53,7 +53,8 @@ rule ukbb_get_hits:
 
 study2col_request = {
     'UKBB_continuous': 1,
-    'UKBB': 0
+    'UKBB': 0,
+    'CAD': 0
 }
 
 rule ukbb_get_cis_genes:
