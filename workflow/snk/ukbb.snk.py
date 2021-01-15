@@ -155,9 +155,14 @@ rule ukbb_gtex_cafeh:
 
         sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
 
-        gc = pd.read_csv('output/annotations/gencode/gencode_v29_v19.tsv', sep='\t')
-        gene2tss = gc.set_index('gene_id').start_pos19.to_dict()
-        gene2chr = gc.set_index('gene_id').chr.to_dict()
+        gc = pd.read_csv('output/annotations/genes_hg19.bed', sep='\t')
+        gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
+        gc.loc[:, 'right'] = gc.end + 1e6
+
+        gene2chr = gc.set_index('gene_id').chrom.to_dict()
+        gene2left = gc.set_index('gene_id').left.to_dict()
+        gene2right = gc.set_index('gene_id').right.to_dict()
+
 
         def cast(s):
             try:
@@ -193,9 +198,13 @@ rule ukbb_gtex_cafeh:
             ]
 
             ukbb = pysam.TabixFile(input.sumstats)
-            tss = gene2tss.get(gene)
             chrom = int(gene2chr.get(gene)[3:])
-            lines = ukbb.fetch(chrom, tss-1e6, tss+1e6)
+            left = gene2left.get(gene)
+            right = gene2right.get(gene)
+            if (right - left) > 1e7:
+                right = left + 1e7
+            print(chrom, left, right)
+            lines = ukbb.fetch(chrom, left, right)
 
             df = pd.DataFrame(
                 list(map(cast, x.strip().split('\t')) for x in lines),
