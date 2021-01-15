@@ -277,6 +277,8 @@ rule fit_gwas_gtex_z_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
         associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
+        tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
         v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
     output:
         variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.variant_report',
