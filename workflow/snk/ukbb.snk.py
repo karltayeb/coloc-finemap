@@ -38,7 +38,8 @@ rule ukbb_build_index:
 
 study2col_hits = {
     'UKBB_continuous': (36, 6),
-    'UKBB': (13, 3)
+    'UKBB': (13, 3),
+    'CAD': (9, 3)
 }
 rule ukbb_get_hits:
     input:
