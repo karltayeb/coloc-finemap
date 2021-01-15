@@ -51,7 +51,7 @@ def load_ukbb_gwas(phenotype, gene):
         'AC', 'ytx', 'beta', 'se', 'tstat', 'pval'
     ]
 
-    ukbb = pysam.TabixFile(input.sumstats)
+    ukbb = pysam.TabixFile(snakemake.input.sumstats)
     chrom = int(gene2chr.get(gene)[3:])
     left = gene2left.get(gene)
     right = gene2right.get(gene)
@@ -95,7 +95,7 @@ def load_ukbb_gwas(phenotype, gene):
     return df
 
 def load_phecode_gwas(phenotype, gene):
-    ukbb = pysam.TabixFile(input.sumstats)
+    ukbb = pysam.TabixFile(snakemake.input.sumstats)
     chrom = int(gene2chr.get(gene)[3:])
     left = gene2left.get(gene)
     right = gene2right.get(gene)
@@ -271,10 +271,10 @@ fit_all(css, max_iter=30, verbose=True)
 
 # save variant report
 table = make_table(css, gene, rsid2variant_id)
-table.to_csv(output.variant_report, sep='\t', index=False)
+table.to_csv(snakemake.output.variant_report, sep='\t', index=False)
 
 ct = coloc_table(css, phenotype, gene=gene)
-ct.to_csv(output.coloc_report, sep='\t', index=False)
+ct.to_csv(snakemake.output.coloc_report, sep='\t', index=False)
 
-css.save(output.model)
+css.save(snakemake.output.model)
 
