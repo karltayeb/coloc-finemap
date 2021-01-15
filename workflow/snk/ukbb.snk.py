@@ -326,15 +326,15 @@ rule ukbb_gtex_cafeh:
 
 
         # reshape summary stats for CAFEH
-        z = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'z')
-        zS = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'zS')
+        B = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'slope')
+        S = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'S')
 
-        mask = ~(np.any(np.isnan(z), 0) | np.any(np.isnan(zS), 0))
-        z = z.loc[:, mask]
-        zS = zS.loc[:, mask]
+        mask = ~(np.any(np.isnan(B), 0) | np.any(np.isnan(S), 0))
+        B = B.loc[:, mask]
+        S = S.loc[:, mask]
 
-        variants = z.columns.values
-        study_ids = z.index.values
+        variants = B.columns.values
+        study_ids = B.index.values
 
         print('{} GTEx variants'.format(gtex.rsid.unique().size))
         print('{} UKBB variants'.format(gwas.rsid.unique().size))
@@ -344,8 +344,8 @@ rule ukbb_gtex_cafeh:
 
         init_args = {
             'LD': sample_ld(gtex_genotype.loc[:, variants]),
-            'B': z.values,
-            'S': zS.values,
+            'B': B.values / S.values,
+            'S': np.ones_like(B),
             'K': K,
             'snp_ids': variants,
             'study_ids': study_ids,
@@ -782,30 +782,27 @@ rule ukbb_saige_gtex_cafeh_truncated:
         df = pd.concat([gtex, gwas])
         df = df[df.rsid.isin(shared_variants)]
 
-
         # reshape summary stats for CAFEH
-        z = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'z')
-        zS = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'zS')
+        B = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'slope')
+        S = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'S')
 
-        mask = (~(np.any(np.isnan(z), 0) | np.any(np.isnan(zS), 0))) & (np.max(np.abs(z), 0) > 3)
-        z = z.loc[:, mask]
-        zS = zS.loc[:, mask]
+        mask = ~(np.any(np.isnan(B), 0) | np.any(np.isnan(S), 0))
+        B = B.loc[:, mask]
+        S = S.loc[:, mask]
 
-        variants = z.columns.values
-        study_ids = z.index.values
+        variants = B.columns.values
+        study_ids = B.index.values
 
         print('{} GTEx variants'.format(gtex.rsid.unique().size))
         print('{} UKBB variants'.format(gwas.rsid.unique().size))
-        print('{} intersecting, fully observed variants, z > 3'.format(variants.size))
-
-
+        print('{} intersecting, fully observed variants'.format(variants.size))
 
         K = 20
 
         init_args = {
             'LD': sample_ld(gtex_genotype.loc[:, variants]),
-            'B': z.values,
-            'S': zS.values,
+            'B': B.values / S.values,
+            'S': np.ones_like(B),
             'K': K,
             'snp_ids': variants,
             'study_ids': study_ids,
@@ -814,7 +811,6 @@ rule ukbb_saige_gtex_cafeh_truncated:
         css = CSS(**init_args)
         css.prior_activity = np.ones(K) * 0.1
         css.weight_precision_b = np.ones_like(css.weight_precision_b) * 1
-
 
         print('fit model with imputed z-score')
         weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
