@@ -248,9 +248,11 @@ print('{} intersecting, fully observed variants'.format(variants.size))
 K = snakemake.params.K
 
 if snakemake.params.zscore:
+    print('Using z scores...')
     B = B.values / S.values
     S = np.ones_like(B)
 else:
+    print('Using effect sizes...')
     B = B.values
     S = S.values
 

@@ -258,21 +258,6 @@ rule generate_snp_report:
         table = make_table(model, gene)
         table.to_csv(output.report, sep='\t', index=None)
 
-rule fit_gwas_gtex_z_impute_cafeh:
-    input:
-        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
-        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
-        v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
-    output:
-        variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z_imputed.variant_report',
-        model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z_imputed.css'
-    params:
-        impute=True,
-        lrgmem=config['lrgmem'],
-        K=20
-    script:
-        '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
-
 rule fit_gwas_gtex_z_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
@@ -287,6 +272,24 @@ rule fit_gwas_gtex_z_cafeh:
     params:
         K=20,
         zscore=True
+    group: 'report'
+    script:
+        '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
+
+rule fit_gwas_gtex_z_cafeh:
+    input:
+        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
+        tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
+        v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid'
+    output:
+        variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.variant_report',
+        coloc_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.coloc_report',
+        model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.css'
+    params:
+        K=20,
+        zscore=False
     group: 'report'
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
