@@ -10,12 +10,13 @@ from cafeh.model_queries import summary_table, coloc_table
 
 sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
 
-gc = pd.read_csv('output/annotations/gencode/gencode_v29_v19.tsv', sep='\t')
-gene2tss = gc.set_index('gene_id').start_pos19.to_dict()
+gc = pd.read_csv('output/annotations/genes_hg19.bed', sep='\t')
+gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
+gc.loc[:, 'right'] = gc.end + 1e6
 
-gc26 = pd.read_csv(
-    '/work-zfs/abattle4/lab_data/annotation/gencode.v26/gencode.v26.annotation.gene.txt', sep='\t')
-gene2chr = gc26.set_index('gene_id').chr.to_dict()
+gene2chr = gc.set_index('gene_id').chrom.to_dict()
+gene2left = gc.set_index('gene_id').left.to_dict()
+gene2right = gc.set_index('gene_id').right.to_dict()
 
 
 def cast(s):
@@ -23,6 +24,7 @@ def cast(s):
         return ast.literal_eval(s)
     except Exception:
         return s
+
 
 def load_ukbb_gwas(phenotype, gene):
     header = [
