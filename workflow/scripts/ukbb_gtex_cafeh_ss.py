@@ -266,6 +266,7 @@ c = pd.concat([a, b], axis=1, join='inner')
 correct = (c.iloc[:, 1] == c.iloc[:, 3]) & (c.iloc[:, 0] == c.iloc[:, 2])
 flipped = (c.iloc[:, 1] == c.iloc[:, 2]) & (c.iloc[:, 0] == c.iloc[:, 3])
 bad = ~(correct | flipped)
+print('Coreect: {}, Flipped: {}, Bad {}'.format(correct.sum(), flipped.sum(), bad.sum()))
 
 gwas.loc[gwas.rsid.isin(flipped[flipped].index), 'z'] \
     = gwas.loc[gwas.rsid.isin(flipped[flipped].index)].z * -1
