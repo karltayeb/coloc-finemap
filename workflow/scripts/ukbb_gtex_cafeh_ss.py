@@ -249,7 +249,7 @@ K = snakemake.params.K
 
 if snakemake.params.zscore:
     B = B.values / S.values
-    S = np.ones_like(B.values)
+    S = np.ones_like(B)
 else:
     B = B.values
     S = S.values
