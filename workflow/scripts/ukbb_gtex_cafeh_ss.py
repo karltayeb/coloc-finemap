@@ -18,8 +18,6 @@ gc26 = pd.read_csv(
 gene2chr = gc26.set_index('gene_id').chr.to_dict()
 
 
-print('gene2chr', gene2chr.get(wildcards.gene))
-
 def cast(s):
     try:
         return ast.literal_eval(s)
@@ -192,9 +190,9 @@ def make_table(model, gene, rsid2variant_id):
                           'rank', 'effect', 'effect_var']]
     return table
 
-gene = wildcards.gene
-study = wildcards.study
-phenotype = wildcards.phenotype
+gene = snakemake.wildcards.gene
+study = snakemake.wildcards.study
+phenotype = snakemake.wildcards.phenotype
 
 # load summary stats
 gtex = load_gtex_associations(gene)
