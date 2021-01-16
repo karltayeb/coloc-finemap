@@ -260,6 +260,10 @@ if study == 'CAD':
 gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
 gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
 
+
+print('{} GTEx variants'.format(gtex.rsid.unique().size))
+print('{} UKBB variants'.format(gwas.rsid.unique().size))
+
 # flip variants with swapped ref/alt alleles
 # remove variants with mismatched ref/alt
 print('harmonizing GWAS and GTEx')
@@ -293,8 +297,6 @@ S = S.loc[:, mask]
 variants = B.columns.values
 study_ids = B.index.values
 
-print('{} GTEx variants'.format(gtex.rsid.unique().size))
-print('{} UKBB variants'.format(gwas.rsid.unique().size))
 print('{} intersecting, fully observed variants'.format(variants.size))
 
 K = snakemake.params.K
