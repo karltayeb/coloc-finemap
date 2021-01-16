@@ -104,6 +104,10 @@ def load_ukbb_gwas(phenotype, gene):
     right = gene2right.get(gene)
     if (right - left) > 1e7:
         right = left + 1e7
+
+    if phenotype in ['Uterine_polyp', 'Uterine_leiomyoma']:
+        chrom = "{0:0=2d}".format(chrom)
+
     print(chrom, left, right)
     lines = ukbb.fetch(chrom, left, right)
 
