@@ -10,23 +10,22 @@ from cafeh.model_queries import summary_table, coloc_table
 
 sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
 
-gc = pd.read_csv('output/annotations/genes_hg19.bed', sep='\t')
-gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
-gc.loc[:, 'right'] = gc.end + 1e6
-
-gene2chr = gc.set_index('gene_id').chrom.to_dict()
-gene2left = gc.set_index('gene_id').left.to_dict()
-gene2right = gc.set_index('gene_id').right.to_dict()
-
-
 def cast(s):
     try:
         return ast.literal_eval(s)
     except Exception:
         return s
 
-def load_cad_gwas(gene):
-    gwas = pysam.TabixFile('output/CAD/CAD/CAD.tsv.bgz')
+def load_cad_gwas(gene, rel = ''):
+    gwas = pysam.TabixFile(rel + 'output/CAD/CAD/CAD.tsv.bgz')
+    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
+    gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
+    gc.loc[:, 'right'] = gc.end + 1e6
+
+    gene2chr = gc.set_index('gene_id').chrom.to_dict()
+    gene2left = gc.set_index('gene_id').left.to_dict()
+    gene2right = gc.set_index('gene_id').right.to_dict()
+
     left = gene2left.get(gene)
     right = gene2right.get(gene)
     chrom = gene2chr.get(gene)
@@ -71,7 +70,17 @@ def load_cad_gwas(gene):
     df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'slope', 'slope_se', 'S', 'z', 'zS']]
     return df
 
-def load_ukbb_gwas(phenotype, gene):
+def load_ukbb_gwas(phenotype, gene, rel = ''):
+
+    gc = pd.read_csv('output/annotations/genes_hg19.bed', sep='\t')
+    gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
+    gc.loc[:, 'right'] = gc.end + 1e6
+
+    gene2chr = gc.set_index('gene_id').chrom.to_dict()
+    gene2left = gc.set_index('gene_id').left.to_dict()
+    gene2right = gc.set_index('gene_id').right.to_dict()
+
+
     header = [
         'variant', 'chr', 'pos', 'ref', 'alt', 'rsid',
         'varid', 'consequence', 'consequence_category',
@@ -98,7 +107,8 @@ def load_ukbb_gwas(phenotype, gene):
         'AC', 'ytx', 'beta', 'se', 'tstat', 'pval'
     ]
 
-    ukbb = pysam.TabixFile(snakemake.input.sumstats)
+    #ukbb = pysam.TabixFile(snakemake.input.sumstats)
+    ukbb = pysam.TabixFile(rel + 'output/UKBB_continuous/{}/{}.tsv.bgz'.formate(phenotype, phenotype))
     chrom = int(gene2chr.get(gene)[3:])
     left = gene2left.get(gene)
     right = gene2right.get(gene)
@@ -142,8 +152,17 @@ def load_ukbb_gwas(phenotype, gene):
     df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'slope', 'slope_se', 'S', 'z', 'zS']]
     return df
 
-def load_phecode_gwas(phenotype, gene):
-    ukbb = pysam.TabixFile(snakemake.input.sumstats)
+def load_phecode_gwas(phenotype, gene, rel=''):
+    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
+    gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
+    gc.loc[:, 'right'] = gc.end + 1e6
+
+    gene2chr = gc.set_index('gene_id').chrom.to_dict()
+    gene2left = gc.set_index('gene_id').left.to_dict()
+    gene2right = gc.set_index('gene_id').right.to_dict()
+
+    ukbb = pysam.TabixFile(rel + 'output/UKBB/{}/{}.tsv.bgz'.format(phenotype, phenotype))
+    #ukbb = pysam.TabixFile(snakemake.input.sumstats)
     chrom = int(gene2chr.get(gene)[3:])
     left = gene2left.get(gene)
     right = gene2right.get(gene)
