@@ -98,7 +98,7 @@ rule gwas_generate_requests:
     input:
         genes='output/{study}/{phenotype}/{phenotype}.genes.txt'
     output:
-        request='output/{study}/{phenotype}/{study}.{phenotype}.{request}.requests.txt'
+        request='output/{study}/{phenotype}/{phenotype}.{request}.requests.txt'
     run:
         from glob import glob
         import pandas as pd
