@@ -260,98 +260,101 @@ def make_table(model, gene, rsid2variant_id):
                           'rank', 'effect', 'effect_var']]
     return table
 
-gene = snakemake.wildcards.gene
-study = snakemake.wildcards.study
-phenotype = snakemake.wildcards.phenotype
+try:
+    gene = snakemake.wildcards.gene
+    study = snakemake.wildcards.study
+    phenotype = snakemake.wildcards.phenotype
 
-# load summary stats
-gtex = load_gtex_associations(gene)
-rsid2variant_id = gtex.set_index('rsid').variant_id.to_dict()
+    # load summary stats
+    gtex = load_gtex_associations(gene)
+    rsid2variant_id = gtex.set_index('rsid').variant_id.to_dict()
 
-if study == 'UKBB':
-    gwas = load_phecode_gwas(phenotype, gene)
-if study == 'UKBB_continuous':
-    gwas = load_ukbb_gwas(phenotype, gene)
-if study == 'CAD':
-    gwas = load_cad_gwas(gene)
+    if study == 'UKBB':
+        gwas = load_phecode_gwas(phenotype, gene)
+    if study == 'UKBB_continuous':
+        gwas = load_ukbb_gwas(phenotype, gene)
+    if study == 'CAD':
+        gwas = load_cad_gwas(gene)
 
-# load genotype
-gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
-gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
+    # load genotype
+    gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
+    gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
 
 
-print('{} GTEx variants'.format(gtex.rsid.unique().size))
-print('{} UKBB variants'.format(gwas.rsid.unique().size))
+    print('{} GTEx variants'.format(gtex.rsid.unique().size))
+    print('{} UKBB variants'.format(gwas.rsid.unique().size))
 
-# flip variants with swapped ref/alt alleles
-# remove variants with mismatched ref/alt
-print('harmonizing GWAS and GTEx')
-a = gtex[~gtex.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
-b = gwas[~gwas.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
-c = pd.concat([a, b], axis=1, join='inner')
+    # flip variants with swapped ref/alt alleles
+    # remove variants with mismatched ref/alt
+    print('harmonizing GWAS and GTEx')
+    a = gtex[~gtex.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
+    b = gwas[~gwas.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
+    c = pd.concat([a, b], axis=1, join='inner')
 
-correct = (c.iloc[:, 1] == c.iloc[:, 3]) & (c.iloc[:, 0] == c.iloc[:, 2])
-flipped = (c.iloc[:, 1] == c.iloc[:, 2]) & (c.iloc[:, 0] == c.iloc[:, 3])
-bad = ~(correct | flipped)
-print('Correct: {}, Flipped: {}, Bad {}'.format(correct.sum(), flipped.sum(), bad.sum()))
+    correct = (c.iloc[:, 1] == c.iloc[:, 3]) & (c.iloc[:, 0] == c.iloc[:, 2])
+    flipped = (c.iloc[:, 1] == c.iloc[:, 2]) & (c.iloc[:, 0] == c.iloc[:, 3])
+    bad = ~(correct | flipped)
+    print('Correct: {}, Flipped: {}, Bad {}'.format(correct.sum(), flipped.sum(), bad.sum()))
 
-gwas.loc[gwas.rsid.isin(flipped[flipped].index), 'slope'] \
-    = gwas.loc[gwas.rsid.isin(flipped[flipped].index)].slope * -1
+    gwas.loc[gwas.rsid.isin(flipped[flipped].index), 'slope'] \
+        = gwas.loc[gwas.rsid.isin(flipped[flipped].index)].slope * -1
 
-shared_variants = c[~bad].index.values
+    shared_variants = c[~bad].index.values
 
-# combine summary stat
-df = pd.concat([gtex, gwas])
-df = df[df.rsid.isin(shared_variants)]
+    # combine summary stat
+    df = pd.concat([gtex, gwas])
+    df = df[df.rsid.isin(shared_variants)]
 
-# reshape summary stats for CAFEH
-B = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'slope')
-S = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'S')
+    # reshape summary stats for CAFEH
+    B = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'slope')
+    S = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'S')
 
-# remove variants with missing sumstats
-mask = ~(np.any(np.isnan(B), 0) | np.any(np.isnan(S), 0))
-B = B.loc[:, mask]
-S = S.loc[:, mask]
+    # remove variants with missing sumstats
+    mask = ~(np.any(np.isnan(B), 0) | np.any(np.isnan(S), 0))
+    B = B.loc[:, mask]
+    S = S.loc[:, mask]
 
-variants = B.columns.values
-study_ids = B.index.values
+    variants = B.columns.values
+    study_ids = B.index.values
 
-print('{} intersecting, fully observed variants'.format(variants.size))
+    print('{} intersecting, fully observed variants'.format(variants.size))
 
-K = snakemake.params.K
+    K = snakemake.params.K
 
-if snakemake.params.zscore:
-    print('Using z scores...')
-    B = B.values / S.values
-    S = np.ones_like(B)
-else:
-    print('Using effect sizes...')
-    B = B.values
-    S = S.values
+    if snakemake.params.zscore:
+        print('Using z scores...')
+        B = B.values / S.values
+        S = np.ones_like(B)
+    else:
+        print('Using effect sizes...')
+        B = B.values
+        S = S.values
 
-init_args = {
-    'LD': sample_ld(gtex_genotype.loc[:, variants]),
-    'B': B,
-    'S': S,
-    'K': K,
-    'snp_ids': variants,
-    'study_ids': study_ids,
-    'tolerance': 1e-8
-}
-css = CSS(**init_args)
-css.prior_activity = np.ones(K) * 0.1
-css.weight_precision_b = np.ones_like(css.weight_precision_b) * 1
+    init_args = {
+        'LD': sample_ld(gtex_genotype.loc[:, variants]),
+        'B': B,
+        'S': S,
+        'K': K,
+        'snp_ids': variants,
+        'study_ids': study_ids,
+        'tolerance': 1e-8
+    }
+    css = CSS(**init_args)
+    css.prior_activity = np.ones(K) * 0.1
+    css.weight_precision_b = np.ones_like(css.weight_precision_b) * 1
 
-print('fitting CAFEH')
-weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
-fit_all(css, max_iter=30, verbose=True)
+    print('fitting CAFEH')
+    weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
+    fit_all(css, max_iter=30, verbose=True)
 
-# save variant report
-table = make_table(css, gene, rsid2variant_id)
-table.to_csv(snakemake.output.variant_report, sep='\t', index=False)
+    # save variant report
+    table = make_table(css, gene, rsid2variant_id)
+    table.to_csv(snakemake.output.variant_report, sep='\t', index=False)
 
-ct = coloc_table(css, phenotype, gene=gene)
-ct.to_csv(snakemake.output.coloc_report, sep='\t', index=False)
+    ct = coloc_table(css, phenotype, gene=gene)
+    ct.to_csv(snakemake.output.coloc_report, sep='\t', index=False)
 
-css.save(snakemake.output.model)
+    css.save(snakemake.output.model)
+except Exception as e:
+    print(e)
 
