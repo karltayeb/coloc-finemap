@@ -266,7 +266,7 @@ def make_table(model, gene, rsid2variant_id):
                           'rank', 'effect', 'effect_var']]
     return table
 
-try:
+if __name__ == "__main__":
     gene = snakemake.wildcards.gene
     study = snakemake.wildcards.study
     phenotype = snakemake.wildcards.phenotype
@@ -361,6 +361,3 @@ try:
     ct.to_csv(snakemake.output.coloc_report, sep='\t', index=False)
 
     css.save(snakemake.output.model)
-except Exception as e:
-    print(e)
-
