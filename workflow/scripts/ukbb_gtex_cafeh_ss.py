@@ -10,6 +10,13 @@ from cafeh.model_queries import summary_table, coloc_table
 
 sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
 
+COLUMNS = [
+    'tissue', 'chr', 'pos', 'ref', 'alt',
+    'rsid', 'variant_id',
+    'sample_size', 'slope', 'slope_se',
+    'S', 'z', 'zS', 'pval_nominal'
+]
+
 def cast(s):
     try:
         return ast.literal_eval(s)
@@ -67,7 +74,7 @@ def load_cad_gwas(gene, rel = ''):
     df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
     df.loc[:, 'S'] = df.slope_se # large sample approximation
 
-    df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'slope', 'slope_se', 'S', 'z', 'zS']]
+    df = df.loc[:, COLUMNS]
     return df
 
 def load_ukbb_gwas(phenotype, gene, rel = ''):
@@ -149,7 +156,7 @@ def load_ukbb_gwas(phenotype, gene, rel = ''):
     df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
     df = df[(df.low_confidence_variant == 'false')]
 
-    df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'slope', 'slope_se', 'S', 'z', 'zS']]
+    df = df.loc[:, COLUMNS]
     return df
 
 def load_phecode_gwas(phenotype, gene, rel=''):
@@ -214,7 +221,7 @@ def load_phecode_gwas(phenotype, gene, rel=''):
     df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
     df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
 
-    df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'sample_size', 'slope', 'slope_se', 'S', 'z', 'zS']]
+    df = df.loc[:, COLUMNS]
     return df
 
 def load_gtex_associations(gene, rel=''):
@@ -246,7 +253,7 @@ def load_gtex_associations(gene, rel=''):
     df.loc[:, 'z'] = df.slope / df.slope_se
     df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
     df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
-    df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'slope', 'slope_se', 'S', 'z', 'zS']]
+    df = df.loc[:, COLUMNS]
     return df
 
 def make_table(model, gene, rsid2variant_id):
