@@ -72,7 +72,7 @@ def load_cad_gwas(gene, rel = ''):
 
 def load_ukbb_gwas(phenotype, gene, rel = ''):
 
-    gc = pd.read_csv('output/annotations/genes_hg19.bed', sep='\t')
+    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
     gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
     gc.loc[:, 'right'] = gc.end + 1e6
 
