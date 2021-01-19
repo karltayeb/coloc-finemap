@@ -97,14 +97,14 @@ rule ukbb_get_cis_genes:
 rule gwas_generate_requests:
     input:
         genes='output/{study}/{phenotype}/{phenotype}.genes.txt'
-    params:
-        request_type = 'z.css'
     output:
-        request='output/requests/{study}.{phenotype}.{params.request_type}.requests.txt'
+        request='output/requests/{study}.{phenotype}.{request}.requests.txt'
     run:
         from glob import glob
         import pandas as pd
         from tqdm import tqdm
+
+        request = wildcards.request
 
         template = 'output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.{request}'
 
@@ -118,7 +118,7 @@ rule gwas_generate_requests:
                 phenotype=row.phenotype,
                 gene=row.gene_id,
                 chr=row.chr,
-                request=params.request_type
+                request=request
             ))
         with open(output.request, 'w') as f:
             [print(r, file=f) for r in requests];
