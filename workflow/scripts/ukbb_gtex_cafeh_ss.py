@@ -253,6 +253,7 @@ def load_gtex_associations(gene, rel=''):
     df.loc[:, 'z'] = df.slope / df.slope_se
     df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
     df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
+    df.loc[:, 'chr'] = gene2chr.get(gene)
     df = df.loc[:, COLUMNS]
     return df
 
