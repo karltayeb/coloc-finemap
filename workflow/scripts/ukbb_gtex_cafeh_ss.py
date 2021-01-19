@@ -224,6 +224,12 @@ def load_gtex_associations(gene):
     v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(
         gene2chr.get(gene), gene, gene)
     """
+    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
+    gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
+    gc.loc[:, 'right'] = gc.end + 1e6
+
+    gene2chr = gc.set_index('gene_id').chrom.to_dict()
+    
     v2r = load_var2rsid(gene)
     ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
         gene2chr.get(gene), gene, gene)
