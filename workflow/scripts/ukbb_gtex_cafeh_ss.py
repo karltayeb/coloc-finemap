@@ -108,7 +108,7 @@ def load_ukbb_gwas(phenotype, gene, rel = ''):
     ]
 
     #ukbb = pysam.TabixFile(snakemake.input.sumstats)
-    ukbb = pysam.TabixFile(rel + 'output/UKBB_continuous/{}/{}.tsv.bgz'.formate(phenotype, phenotype))
+    ukbb = pysam.TabixFile(rel + 'output/UKBB_continuous/{}/{}.tsv.bgz'.format(phenotype, phenotype))
     chrom = int(gene2chr.get(gene)[3:])
     left = gene2left.get(gene)
     right = gene2right.get(gene)
