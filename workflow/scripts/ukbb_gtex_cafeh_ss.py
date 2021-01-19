@@ -217,7 +217,7 @@ def load_phecode_gwas(phenotype, gene, rel=''):
     df = df.loc[:, ['tissue', 'chr', 'pos', 'ref', 'alt', 'rsid', 'variant_id', 'sample_size', 'slope', 'slope_se', 'S', 'z', 'zS']]
     return df
 
-def load_gtex_associations(gene):
+def load_gtex_associations(gene, rel=''):
     """
     ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
         gene2chr.get(gene), gene, gene)
@@ -229,7 +229,7 @@ def load_gtex_associations(gene):
     gc.loc[:, 'right'] = gc.end + 1e6
 
     gene2chr = gc.set_index('gene_id').chrom.to_dict()
-    
+
     v2r = load_var2rsid(gene)
     ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
         gene2chr.get(gene), gene, gene)
