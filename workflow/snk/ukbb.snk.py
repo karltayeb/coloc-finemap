@@ -62,7 +62,7 @@ rule ukbb_get_cis_genes:
     input:
         hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
     output:
-        request='output/{study}/{phenotype}/{phenotype}.genes.txt'
+        genes='output/{study}/{phenotype}/{phenotype}.genes.txt'
     run:
         import pandas as pd
         import numpy as np
@@ -94,6 +94,36 @@ rule ukbb_get_cis_genes:
         } for _, row in genes.iterrows()])
         results.to_csv(output[0], sep='\t')
 
+rule gwas_generate_requests:
+    input:
+        genes='output/{study}/{phenotype}/{phenotype}.genes.txt'
+    params:
+        request_type = 'z.css'
+    output:
+        request='output/requests/{study}.{phenotype}.{params.request_type}.requests.txt'
+    run:
+        from glob import glob
+        import pandas as pd
+        from tqdm import tqdm
+
+        template = 'output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.{request}'
+
+        df = pd.read_csv(input.genes, sep='\t', index_col=0)
+        df = df[~df.gene_id.duplicated()]
+
+        requests = []
+        for _, row in df.iterrows():
+            requests.append(template.format(
+                study=row.study,
+                phenotype=row.phenotype,
+                gene=row.gene_id,
+                chr=row.chr,
+                request=params.request_type
+            ))
+        with open(output.request, 'w') as f:
+            [print(r, file=f) for r in requests];
+
+    
 rule ukbb_get_request:
     input:
         hits='output/{study}/{phenotype}/{phenotype}.hits.txt'
