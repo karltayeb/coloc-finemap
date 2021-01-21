@@ -420,3 +420,10 @@ rule ukbb_saige_build_index:
     shell:
         "tabix -s 1 -b 2 -e 2 -S 1 {input}"
 
+rule grasp_build_index:
+    input:
+        sumstats='output/GRASP/{phenotype}/{phenotype}.tsv.bgz',
+    output:
+        tabix_index='output/GRASP/{phenotype}/{phenotype}.tsv.bgz.tbi'
+    shell:
+        "tabix -s 1 -b 2 -e 2 -S 1 {input}"
