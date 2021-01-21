@@ -235,7 +235,7 @@ def load_grasp_gwas(phenotype, gene, rel=''):
 
     ukbb = pysam.TabixFile(rel + 'output/GRASP/{}/{}.tsv.bgz'.format(phenotype, phenotype))
     #ukbb = pysam.TabixFile(snakemake.input.sumstats)
-    chrom = int(gene2chr.get(gene)[3:])
+    chrom = gene2chr.get(gene)
     left = gene2left.get(gene)
     right = gene2right.get(gene)
     if (right - left) > 1e7:
