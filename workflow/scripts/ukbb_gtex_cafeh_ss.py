@@ -224,6 +224,56 @@ def load_phecode_gwas(phenotype, gene, rel=''):
     df = df.loc[:, COLUMNS]
     return df
 
+def load_grasp_gwas(phenotype, gene):
+    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
+    gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
+    gc.loc[:, 'right'] = gc.end + 1e6
+
+    gene2chr = gc.set_index('gene_id').chrom.to_dict()
+    gene2left = gc.set_index('gene_id').left.to_dict()
+    gene2right = gc.set_index('gene_id').right.to_dict()
+
+    ukbb = pysam.TabixFile(rel + 'output/GRASP/{}/{}.tsv.bgz'.format(phenotype, phenotype))
+    #ukbb = pysam.TabixFile(snakemake.input.sumstats)
+    chrom = int(gene2chr.get(gene)[3:])
+    left = gene2left.get(gene)
+    right = gene2right.get(gene)
+    if (right - left) > 1e7:
+        right = left + 1e7
+    if phenotype in ['Uterine_polyp', 'Uterine_leiomyoma']:
+        chrom = "{0:0=2d}".format(chrom)
+
+    print(chrom, left, right)
+    lines = ukbb.fetch(chrom, left, right)
+
+    header= [
+        'CHR', 'POS', 'ID', 'REF', 'ALT',
+        'ref_frequency', 'beta', 'beta_se',
+        'p', 'sample_size', 'chromosome_number']
+
+    df = pd.DataFrame(
+        list(map(cast, x.strip().split('\t')) for x in lines),
+        columns=header
+    )
+
+    df.rename(columns={
+        'POS': 'pos',
+        'REF': 'ref',
+        'ALT': 'alt',
+        'ID': 'rsid',
+        'beta': 'slope',
+        'beta_se': 'slope_se',
+        'p': 'pval_nominal'}, inplace=True)
+
+    df.loc[:, 'tissue'] = phenotype
+    df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
+    df.loc[:, 'z'] = df.slope / df.slope_se
+    df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
+
+    df = df.loc[:, COLUMNS]
+    return df
+
+
 def load_gtex_associations(gene, rel=''):
     """
     ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
@@ -289,6 +339,8 @@ if __name__ == "__main__":
         gwas = load_ukbb_gwas(phenotype, gene)
     if study == 'CAD':
         gwas = load_cad_gwas(gene)
+    if study == 'GRASP':
+        gwas = load_grasp_gwas(phenotype, gene)
 
     # load genotype
     gtex_genotype = load_gtex_genotype(gene, use_rsid=True)
