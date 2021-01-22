@@ -265,6 +265,9 @@ def load_grasp_gwas(phenotype, gene, rel=''):
         'beta_se': 'slope_se',
         'p': 'pval_nominal'}, inplace=True)
 
+    df.loc[:, 'ref'] = df.ref.str.upper()
+    df.loc[:, 'alt'] = df.alt.str.upper()
+    
     df = df.apply(pd.to_numeric, errors='ignore')
     df = df.loc[:,~df.columns.duplicated()]
     df.slope = pd.to_numeric(df.slope, errors='coerce')
