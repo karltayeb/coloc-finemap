@@ -317,8 +317,8 @@ def load_gtex_associations(gene, rel=''):
     df = df.loc[:, COLUMNS]
     return df
 
-def make_table(model, gene, rsid2variant_id):
-    table = summary_table(model)
+def make_table(model, gene, rsid2variant_id, filter_variants=False):
+    table = summary_table(model, filter_variants=filter_variants)
 
     # annotate table
     table.loc[:, 'rsid'] = table.variant_id
