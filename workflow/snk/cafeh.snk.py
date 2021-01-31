@@ -294,6 +294,22 @@ rule fit_gwas_gtex_cafeh:
     script:
         '../../workflow/scripts/ukbb_gtex_cafeh_ss.py'
 
+
+rule gwas_gtex_z_full_variant_report:
+    input:
+        genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
+        associations = 'output/GTEx/{chr}/{gene}/{gene}.associations',
+        sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
+        tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
+        v2r = 'output/GTEx/{chr}/{gene}/{gene}.snp2rsid',
+        model='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.css'
+    output:
+        variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.full.variant_report'
+    script:
+        '../../workflow/scripts/gwas_full_variant_report.py'
+
+
+
 rule fit_gwas_gtex_z_pairwise_cafeh:
     input:
         genotype_gtex = 'output/GTEx/{chr}/{gene}/{gene}.raw',
