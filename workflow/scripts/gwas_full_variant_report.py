@@ -385,23 +385,24 @@ if __name__ == "__main__":
     B = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'slope')
     S = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'S')
 
-    # remove variants with missing sumstats
-    mask = ~(np.any(np.isnan(B), 0) | np.any(np.isnan(S), 0))
-    B = B.loc[:, mask]
-    S = S.loc[:, mask]
 
-    variants = B.columns.values
-    study_ids = B.index.values
+    model = pickle.load(open(snakemake.input.model, 'rb'))
+    model._decompress_model()
 
-    print('{} intersecting, fully observed variants'.format(variants.size))
+    variants = model.snp_ids
+    study_ids = model.study_ids
+
+    #  remove variants with missing sumstats
+    #mask = ~(np.any(np.isnan(B), 0) | np.any(np.isnan(S), 0))
+    #B = B.loc[:, mask]
+    #S = S.loc[:, mask]
+    B = B.loc[:, variants]
+    S = S.loc[:, variants]
 
     B = B.values / S.values
     S = np.ones_like(B)
     LD = sample_ld(gtex_genotype.loc[:, variants])
 
-
-    model = pickle.load(open(snakemake.input.model, 'rb'))
-    model._decompress_model()
 
     model.B = B
     model.S = S
