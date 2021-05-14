@@ -1,7 +1,7 @@
 gtex_bfile: '/work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
 gene_list: 'data/protein_coding_autosomal_egenes.txt'
 UKBB_phenotypes: 'data/UKBB_phenotypes.txt'
-request: 'output/requests/empty.txt'
+request: 'requests/empty.txt'
 lrgmem: False
 enrichment_filters:
   active: (df.p_active > 0.9) & (df.pip > 0.2) & (df.alpha < 0.95)
