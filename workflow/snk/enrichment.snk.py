@@ -97,7 +97,7 @@ rule gtex_make_test_set:
             df = pd.read_csv(input[0], sep='\t')
             df = df[eval(params.filters)]
         else:
-            genes = pd.read_csv('output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t').gene.values
+            genes = pd.read_csv(config['gene_list'], sep='\t').gene.values
             eqtls = pd.read_csv(
                 '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL/'
                 '{}.v8.signif_variant_gene_pairs.txt'.format(tissue),

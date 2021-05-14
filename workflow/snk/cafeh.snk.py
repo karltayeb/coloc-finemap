@@ -141,7 +141,6 @@ rule fit_cafeh_genotype_ss:
         )
         model.save(output.model)
 
-
 rule fit_susie:
     input:
         genotype = 'output/GTEx/{chr}/{gene}/{gene}.raw',
@@ -307,7 +306,6 @@ rule gwas_gtex_z_full_variant_report:
         variant_report='output/{study}/{phenotype}/{chr}/{gene}/{gene}.{phenotype}.z.full.variant_report'
     script:
         '../../workflow/scripts/gwas_full_variant_report.py'
-
 
 
 rule fit_gwas_gtex_z_pairwise_cafeh:

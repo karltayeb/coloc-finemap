@@ -5,8 +5,8 @@ import pandas as pd
 from collections import defaultdict
 from utils.misc import * 
 
-gencode = pd.read_csv(
-    'output/GTEx/protein_coding_autosomal_egenes.txt', sep='\t', index_col=0)
+config = yaml.load(open('config.yaml'))
+gencode = pd.read_csv(config['gene_list'], sep='\t', index_col=0)
 
 tissues = [x.split('.')[0].split('/')[-1] for x in glob.glob(
     '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_all_associations/*allpairs.txt')]
@@ -58,6 +58,7 @@ rule get_gtex_genotype:
         #subprocess.run(cmd, shell=True)
         shell(cmd)
         print('PLINK FINISHED RUNNING?')
+
 rule snpid2rsid:
     input:
         'output/GTEx/{chrom}/{gene}/{gene}.snplist'

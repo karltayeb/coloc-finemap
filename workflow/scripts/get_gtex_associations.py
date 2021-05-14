@@ -62,6 +62,7 @@ def get_associations(test_gene):
 test_gene = snakemake.wildcards.gene
 results = get_associations(test_gene)
 results.to_csv(snakemake.output.associations)
+
 """
 a = pd.pivot_table(results, index='tissue', columns='variant_id', values='zscore')
 a.to_csv(snakemake.output[0], sep='\t')

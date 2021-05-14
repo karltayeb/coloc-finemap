@@ -409,7 +409,7 @@ if __name__ == "__main__":
     model.LD = LD
 
     model.run_time
-    model.fit(update_weights=True, update_pi=False, verbose=True, max_iter=2)
+    model.fit(update_weights=True, update_pi=False, verbose=True, max_iter=10)
 
     table = make_table(model, gene, rsid2variant_id, filter_variants=False)
     table.to_csv(snakemake.output.variant_report, sep='\t', index=False)
