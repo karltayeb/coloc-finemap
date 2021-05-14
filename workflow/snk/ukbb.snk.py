@@ -163,7 +163,6 @@ rule ukbb_get_request:
                 print(r, file=f)
 
 
-
 # UKBB SAIGE
 ukbb_phenotypes = pd.read_csv('output/UKBB/UKBB_phenotypes.txt', sep ='\t', header=None)
 
@@ -182,6 +181,7 @@ rule ukbb_saige_build_index:
         tabix_index='output/UKBB/{phenotype}/{phenotype}.tsv.bgz.tbi'
     shell:
         "tabix -s 1 -b 2 -e 2 -S 1 {input}"
+
 
 rule grasp_build_index:
     input:
