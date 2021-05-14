@@ -5,7 +5,6 @@ import pandas as pd
 from collections import defaultdict
 from utils.misc import * 
 
-config = yaml.load(open('config.yaml'))
 gencode = pd.read_csv(config['gene_list'], sep='\t', index_col=0)
 
 tissues = [x.split('.')[0].split('/')[-1] for x in glob.glob(
