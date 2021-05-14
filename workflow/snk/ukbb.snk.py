@@ -164,7 +164,7 @@ rule ukbb_get_request:
 
 
 # UKBB SAIGE
-ukbb_phenotypes = pd.read_csv('output/UKBB/UKBB_phenotypes.txt', sep ='\t', header=None)
+ukbb_phenotypes = pd.read_csv(config['UKBB_phenotypes'], sep ='\t', header=None)
 
 rule download_ukbb_saige_sumstats:
     output:
