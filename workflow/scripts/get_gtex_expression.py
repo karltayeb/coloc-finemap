@@ -8,7 +8,7 @@ association_indices = {
     x.split('/')[-1].split('.')[0]: json.load(open(x, 'r'))
     for x in snakemake.input
 }
-gene_tissue_map = json.load(open('data/GTEx/gene2tissues'))
+gene_tissue_map = json.load(open('data/gene2tissues'))
 gene_expression_df = {}
 for tissue in gene_tissue_map[test_gene]:
     expression = pd.read_csv('/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/GTEx_Analysis_v8_eQTL_expression_matrices/'
