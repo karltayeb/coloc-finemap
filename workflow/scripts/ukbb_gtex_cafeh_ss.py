@@ -25,7 +25,7 @@ def cast(s):
 
 def load_cad_gwas(gene, rel = ''):
     gwas = pysam.TabixFile(rel + 'output/CAD/CAD/CAD.tsv.bgz')
-    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
+    gc = pd.read_csv(rel + 'data/genes_hg19.bed', sep='\t')
     gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
     gc.loc[:, 'right'] = gc.end + 1e6
 
@@ -79,7 +79,7 @@ def load_cad_gwas(gene, rel = ''):
 
 def load_ukbb_gwas(phenotype, gene, rel = ''):
 
-    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
+    gc = pd.read_csv(rel + 'data/genes_hg19.bed', sep='\t')
     gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
     gc.loc[:, 'right'] = gc.end + 1e6
 
@@ -160,7 +160,7 @@ def load_ukbb_gwas(phenotype, gene, rel = ''):
     return df
 
 def load_phecode_gwas(phenotype, gene, rel=''):
-    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
+    gc = pd.read_csv(rel + 'data/genes_hg19.bed', sep='\t')
     gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
     gc.loc[:, 'right'] = gc.end + 1e6
 
@@ -225,7 +225,7 @@ def load_phecode_gwas(phenotype, gene, rel=''):
     return df
 
 def load_grasp_gwas(phenotype, gene, rel=''):
-    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
+    gc = pd.read_csv(rel + 'data/genes_hg19.bed', sep='\t')
     gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
     gc.loc[:, 'right'] = gc.end + 1e6
 
@@ -291,7 +291,7 @@ def load_gtex_associations(gene, rel=''):
     v2rp = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.snp2rsid.json'.format(
         gene2chr.get(gene), gene, gene)
     """
-    gc = pd.read_csv(rel + 'output/annotations/genes_hg19.bed', sep='\t')
+    gc = pd.read_csv(rel + 'data/genes_hg19.bed', sep='\t')
     gc.loc[:, 'left'] = np.maximum(0, gc.start - 1e6)
     gc.loc[:, 'right'] = gc.end + 1e6
 
