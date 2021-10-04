@@ -2,15 +2,14 @@
 
 rule download_eqtlgen:
     output:
-        'output/eQTLGEN/eQTLGEN/eQTLGEN.txt.gz'
+        'output/eQTLGEN/eQTLGEN.txt.gz'
     run:
      shell('wget https://molgenis26.gcc.rug.nl/downloads/eqtlgen/cis-eqtl/cis-eQTLs_full_20180905.txt.gz -O {output}')
-     # zcat eQTLGEN.txt.gz | sort -k3,3 -k4,4 | bgzip > eQTLGEN.tsv.bgz
-     #  
+     # zcat eQTLGEN.txt.gz | awk '{print > "chr"$3"_eQTLGEN.tsv"}'
 
 rule eqtlgen_build_index:
     input:
-        'output/eQTLGEN/eQTLGEN/eQTLGEN.txt.gz'
+        'output/eQTLGEN/eQTLGEN.txt.gz'
     output:
         sumstats='output/eQTLGEN/eQTLGEN/eQTLGEN.tsv.bgz',
         tabix_index='output/eQTLGEN/eQTLGEN/eQTLGEN.tsv.bgz.tbi'
@@ -18,13 +17,14 @@ rule eqtlgen_build_index:
         shell("paste <(zcat {input.var}) <(zcat {input.sumstats_raw}) | bgzip > {output.sumstats}")
         shell("tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}")
 
-
 rule run_eqtlgen_x_gtex:
+    input:
+        'output/eQTLGEN/{chr}_eQTLGEN.tsv'
     output:
-        attempted_genes_path = 'output/eQTLGEN/eQTLGEN/{chr}_attempted_genes.txt',
-        variant_report_path = 'output/eQTLGEN/eQTLGEN/{chr}_variant_report.txt',
-        active_path = 'output/eQTLGEN/eQTLGEN/{chr}_p_active.txt',
-        error_path = 'output/eQTLGEN/eQTLGEN/{chr}_error.txt',
+        attempted_genes_path = 'output/eQTLGEN/eQTLGEN/{chr}/{chr}_attempted_genes.txt',
+        variant_report_path = 'output/eQTLGEN/eQTLGEN/{chr}/{chr}_variant_report.txt',
+        active_path = 'output/eQTLGEN/eQTLGEN/{chr}/{chr}_p_active.txt',
+        error_path = 'output/eQTLGEN/eQTLGEN/{chr}/{chr}_error.txt',
     notebook:
         "notebooks/final_analysis/eQTLgen.ipynb"
 
