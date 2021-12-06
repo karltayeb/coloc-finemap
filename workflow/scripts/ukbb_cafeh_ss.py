@@ -1,0 +1,247 @@
+import pysam
+import pandas as pd
+import numpy as np
+import sys
+sys.path.append('/work-zfs/abattle4/karl/cosie_analysis/utils/')
+from misc import load_gtex_genotype, load_var2rsid, center_mean_impute
+from cafeh.cafeh_ss import CAFEH as CSS
+from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
+from cafeh.model_queries import summary_table, coloc_table
+
+sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
+
+COLUMNS = [
+    'tissue', 'chr', 'pos', 'ref', 'alt',
+    'rsid', 'variant_id',
+    'sample_size', 'slope', 'slope_se',
+    'S', 'z', 'zS', 'pval_nominal'
+]
+
+def cast(s):
+    try:
+        return ast.literal_eval(s)
+    except Exception:
+        return s
+
+def load_lookup():
+    df = pd.read_csv(
+        '/work-zfs/abattle4/marios/GTEx_v8/coloc/aggregate_phenotype_loci', sep='\t', header=None)
+    df.columns = ['chrom', 'start', 'end', 'rsid', 'phenotype']
+    df = df.set_index(['rsid'])
+    
+    continuous_phenotypes = [
+        'BMI', 'Diastolic_blood_pressure',
+        'Systolic_blood_pressure', 'LDL',
+        'Lipoprotein_A', 'QRS_duration', 'Ventricular_rate'
+    ]
+    df['source'] = df.phenotype.apply(lambda x: 'UKBB' if x not in continuous_phenotypes else 'UKBB_continuous')
+    return df
+
+def load_gtex_genotype2(locus, use_rsid=False):
+    """
+    load gtex genotype for variants in 1Mb window of gene tss
+    @param gene: ensemble gene id
+    @param use_rsid: boolean to convert variant id to rsid
+    """
+    lookup = load_lookup()
+    
+    d = lookup.loc[locus].to_dict()
+    d['locus'] = locus
+    gp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.raw'.format(**d)
+    v2rp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.snp2rsid'.format(**d)
+    v2r = json.load(open(v2rp, 'r'))
+
+    print('loading gtex genotypes...')
+    genotype = pd.read_csv(gp, sep=' ')
+    genotype = genotype.set_index('IID').iloc[:, 5:]
+
+    # recode genotypes
+    coded_snp_ids = np.array([x.strip() for x in genotype.columns])
+    snp_ids = {x: '_'.join(x.strip().split('_')[:-1]) for x in coded_snp_ids}
+    genotype.rename(columns=snp_ids, inplace=True)
+
+    if use_rsid:
+        genotype.rename(columns=v2r, inplace=True)
+    return genotype, v2r
+
+def load_ukbb_gwas(phenotype, locus, rel = ''):
+    header = [
+        'variant', 'chr', 'pos', 'ref', 'alt', 'rsid',
+        'varid', 'consequence', 'consequence_category',
+        'info', 'call_rate', 'AC', 'AF', 'minor_allele', 
+        'minor_AF', 'p_hwe', 'n_called', 'n_not_called',
+        'n_hom_ref', 'n_het', 'n_hom_var', 'n_non_ref',
+        
+        'r_heterozygosity', 'r_het_hom_var', 'r_expected_het_frequency',
+        'variant', 'minor_allele', 'minor_AF',
+        'low_confidence_variant', 'n_complete_samples',
+        'AC', 'ytx', 'beta', 'se', 'tstat', 'pval'
+    ]
+
+    header_cc = [
+        'variant', 'chr', 'pos', 'ref', 'alt', 'rsid',
+        'varid', 'consequence', 'consequence_category',
+        'info', 'call_rate', 'AC', 'AF', 'minor_allele', 
+        'minor_AF', 'p_hwe', 'n_called', 'n_not_called',
+        'n_hom_ref', 'n_het', 'n_hom_var', 'n_non_ref',
+        
+        'r_heterozygosity', 'r_het_hom_var', 'r_expected_het_frequency',
+        'variant', 'minor_allele', 'minor_AF', 'expected_case_minor_AC',
+        'low_confidence_variant', 'n_complete_samples',
+        'AC', 'ytx', 'beta', 'se', 'tstat', 'pval'
+    ]
+
+    ukbb = pysam.TabixFile(rel + 'output/UKBB_continuous/{}/{}.tsv.bgz'.format(phenotype, phenotype))
+    
+    lookup = load_lookup()
+    chrom = int(lookup.loc[locus].chrom[3:])
+    left = lookup.loc[locus].start
+    right = lookup.loc[locus].end
+
+    print(chrom, left, right)
+    lines = ukbb.fetch(chrom, left, right)
+
+    df = pd.DataFrame(
+        list(map(cast, x.strip().split('\t')) for x in lines),
+    )
+
+    if df.shape[1] == len(header):
+        df.columns = header
+    else:
+        df.columns = header_cc
+
+    df = df.apply(pd.to_numeric, errors='ignore')
+    df = df.loc[:,~df.columns.duplicated()]
+
+    df.beta = pd.to_numeric(df.beta, errors='coerce')
+    df.se = pd.to_numeric(df.se, errors='coerce')
+    df.tstat = pd.to_numeric(df.tstat, errors='coerce')
+    df.pval = pd.to_numeric(df.pval, errors='coerce')
+
+    df.rename(columns={
+        'varid': 'variant_id',
+        'beta': 'slope',
+        'se': 'slope_se',
+        'pval': 'pval_nominal',
+        'n_complete_samples': 'sample_size'
+    }, inplace=True)
+    df.loc[:, 'tissue'] = phenotype
+    df.loc[:, 'gene'] = gene
+    df.loc[:, 'z'] = df.slope / df.slope_se
+    df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
+    df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
+    df = df[(df.low_confidence_variant == 'false')]
+
+    df = df.loc[:, COLUMNS]
+    return df
+
+def make_table(model, gene, rsid2variant_id):
+    table = summary_table(model)
+
+    # annotate table
+    table.loc[:, 'rsid'] = table.variant_id
+    table.loc[:, 'variant_id'] = table.rsid.apply(lambda x: rsid2variant_id.get(x, 'chr0_0_A_B_n'))
+    table.loc[:, 'chr'] = table.variant_id.apply(lambda x: (x.split('_')[0]))
+    table.loc[:, 'start'] = table.variant_id.apply(lambda x: int(x.split('_')[1]))
+    table.loc[:, 'end'] = table.start + 1
+    table.loc[:, 'gene'] = gene
+
+    table = table.loc[:, ['chr', 'start', 'end', 'gene',
+                          'variant_id', 'rsid', 'study', 'pip',
+                          'top_component', 'p_active', 'pi', 'alpha',
+                          'rank', 'effect', 'effect_var']]
+    return table
+
+if __name__ == "__main__":
+    locus = snakemake.wildcards.locus
+    study = snakemake.wildcards.study
+    phenotype = snakemake.wildcards.phenotype
+
+    # load summary stats
+    rsid2variant_id = gtex.set_index('rsid').variant_id.to_dict()
+
+    if study == 'UKBB':
+        gwas = load_ukbb_gwas(phenotype, locus)
+    if study == 'UKBB_continuous':
+        gwas = load_ukbb_gwas(phenotype, locus)
+
+    # load genotype
+    gtex_genotype, v2r = load_gtex_genotype2(gene, use_rsid=True)
+    gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
+
+
+    print('{} UKBB variants'.format(gwas.rsid.unique().size))
+
+    # flip variants with swapped ref/alt alleles
+    # remove variants with mismatched ref/alt
+    print('harmonizing GWAS and GTEx')
+    a = pd.DataFrame(
+        {v: (k.split('_')[-3], k.split('_')[-2]) for k, v in v2r.items()})\
+        .T.rename(columns={0: 'ref', 1: 'alt'})
+    b = gwas[~gwas.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
+    c = pd.concat([a, b], axis=1, join='inner')
+
+    correct = (c.iloc[:, 1] == c.iloc[:, 3]) & (c.iloc[:, 0] == c.iloc[:, 2])
+    flipped = (c.iloc[:, 1] == c.iloc[:, 2]) & (c.iloc[:, 0] == c.iloc[:, 3])
+    bad = ~(correct | flipped)
+    print('Correct: {}, Flipped: {}, Bad {}'.format(correct.sum(), flipped.sum(), bad.sum()))
+
+    gwas.loc[gwas.rsid.isin(flipped[flipped].index), 'slope'] \
+        = gwas.loc[gwas.rsid.isin(flipped[flipped].index)].slope * -1
+
+    shared_variants = c[~bad].index.values
+
+    # combine summary stat
+    df = pd.concat([gtex, gwas])
+    df = df[df.rsid.isin(shared_variants)]
+
+    # reshape summary stats for CAFEH
+    B = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'slope')
+    S = df[~df.duplicated(['tissue', 'rsid'])].pivot('tissue', 'rsid', 'S')
+
+    # remove variants with missing sumstats
+    mask = ~(np.any(np.isnan(B), 0) | np.any(np.isnan(S), 0))
+    B = B.loc[:, mask]
+    S = S.loc[:, mask]
+
+    variants = B.columns.values
+    study_ids = B.index.values
+
+    print('{} intersecting, fully observed variants'.format(variants.size))
+
+    K = snakemake.params.K
+
+    if snakemake.params.zscore:
+        print('Using z scores...')
+        B = B.values / S.values
+        S = np.ones_like(B)
+    else:
+        print('Using effect sizes...')
+        B = B.values
+        S = S.values
+
+    init_args = {
+        'LD': sample_ld(gtex_genotype.loc[:, variants]),
+        'B': B,
+        'S': S,
+        'K': K,
+        'snp_ids': variants,
+        'study_ids': study_ids,
+        'tolerance': 1e-8
+    }
+    css = CSS(**init_args)
+    css.prior_activity = np.ones(K) * 0.1
+    css.weight_precision_b = np.ones_like(css.weight_precision_b) * 1
+
+    print('fitting CAFEH')
+    weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
+    fit_all(css, max_iter=30, verbose=True)
+
+    # save variant report
+    table = make_table(css, gene, rsid2variant_id)
+    table.to_csv(snakemake.output.variant_report, sep='\t', index=False)
+
+    ct = coloc_table(css, phenotype, gene=gene)
+    ct.to_csv(snakemake.output.coloc_report, sep='\t', index=False)
+
+    css.save(snakemake.output.model)
