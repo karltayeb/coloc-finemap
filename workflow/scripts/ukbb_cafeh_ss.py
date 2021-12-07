@@ -22,7 +22,7 @@ def cast(s):
     except Exception:
         return s
 
-def load_lookup():
+def load_lookup(phenotype=None):
     df = pd.read_csv(
         '/work-zfs/abattle4/marios/GTEx_v8/coloc/aggregate_phenotype_loci', sep='\t', header=None)
     df.columns = ['chrom', 'start', 'end', 'rsid', 'phenotype']
@@ -34,6 +34,8 @@ def load_lookup():
         'Lipoprotein_A', 'QRS_duration', 'Ventricular_rate'
     ]
     df['source'] = df.phenotype.apply(lambda x: 'UKBB' if x not in continuous_phenotypes else 'UKBB_continuous')
+    if phenotype is not None:
+        df = df[df.phenotype == phenotype]
     return df
 
 
@@ -47,17 +49,17 @@ def load_bim():
             4: 'ref',
             5: 'alt'})
 
-def load_gtex_genotype2(locus, use_rsid=False):
+def load_gtex_genotype2(phenotype, locus, use_rsid=False):
     """
     load gtex genotype for variants in 1Mb window of gene tss
     @param gene: ensemble gene id
     @param use_rsid: boolean to convert variant id to rsid
     """
-    lookup = load_lookup()
+    lookup = load_lookup(phenotype)
     
     d = lookup.loc[locus].to_dict()
     d['locus'] = locus
-    d['geno_source'] = snakemake.wildcards.source
+    d['geno_source'] = 'gtex'
     gp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.{geno_source}.raw'.format(**d)
     v2rp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.{geno_source}.snp2rsid'.format(**d)
     v2r = json.load(open(v2rp, 'r'))
@@ -78,7 +80,7 @@ def load_gtex_genotype2(locus, use_rsid=False):
 
 def load_phecode_gwas(phenotype, locus, rel=''):
     ukbb = pysam.TabixFile(rel + 'output/UKBB/{}/{}.tsv.bgz'.format(phenotype, phenotype))
-    lookup = load_lookup()
+    lookup = load_lookup(phenotype)
     chrom = int(lookup.loc[locus].chrom[3:])
     left = lookup.loc[locus].start
     right = lookup.loc[locus].end
@@ -160,7 +162,7 @@ def load_ukbb_gwas(phenotype, locus, rel = ''):
 
     ukbb = pysam.TabixFile(rel + 'output/UKBB_continuous/{}/{}.tsv.bgz'.format(phenotype, phenotype))
     
-    lookup = load_lookup()
+    lookup = load_lookup(phenotype)
     chrom = int(lookup.loc[locus].chrom[3:])
     left = lookup.loc[locus].start
     right = lookup.loc[locus].end
@@ -201,7 +203,6 @@ def load_ukbb_gwas(phenotype, locus, rel = ''):
 
     df = df.loc[:, COLUMNS]
     return df
-
 
 def make_table(model, locus, rsid2variant_id, bim):
     table = summary_table(model)
