@@ -63,7 +63,7 @@ rule snpid2rsid_for_gwas:
     script:
         "../../workflow/scripts/variantid2rsid.py"
 
-rule snpid2rsid_for_gwas:
+rule snpid2rsid_for_gwas_1kg:
     input:
         'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.1kg.snplist'
     output:
