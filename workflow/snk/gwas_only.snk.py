@@ -15,7 +15,7 @@ rule get_gtex_genotype_for_gwas:
         log = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.log'
     group: "g"
     params:
-        bfile = lambda w: source2bfile.get(w)
+        bfile = lambda w: source2bfile.get(w.source)
     run:
         from utils.misc import plink_get_genotype
         import subprocess
