@@ -4,6 +4,9 @@ source2bfile = {
     '1kg': '/work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
 }
 
+wildcard_constraints:
+    source="1kg|gtex"
+
 rule get_gtex_genotype_for_gwas:
     output:
         snplist = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snplist',
