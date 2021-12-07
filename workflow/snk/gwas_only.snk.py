@@ -67,7 +67,7 @@ rule fit_gwas_z_cafeh:
             'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.z.css'
     params:
         K=20,
-        zscore=True
+        zscore=True,
         zld=False
     group: 'report'
     script:
@@ -86,7 +86,7 @@ rule fit_gwas_z_cafeh:
             'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.zld.z.css'
     params:
         K=20,
-        zscore=True
+        zscore=True,
         zld=True
     group: 'report'
     script:
