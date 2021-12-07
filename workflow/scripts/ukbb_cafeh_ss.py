@@ -1,4 +1,5 @@
 import pysam
+import json
 import pandas as pd
 import numpy as np
 import sys
@@ -37,6 +38,7 @@ def load_lookup():
     df['source'] = df.phenotype.apply(lambda x: 'UKBB' if x not in continuous_phenotypes else 'UKBB_continuous')
     return df
 
+
 def load_gtex_genotype2(locus, use_rsid=False):
     """
     load gtex genotype for variants in 1Mb window of gene tss
@@ -63,6 +65,62 @@ def load_gtex_genotype2(locus, use_rsid=False):
     if use_rsid:
         genotype.rename(columns=v2r, inplace=True)
     return genotype, v2r
+
+
+def load_phecode_gwas(phenotype, locus, rel=''):
+    ukbb = pysam.TabixFile(rel + 'output/UKBB/{}/{}.tsv.bgz'.format(phenotype, phenotype))
+    lookup = load_lookup()
+    chrom = int(lookup.loc[locus].chrom[3:])
+    left = lookup.loc[locus].start
+    right = lookup.loc[locus].end
+    if phenotype in ['Uterine_polyp', 'Uterine_leiomyoma']:
+        chrom = "{0:0=2d}".format(chrom)
+
+    print(chrom, left, right)
+    #lines = ukbb.fetch(chrom, left, right)
+    lines = ukbb.fetch(chrom, 0, 1e20)
+
+    header = [
+        'CHROM', 'POS', 'ID', 'REF', 'ALT',
+        'ac', 'af', 'num_cases', 'num_controls',
+        'beta', 'sebeta', 'Tstat', 'pval', 'pval_SAIGE_NoSPA',
+        'Is_Converged', 'varT', 'varTstar']
+
+    df = pd.DataFrame(
+        list(map(cast, x.strip().split('\t')) for x in lines),
+        columns=header
+    )
+
+
+    df = df.apply(pd.to_numeric, errors='ignore')
+    df = df.loc[:,~df.columns.duplicated()]
+
+    df.beta = pd.to_numeric(df.beta, errors='coerce')
+    df.sebeta = pd.to_numeric(df.sebeta, errors='coerce')
+    df.Tstat = pd.to_numeric(df.Tstat, errors='coerce')
+    df.pval = pd.to_numeric(df.pval, errors='coerce')
+
+    df.rename(columns={
+        'CHROM': 'chr',
+        'POS': 'pos',
+        'REF': 'ref',
+        'ALT': 'alt',
+        'ID': 'rsid',
+        'beta': 'slope',
+        'sebeta': 'slope_se'
+    }, inplace=True)
+
+    # TODO: Effective Sample size?
+    df.loc[:, 'sample_size'] = df.num_cases + df.num_controls
+
+    df.loc[:, 'tissue'] = phenotype
+    df.loc[:, 'z'] = df.slope / df.slope_se
+    df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
+    df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
+
+    df = df.loc[:, COLUMNS]
+    return df
+
 
 def load_ukbb_gwas(phenotype, locus, rel = ''):
     header = [
@@ -99,7 +157,8 @@ def load_ukbb_gwas(phenotype, locus, rel = ''):
     right = lookup.loc[locus].end
 
     print(chrom, left, right)
-    lines = ukbb.fetch(chrom, left, right)
+    #lines = ukbb.fetch(chrom, left, right)
+    lines = ukbb.fetch(chrom, 0, 1e20)
 
     df = pd.DataFrame(
         list(map(cast, x.strip().split('\t')) for x in lines),
@@ -126,7 +185,6 @@ def load_ukbb_gwas(phenotype, locus, rel = ''):
         'n_complete_samples': 'sample_size'
     }, inplace=True)
     df.loc[:, 'tissue'] = phenotype
-    df.loc[:, 'gene'] = gene
     df.loc[:, 'z'] = df.slope / df.slope_se
     df.loc[:, 'zS'] = np.sqrt((df.z**2 / df.sample_size) + 1)
     df.loc[:, 'S'] = np.sqrt((df.slope**2 / df.sample_size) + df.slope_se**2)
@@ -135,7 +193,8 @@ def load_ukbb_gwas(phenotype, locus, rel = ''):
     df = df.loc[:, COLUMNS]
     return df
 
-def make_table(model, gene, rsid2variant_id):
+
+def make_table(model, locus, rsid2variant_id):
     table = summary_table(model)
 
     # annotate table
@@ -144,31 +203,29 @@ def make_table(model, gene, rsid2variant_id):
     table.loc[:, 'chr'] = table.variant_id.apply(lambda x: (x.split('_')[0]))
     table.loc[:, 'start'] = table.variant_id.apply(lambda x: int(x.split('_')[1]))
     table.loc[:, 'end'] = table.start + 1
-    table.loc[:, 'gene'] = gene
+    table.loc[:, 'sentinal_snp'] = locus
 
-    table = table.loc[:, ['chr', 'start', 'end', 'gene',
+    table = table.loc[:, ['chr', 'start', 'end', 'sentinal_snp',
                           'variant_id', 'rsid', 'study', 'pip',
                           'top_component', 'p_active', 'pi', 'alpha',
                           'rank', 'effect', 'effect_var']]
     return table
+
 
 if __name__ == "__main__":
     locus = snakemake.wildcards.locus
     study = snakemake.wildcards.study
     phenotype = snakemake.wildcards.phenotype
 
-    # load summary stats
-    rsid2variant_id = gtex.set_index('rsid').variant_id.to_dict()
-
     if study == 'UKBB':
-        gwas = load_ukbb_gwas(phenotype, locus)
+        gwas = load_phecode_gwas(phenotype, locus)
     if study == 'UKBB_continuous':
         gwas = load_ukbb_gwas(phenotype, locus)
 
     # load genotype
-    gtex_genotype, v2r = load_gtex_genotype2(gene, use_rsid=True)
+    gtex_genotype, v2r = load_gtex_genotype2(locus, use_rsid=True)
     gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
-
+    rsid2variant_id = {v: k for k, v in v2r.items()}
 
     print('{} UKBB variants'.format(gwas.rsid.unique().size))
 
@@ -192,7 +249,7 @@ if __name__ == "__main__":
     shared_variants = c[~bad].index.values
 
     # combine summary stat
-    df = pd.concat([gtex, gwas])
+    df = gwas
     df = df[df.rsid.isin(shared_variants)]
 
     # reshape summary stats for CAFEH
@@ -220,8 +277,14 @@ if __name__ == "__main__":
         B = B.values
         S = S.values
 
+    LD = np.corrcoef(
+        np.concatenate(
+            [center_mean_impute(gtex_genotype.loc[:, variants]).values, B/S]),
+        rowvar=False
+    )
+
     init_args = {
-        'LD': sample_ld(gtex_genotype.loc[:, variants]),
+        'LD': LD,
         'B': B,
         'S': S,
         'K': K,
@@ -229,6 +292,7 @@ if __name__ == "__main__":
         'study_ids': study_ids,
         'tolerance': 1e-8
     }
+
     css = CSS(**init_args)
     css.prior_activity = np.ones(K) * 0.1
     css.weight_precision_b = np.ones_like(css.weight_precision_b) * 1
@@ -238,10 +302,7 @@ if __name__ == "__main__":
     fit_all(css, max_iter=30, verbose=True)
 
     # save variant report
-    table = make_table(css, gene, rsid2variant_id)
+    table = make_table(css, locus, rsid2variant_id)
     table.to_csv(snakemake.output.variant_report, sep='\t', index=False)
-
-    ct = coloc_table(css, phenotype, gene=gene)
-    ct.to_csv(snakemake.output.coloc_report, sep='\t', index=False)
 
     css.save(snakemake.output.model)
