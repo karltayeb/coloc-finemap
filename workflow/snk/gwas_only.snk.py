@@ -71,6 +71,10 @@ rule snpid2rsid_for_gwas_1kg:
        rsid_map = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.1kg.snp2rsid'
     group: "g"
     run:
+        import pandas as pd
+        import numpy as np
+        import json
+
         rsids = pd.read_csv(input[0], header=None).values.flatten()
         snp2rsid = {v: v for v in rsids}
         np.savetxt(output[0], np.array(list(snp2rsid.values())), fmt='%s')
