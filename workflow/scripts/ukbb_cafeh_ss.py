@@ -248,8 +248,8 @@ if __name__ == "__main__":
     print('harmonizing GWAS and GTEx')
     a = bim.set_index('rsid')[['ref', 'alt']]
     b = gwas[~gwas.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
-    c = pd.concat([a, b], axis=1, join='inner')
-
+    anb = np.intersect1d(a.index, b.index)
+    c = pd.concat([a.loc[anb], b.loc[anb]], axis=1, join='inner')
     correct = (c.iloc[:, 1] == c.iloc[:, 3]) & (c.iloc[:, 0] == c.iloc[:, 2])
     flipped = (c.iloc[:, 1] == c.iloc[:, 2]) & (c.iloc[:, 0] == c.iloc[:, 3])
     bad = ~(correct | flipped)
