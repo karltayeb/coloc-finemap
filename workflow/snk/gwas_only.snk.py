@@ -103,6 +103,7 @@ rule fit_gwas_z_cafeh:
 rule fit_gwas_z_cafeh_zld:
     input:
         genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
+        bim = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.bim',
         sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
         v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'
