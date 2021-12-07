@@ -47,9 +47,9 @@ def load_gtex_genotype2(locus, use_rsid=False):
     
     d = lookup.loc[locus].to_dict()
     d['locus'] = locus
-    d['source'] = snakemake.wildcards.source
-    gp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.{source}.raw'.format(**d)
-    v2rp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'.format(**d)
+    d['geno_source'] = snakemake.wildcards.source
+    gp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.{geno_source}.raw'.format(**d)
+    v2rp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.{geno_source}.snp2rsid'.format(**d)
     v2r = json.load(open(v2rp, 'r'))
 
     print('loading gtex genotypes...')
