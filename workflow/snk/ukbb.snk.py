@@ -1,39 +1,9 @@
-# eQTL gene
-
-rule download_eqtlgen:
-    output:
-        'output/eQTLGEN/eQTLGEN.txt.gz'
-    run:
-     shell('wget https://molgenis26.gcc.rug.nl/downloads/eqtlgen/cis-eqtl/cis-eQTLs_full_20180905.txt.gz -O {output}')
-     # zcat eQTLGEN.txt.gz | awk '{print > "chr"$3"_eQTLGEN.tsv"}'
-
-rule eqtlgen_build_index:
-    input:
-        'output/eQTLGEN/eQTLGEN.txt.gz'
-    output:
-        sumstats='output/eQTLGEN/eQTLGEN/eQTLGEN.tsv.bgz',
-        tabix_index='output/eQTLGEN/eQTLGEN/eQTLGEN.tsv.bgz.tbi'
-    run:
-        shell("paste <(zcat {input.var}) <(zcat {input.sumstats_raw}) | bgzip > {output.sumstats}")
-        shell("tabix -s 2 -b 3 -e 3 -S 1 {output.sumstats}")
-
-rule run_eqtlgen_x_gtex:
-    input:
-        'output/eQTLGEN/{chr}_eQTLGEN.tsv'
-    output:
-        attempted_genes_path = 'output/eQTLGEN/eQTLGEN/{chr}/{chr}_attempted_genes.txt',
-        variant_report_path = 'output/eQTLGEN/eQTLGEN/{chr}/{chr}_variant_report.txt',
-        active_path = 'output/eQTLGEN/eQTLGEN/{chr}/{chr}_p_active.txt',
-        error_path = 'output/eQTLGEN/eQTLGEN/{chr}/{chr}_error.txt',
-    notebook:
-        "notebooks/final_analysis/eQTLgen.ipynb"
-
 # UKBB_continuous
 
 rule download_ukbb_pheno:
     input:
-        manifest='output/UKBB_continuous/manifest.txt',
-        pheno2manifest='output/UKBB_continuous/pheno2manifest'
+        manifest='data/UKBB_continuous_manifest.txt',
+        pheno2manifest='data/UKBB_continuous_pheno2manifest.txt'
     output:
         temp_sumstats='output/UKBB_continuous/{phenotype}/_{phenotype}.tsv.bgz'
     run:
