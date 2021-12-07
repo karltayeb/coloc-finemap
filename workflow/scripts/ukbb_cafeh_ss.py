@@ -294,6 +294,7 @@ if __name__ == "__main__":
         S = S.values
 
     if snakemake.params.zld:
+        print('using zscore corrected LD...')
         LD = np.corrcoef(
             np.concatenate(
                 [center_mean_impute(gtex_genotype.loc[:, variants]).values, B/S]),
