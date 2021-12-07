@@ -234,17 +234,19 @@ if __name__ == "__main__":
     # load genotype
     gtex_genotype, v2r = load_gtex_genotype2(locus, use_rsid=True)
     bim = load_bim()
+
     gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
     rsid2variant_id = {v: k for k, v in v2r.items()}
+    bim['rsid'] = bim.variant_id.apply(lambda x: v2r.get(x, '-'))
+    bim = bim[bim.rsid != '-']
 
     print('{} UKBB variants'.format(gwas.rsid.unique().size))
+    print('{} reference variants'.format(bim.rsid.unique().size))
 
     # flip variants with swapped ref/alt alleles
     # remove variants with mismatched ref/alt
     print('harmonizing GWAS and GTEx')
-    a = pd.DataFrame(
-        {v: (k.split('_')[-3], k.split('_')[-2]) for k, v in v2r.items()})\
-        .T.rename(columns={0: 'ref', 1: 'alt'})
+    a = bim.set_index('rsid')[['ref', 'alt']]
     b = gwas[~gwas.rsid.duplicated()].set_index('rsid').loc[:, ['ref', 'alt']]
     c = pd.concat([a, b], axis=1, join='inner')
 
