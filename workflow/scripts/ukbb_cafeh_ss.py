@@ -9,8 +9,6 @@ from cafeh.cafeh_ss import CAFEH as CSS
 from cafeh.fitting import weight_ard_active_fit_procedure, fit_all
 from cafeh.model_queries import summary_table, coloc_table
 
-sample_ld = lambda g: np.corrcoef(center_mean_impute(g), rowvar=False)
-
 COLUMNS = [
     'tissue', 'chr', 'pos', 'ref', 'alt',
     'rsid', 'variant_id',
@@ -50,8 +48,8 @@ def load_gtex_genotype2(locus, use_rsid=False):
     d = lookup.loc[locus].to_dict()
     d['locus'] = locus
     d['source'] = snakemake.wildcards.source
-    gp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.raw'.format(**d)
-    v2rp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.snp2rsid'.format(**d)
+    gp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.{source}.raw'.format(**d)
+    v2rp = 'output/GWAS_only/{source}/{phenotype}/{chrom}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'.format(**d)
     v2r = json.load(open(v2rp, 'r'))
 
     print('loading gtex genotypes...')
