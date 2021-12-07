@@ -1,12 +1,17 @@
+
+source2bfile = {
+    'gtex': '/work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes',
+    '1kg': '/work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
+}
+
 rule get_gtex_genotype_for_gwas:
     output:
-        snplist = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.snplist',
-        genotype = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.raw',
-        log = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.log'
+        snplist = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snplist',
+        genotype = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
+        log = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.log'
     group: "g"
     params:
-        bfile = '/work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
-        #bfile = '/work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
+        bfile = lambda w: source2bfile.get(w)
     run:
         from utils.misc import plink_get_genotype
         import subprocess
@@ -45,10 +50,10 @@ rule get_gtex_genotype_for_gwas:
 
 rule snpid2rsid_for_gwas:
     input:
-        'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.snplist'
+        'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snplist'
     output:
-       rsids = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.rsids',
-       rsid_map = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.snp2rsid'
+       rsids = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.rsids',
+       rsid_map = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'
     group: "g"
     script:
         "../../workflow/scripts/variantid2rsid.py"
@@ -56,15 +61,15 @@ rule snpid2rsid_for_gwas:
 
 rule fit_gwas_z_cafeh:
     input:
-        genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.raw',
+        genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
         sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
-        v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.snp2rsid'
+        v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'
     output:
         variant_report=\
-            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.z.variant_report',
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.z.variant_report',
         model=\
-            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.z.css'
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.z.css'
     params:
         K=20,
         zscore=True,
@@ -75,15 +80,15 @@ rule fit_gwas_z_cafeh:
 
 rule fit_gwas_z_cafeh_zld:
     input:
-        genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.raw',
+        genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
         sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
-        v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.snp2rsid'
+        v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'
     output:
         variant_report=\
-            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.zld.z.variant_report',
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.zld.z.variant_report',
         model=\
-            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.zld.z.css'
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.zld.z.css'
     params:
         K=20,
         zscore=True,
