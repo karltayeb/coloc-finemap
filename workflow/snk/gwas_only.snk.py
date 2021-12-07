@@ -9,7 +9,8 @@ wildcard_constraints:
 
 rule get_gtex_genotype_for_gwas:
     output:
-        snplist = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snplist',
+        snplist = \
+        'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snplist',
         genotype = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
         log = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.log'
     group: "g"
@@ -46,7 +47,8 @@ rule get_gtex_genotype_for_gwas:
             return cmd
 
         lookup = load_lookup()
-        cmd = plink_get_genotype_gwas_only(lookup, params.bfile, output.genotype[:-4])
+        q = len(params.source) + 5
+        cmd = plink_get_genotype_gwas_only(lookup, params.bfile, output.genotype[:-q])
         print(cmd)
         shell(cmd)
         print('PLINK FINISHED RUNNING?')
