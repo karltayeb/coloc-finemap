@@ -41,9 +41,9 @@ def load_bim():
     return pd.read_csv(snakemake.input.bim, sep = '\t', header=None)\
         .rename(columns={
             0: 'chrom',
-            1:'variant_id',
-            2:'cm',
-            3:'bp',
+            1: 'variant_id',
+            2: 'cm',
+            3: 'pos',
             4: 'ref',
             5: 'alt'})
 
@@ -203,16 +203,16 @@ def load_ukbb_gwas(phenotype, locus, rel = ''):
     return df
 
 
-def make_table(model, locus, rsid2variant_id):
+def make_table(model, locus, rsid2variant_id, bim):
     table = summary_table(model)
 
     # annotate table
-    table.loc[:, 'rsid'] = table.variant_id
-    table.loc[:, 'variant_id'] = table.rsid.apply(lambda x: rsid2variant_id.get(x, 'chr0_0_A_B_n'))
-    table.loc[:, 'chr'] = table.variant_id.apply(lambda x: (x.split('_')[0]))
-    table.loc[:, 'start'] = table.variant_id.apply(lambda x: int(x.split('_')[1]))
-    table.loc[:, 'end'] = table.start + 1
-    table.loc[:, 'sentinal_snp'] = locus
+    table['rsid'] = table.variant_id
+    table['variant_id'] = table.rsid.apply(lambda x: rsid2variant_id.get(x, 'chr0_0_A_B_n'))
+    table['chr'] = bim.set_index('rsid').loc[table.rsid].chrom # table.variant_id.apply(lambda x: (x.split('_')[0]))
+    table['start'] = bim.set_index('rsid').loc[table.rsid].pos #table.variant_id.apply(lambda x: int(x.split('_')[1]))
+    table['end'] = table.start + 1
+    table['sentinal_snp'] = locus
 
     table = table.loc[:, ['chr', 'start', 'end', 'sentinal_snp',
                           'variant_id', 'rsid', 'study', 'pip',
