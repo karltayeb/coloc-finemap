@@ -320,7 +320,7 @@ if __name__ == "__main__":
     fit_all(css, max_iter=30, verbose=True)
 
     # save variant report
-    table = make_table(css, locus, rsid2variant_id)
+    table = make_table(css, locus, rsid2variant_id, bim)
     table.to_csv(snakemake.output.variant_report, sep='\t', index=False)
 
     css.save(snakemake.output.model)
