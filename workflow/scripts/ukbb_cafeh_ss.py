@@ -235,9 +235,10 @@ if __name__ == "__main__":
 
     # load genotype
     gtex_genotype, v2r = load_gtex_genotype2(phenotype, locus, use_rsid=True)
-    bim = load_bim()
     gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
     rsid2variant_id = {v: k for k, v in v2r.items()}
+    
+    bim = load_bim()
     bim['rsid'] = bim.variant_id.apply(lambda x: v2r.get(x, '-'))
     bim = bim[bim.rsid != '-']
 
