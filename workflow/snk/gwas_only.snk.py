@@ -15,9 +15,9 @@ rule get_gtex_genotype_for_gwas:
             df = df.set_index(['chrom', 'rsid'])
             return df
 
-        def plink_get_genotype_gwas_only(bfile, save_path):
-            chrom = path.split('/')[-3]
-            rsid = path.split('/')[-2]
+        def plink_get_genotype_gwas_only(lookup, bfile, save_path):
+            chrom = save_path.split('/')[-3]
+            rsid = save_path.split('/')[-2]
             start, end = lookup.loc[(chrom, rsid)].values[0][:2]
 
             cmd = ' '.join(
@@ -36,7 +36,7 @@ rule get_gtex_genotype_for_gwas:
 
         lookup = load_lookup()
         gtex_bfile = '/work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        cmd = plink_get_genotype(lookup, gtex_bfile, output.genotype[:-4])
+        cmd = plink_get_genotype_gwas_only(lookup, gtex_bfile, output.genotype[:-4])
         print(cmd)
         #subprocess.run(cmd, shell=True)
         shell(cmd)
@@ -61,7 +61,7 @@ rule fit_gwas_z_cafeh:
         v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.snp2rsid'
     output:
         variant_report=\
-            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.z.variant_report'
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.z.variant_report',
         model=\
             'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.z.css'
     params:
