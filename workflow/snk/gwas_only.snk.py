@@ -13,6 +13,7 @@ rule get_gtex_genotype_for_gwas:
         'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snplist',
         genotype = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
         log = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.log'
+        bim = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.bim'
     group: "g"
     params:
         bfile = lambda w: source2bfile.get(w.source)
@@ -54,18 +55,31 @@ rule get_gtex_genotype_for_gwas:
 
 rule snpid2rsid_for_gwas:
     input:
-        'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snplist'
+        'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.gtex.snplist'
     output:
-       rsids = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.rsids',
-       rsid_map = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'
+       rsids = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.gtex.rsids',
+       rsid_map = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.gtex.snp2rsid'
     group: "g"
     script:
         "../../workflow/scripts/variantid2rsid.py"
 
+rule snpid2rsid_for_gwas:
+    input:
+        'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.1kg.snplist'
+    output:
+       rsids = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.1kg.rsids',
+       rsid_map = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.1kg.snp2rsid'
+    group: "g"
+    run:
+        rsids = pd.read_csv(input[0], header=None).values.flatten()
+        snp2rsid = {v: v for v in rsids}
+        np.savetxt(output[0], np.array(list(snp2rsid.values())), fmt='%s')
+        json.dump(snp2rsid, open(output[1], 'w'))
 
 rule fit_gwas_z_cafeh:
     input:
         genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
+        genotype_bim = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.bim'
         sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
         v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'

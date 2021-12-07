@@ -37,6 +37,16 @@ def load_lookup():
     return df
 
 
+def load_bim():
+    return pd.read_csv(snakemake.input.bim, sep = '\t', header=None)\
+        .rename(columns={
+            0: 'chrom',
+            1:'variant_id',
+            2:'cm',
+            3:'bp',
+            4: 'ref',
+            5: 'alt'})
+
 def load_gtex_genotype2(locus, use_rsid=False):
     """
     load gtex genotype for variants in 1Mb window of gene tss
@@ -223,6 +233,7 @@ if __name__ == "__main__":
 
     # load genotype
     gtex_genotype, v2r = load_gtex_genotype2(locus, use_rsid=True)
+    bim = load_bim()
     gtex_genotype = gtex_genotype.loc[:,~gtex_genotype.columns.duplicated()]
     rsid2variant_id = {v: k for k, v in v2r.items()}
 
