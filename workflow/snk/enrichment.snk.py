@@ -6,10 +6,9 @@ rule get_tissue_expressed_genes_bed:
         import numpy as np
 
         tissue = wildcards.tissue
-        expression_path = '/work-zfs/abattle4/lab_data/GTEx_v8/ciseQTL/'\
-            'GTEx_Analysis_v8_eQTL_expression_matrices/{}.v8.normalized_expression.bed.gz'.format(tissue)
+        expression_path = config['gtex_expression'] + '{}.v8.normalized_expression.bed.gz'.format(tissue)
 
-        gencode_path = '/work-zfs/abattle4/lab_data/annotation/gencode.v26/gencode.v26.annotation.gene.txt'
+        gencode_path = 'data/gencode.v26.annotation.gene.txt'
 
         print('load data')
         gencode = pd.read_csv(gencode_path, sep='\t')
@@ -43,7 +42,7 @@ rule get_tissue_variant_gene_bank:
         'output/GTEx/enrichment/bank/{tissue}.bank.bed'
     run:
         import subprocess
-        cmd = "bedtools closest -a output/GTEx/GTEx.afreq.ldscore.bed -b {input} -d "\
+        cmd = "bedtools closest -a data/GTEx.afreq.ldscore.bed -b {input} -d "\
             "| awk \' BEGIN {{FS = \"\\t\"}}; {{print $1, $2, $3, $4, $5, $10, $12, $13, $14, $15,$15* $16}}\' > {output}"
         cmd = cmd.format(input=input[0], output=output[0])
         print(cmd)
