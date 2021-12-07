@@ -4,6 +4,9 @@ rule get_gtex_genotype_for_gwas:
         genotype = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.raw',
         log = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.log'
     group: "g"
+    params:
+        bfile = '/work-zfs/abattle4/marios/annotations/1kG_plink/1000G_hg38_plink_merged'
+        #bfile = '/work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
     run:
         from utils.misc import plink_get_genotype
         import subprocess
@@ -35,10 +38,8 @@ rule get_gtex_genotype_for_gwas:
             return cmd
 
         lookup = load_lookup()
-        gtex_bfile = '/work-zfs/abattle4/marios/GTEx_v8/coloc/GTEx_all_genotypes'
-        cmd = plink_get_genotype_gwas_only(lookup, gtex_bfile, output.genotype[:-4])
+        cmd = plink_get_genotype_gwas_only(lookup, params.bfile, output.genotype[:-4])
         print(cmd)
-        #subprocess.run(cmd, shell=True)
         shell(cmd)
         print('PLINK FINISHED RUNNING?')
 
@@ -67,6 +68,26 @@ rule fit_gwas_z_cafeh:
     params:
         K=20,
         zscore=True
+        zld=False
+    group: 'report'
+    script:
+        '../../workflow/scripts/ukbb_cafeh_ss.py'
+
+rule fit_gwas_z_cafeh:
+    input:
+        genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.raw',
+        sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
+        tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
+        v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.snp2rsid'
+    output:
+        variant_report=\
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.zld.z.variant_report',
+        model=\
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.zld.z.css'
+    params:
+        K=20,
+        zscore=True
+        zld=True
     group: 'report'
     script:
         '../../workflow/scripts/ukbb_cafeh_ss.py'

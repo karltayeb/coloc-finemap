@@ -277,11 +277,17 @@ if __name__ == "__main__":
         B = B.values
         S = S.values
 
-    LD = np.corrcoef(
-        np.concatenate(
-            [center_mean_impute(gtex_genotype.loc[:, variants]).values, B/S]),
-        rowvar=False
-    )
+    if snakemake.params.zld = True:
+        LD = np.corrcoef(
+            np.concatenate(
+                [center_mean_impute(gtex_genotype.loc[:, variants]).values, B/S]),
+            rowvar=False
+        )
+    else:
+        LD = np.corrcoef(
+            center_mean_impute(gtex_genotype.loc[:, variants]).values,
+            rowvar=False
+        )
 
     init_args = {
         'LD': LD,
