@@ -259,6 +259,8 @@ if __name__ == "__main__":
         = gwas.loc[gwas.rsid.isin(flipped[flipped].index)].slope * -1
 
     shared_variants = c[~bad].index.values
+    shared_variants = np.intersect1d(gtex_genotype.columns, shared_variants)
+    shared_variants = np.intersect1d(b.index, shared_variants)
 
     # combine summary stat
     df = gwas
