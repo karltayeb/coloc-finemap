@@ -11,6 +11,7 @@ include: 'workflow/snk/cafeh.snk.py'
 include: 'workflow/snk/ukbb.snk.py'
 include: 'workflow/snk/enrichment.snk.py'
 include: 'workflow/snk/terminal_rules.snk.py'
+include: 'workflow/snk/gwas_only.snk.py'
 
 #include: 'workflow/snk/caviar.snk.py'
 #include: 'workflow/snk/coloc.snk.py'
