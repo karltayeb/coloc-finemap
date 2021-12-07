@@ -41,7 +41,7 @@ rule get_gtex_genotype_for_gwas:
                  '--maf', '0.01',
                  '--geno', '0.1',
                  '--recode', 'A',
-                 '--keep-allele-order',
+                 '--keep-allele-order', '--make-bed',
                  '--snps-only', '--write-snplist', '--allow-no-sex',
                  '--out', save_path])
             return cmd
