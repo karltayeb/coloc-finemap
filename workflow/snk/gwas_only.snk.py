@@ -47,7 +47,7 @@ rule get_gtex_genotype_for_gwas:
             return cmd
 
         lookup = load_lookup()
-        q = len(params.source) + 5
+        q = len(params.bfile) + 5
         print(params.bfile)
         print(output.genotype[:-q])
         cmd = plink_get_genotype_gwas_only(lookup, params.bfile, output.genotype[:-q])
