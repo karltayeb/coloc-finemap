@@ -83,7 +83,7 @@ rule snpid2rsid_for_gwas_1kg:
 rule fit_gwas_z_cafeh:
     input:
         genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
-        genotype_bim = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.bim',
+        bim = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.bim',
         sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
         tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
         v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'
