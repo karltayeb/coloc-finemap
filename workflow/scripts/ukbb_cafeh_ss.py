@@ -205,12 +205,13 @@ def load_ukbb_gwas(phenotype, locus, rel = ''):
 
 def make_table(model, locus, rsid2variant_id, bim):
     table = summary_table(model)
+    bim = bim[~bim.rsid.duplicated()].set_index('rsid')
 
     # annotate table
     table['rsid'] = table.variant_id
     table['variant_id'] = table.rsid.apply(lambda x: rsid2variant_id.get(x, 'chr0_0_A_B_n'))
-    table['chr'] = bim.set_index('rsid').loc[table.rsid].chrom # table.variant_id.apply(lambda x: (x.split('_')[0]))
-    table['start'] = bim.set_index('rsid').loc[table.rsid].pos #table.variant_id.apply(lambda x: int(x.split('_')[1]))
+    table['chr'] = bim.loc[table.rsid].chrom # table.variant_id.apply(lambda x: (x.split('_')[0]))
+    table['start'] = bim.loc[table.rsid].pos #table.variant_id.apply(lambda x: int(x.split('_')[1]))
     table['end'] = table.start + 1
     table['sentinal_snp'] = locus
 
