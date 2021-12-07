@@ -73,7 +73,7 @@ rule fit_gwas_z_cafeh:
     script:
         '../../workflow/scripts/ukbb_cafeh_ss.py'
 
-rule fit_gwas_z_cafeh:
+rule fit_gwas_z_cafeh_zld:
     input:
         genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.raw',
         sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
