@@ -27,7 +27,7 @@ rule download_ukbb_pheno:
 
 rule ukbb_build_index:
     input:
-        var='output/UKBB_continuous/variants.tsv.bgz',
+        var='data/UKBB_continuous_variants.tsv.bgz',
         sumstats_raw='output/UKBB_continuous/{phenotype}/_{phenotype}.tsv.bgz'
     output:
         sumstats='output/UKBB_continuous/{phenotype}/{phenotype}.tsv.bgz',
