@@ -277,7 +277,7 @@ if __name__ == "__main__":
         B = B.values
         S = S.values
 
-    if snakemake.params.zld = True:
+    if snakemake.params.zld:
         LD = np.corrcoef(
             np.concatenate(
                 [center_mean_impute(gtex_genotype.loc[:, variants]).values, B/S]),
