@@ -284,6 +284,9 @@ def load_grasp_gwas(phenotype, gene, rel=''):
     return df
 
 
+def load_eqtlgen_gwas(phenotype, gene, rel=''):
+    pass
+
 def load_gtex_associations(gene, rel=''):
     """
     ap = '/work-zfs/abattle4/karl/cosie_analysis/output/GTEx/{}/{}/{}.associations'.format(
@@ -351,6 +354,8 @@ if __name__ == "__main__":
         gwas = load_cad_gwas(gene)
     if study == 'GRASP':
         gwas = load_grasp_gwas(phenotype, gene)
+    if study == 'EQTLGEN':
+        gwas = load_grasp_gwas(gene)
 
     # load genotype
     gtex_genotype = load_gtex_genotype(gene, use_rsid=True)

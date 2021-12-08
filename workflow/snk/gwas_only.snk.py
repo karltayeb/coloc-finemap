@@ -76,6 +76,7 @@ rule snpid2rsid_for_gwas_1kg:
         import json
 
         rsids = pd.read_csv(input[0], header=None).values.flatten()
+
         snp2rsid = {v: v for v in rsids}
         np.savetxt(output[0], np.array(list(snp2rsid.values())), fmt='%s')
         json.dump(snp2rsid, open(output[1], 'w'))
@@ -119,3 +120,16 @@ rule fit_gwas_z_cafeh_zld:
     group: 'report'
     script:
         '../../workflow/scripts/ukbb_cafeh_ss.py'
+
+rule proc_data_for_susie:
+    input:
+        genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
+        bim = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.bim',
+        sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
+        tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
+        v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'
+    output:
+        z='output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.z',
+        X='output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.X'
+    script:
+        '../../workflow/scripts/prep_data_for_susie_rss.py'
