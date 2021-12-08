@@ -111,12 +111,12 @@ rule fit_gwas_z_cafeh_K:
         v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'
     output:
         variant_report=\
-            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.K{K}.z.variant_report',
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.K{K}.v{v}.z.variant_report',
         model=\
-            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.K{K}.z.css'
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.K{K}.v{v}.z.css'
     params:
         K = lambda w: int(w.K),
-        prior_variance=1,
+        prior_variance = lambda w: int(w.v),
         zscore=True,
         zld=False
     group: 'report'
