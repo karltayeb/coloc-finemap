@@ -305,11 +305,13 @@ if __name__ == "__main__":
             rowvar=False
         )
 
+    K = snakemake.params.K
+
     init_args = {
         'LD': LD,
         'B': B,
         'S': S,
-        'K': snakemake.params.K,
+        'K': K,
         'snp_ids': variants,
         'study_ids': study_ids,
         'tolerance': 1e-8
