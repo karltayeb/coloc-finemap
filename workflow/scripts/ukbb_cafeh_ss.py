@@ -282,8 +282,6 @@ if __name__ == "__main__":
 
     print('{} intersecting, fully observed variants'.format(variants.size))
 
-    K = snakemake.params.K
-
     if snakemake.params.zscore:
         print('Using z scores...')
         B = B.values / S.values
@@ -301,6 +299,7 @@ if __name__ == "__main__":
             rowvar=False
         )
     else:
+        print('using reference LD...')
         LD = np.corrcoef(
             center_mean_impute(gtex_genotype.loc[:, variants]).values,
             rowvar=False
@@ -310,7 +309,7 @@ if __name__ == "__main__":
         'LD': LD,
         'B': B,
         'S': S,
-        'K': K,
+        'K': snakemake.params.K,
         'snp_ids': variants,
         'study_ids': study_ids,
         'tolerance': 1e-8
@@ -318,11 +317,11 @@ if __name__ == "__main__":
 
     css = CSS(**init_args)
     css.prior_activity = np.ones(K) * 0.1
-    css.weight_precision_b = np.ones_like(css.weight_precision_b) * 1
+    css.weight_precision_b = np.ones_like(css.weight_precision_b) * snakemake.params.prior_variance
 
     print('fitting CAFEH')
-    weight_ard_active_fit_procedure(css, max_iter=10, verbose=True)
-    fit_all(css, max_iter=30, verbose=True)
+    weight_ard_active_fit_procedure(css, max_iter=10, verbose=False)
+    fit_all(css, max_iter=500, verbose=False)
 
     # save variant report
     table = make_table(css, locus, rsid2variant_id, bim)
