@@ -95,6 +95,28 @@ rule fit_gwas_z_cafeh:
             'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.z.css'
     params:
         K=20,
+        prior_variance=1,
+        zscore=True,
+        zld=False
+    group: 'report'
+    script:
+        '../../workflow/scripts/ukbb_cafeh_ss.py'
+
+rule fit_gwas_z_cafeh_K:
+    input:
+        genotype_gtex = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.raw',
+        bim = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.bim',
+        sumstats='output/{study}/{phenotype}/{phenotype}.tsv.bgz',
+        tabix_index='output/{study}/{phenotype}/{phenotype}.tsv.bgz.tbi',
+        v2r = 'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.snp2rsid'
+    output:
+        variant_report=\
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.K{K}.z.variant_report',
+        model=\
+            'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.K{K}.z.css'
+    params:
+        K = lambda w: int(w.K),
+        prior_variance=1,
         zscore=True,
         zld=False
     group: 'report'
@@ -114,7 +136,8 @@ rule fit_gwas_z_cafeh_zld:
         model=\
             'output/GWAS_only/{study}/{phenotype}/{chr}/{locus}/{phenotype}.{locus}.{source}.zld.z.css'
     params:
-        K=20,
+        K=10,
+        prior_variance=1,
         zscore=True,
         zld=True
     group: 'report'
